@@ -1,0 +1,77 @@
+<ion-header>
+
+  <ion-navbar color="custom-color">
+    <ion-title>Crear Idea</ion-title>
+    <ion-buttons start>
+      <button ion-button (click)="cancel()">
+        <span color="primary" showWhen="ios">
+          Cancel
+        </span>
+        <ion-icon name="md-close" showWhen="android,windows"></ion-icon>
+      </button>
+    </ion-buttons>
+    <ion-buttons end>
+      <button ion-button (click)="done()" [disabled]="!isReadyToSave" strong>
+        <span color="primary" showWhen="ios">
+          Done
+        </span>
+        <ion-icon name="md-checkmark" showWhen="core,android,windows"></ion-icon>
+      </button>
+    </ion-buttons>    
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content padding>
+  <form *ngIf="form" [formGroup]="form" >    
+    <ion-list>
+      <ion-item>
+        <ion-label floating> Título </ion-label>
+        <ion-input type="text" formControlName="title"></ion-input>
+      </ion-item>
+      
+      <ion-item>
+        <ion-label floating> Descripción </ion-label>
+        <ion-textarea type="text" formControlName="description"></ion-textarea>
+      </ion-item>
+      
+      <ion-item>
+        <ion-label> Categoría </ion-label>
+        <ion-select formControlName="campaign_id" cancelText="Cancelar">
+          <ion-option *ngFor="let campaign of campaigns" value="{{ campaign.id }}">
+              {{ campaign.name }}
+          </ion-option>
+        </ion-select>
+      </ion-item>  
+
+      <ion-item>        
+        <ion-label> Lugar </ion-label>        
+        <ion-select formControlName="location_id" cancelText="Cancelar">         
+          <ion-option *ngFor="let location of locations" value="{{ location.id }}">
+              {{ location.name }}
+          </ion-option>                                                                                          
+        </ion-select>
+      </ion-item>
+
+      <ion-item>
+        <!-- <ion-label>No sabes dónde te encuentras?</ion-label> -->
+        <button ion-button color="custom-color" clear (click)="getCurrentLocation()">
+          <ion-icon ios="ios-pin" md="md-pin"></ion-icon>
+          &nbsp;Usar mi ubicación actual 
+        </button>
+      </ion-item>
+    </ion-list>
+
+    <!--<input type="file" #fileInput style="visibility: hidden; height: 0px" name="files[]" (change)="processWebImage($event)" />
+    <div class="profile-image-wrapper" (click)="getPicture()">
+      <div class="profile-image-placeholder" *ngIf="!this.form.controls.profilePic.value">
+        <ion-icon name="add"></ion-icon>
+        <div>
+          {{ 'ITEM_CREATE_CHOOSE_IMAGE' }}
+        </div>
+      </div>
+      <div class="profile-image" [style.backgroundImage]="getProfileImageStyle()" *ngIf="this.form.controls.profilePic.value"></div>
+    </div>    -->
+  </form>
+</ion-content>

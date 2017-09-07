@@ -1,0 +1,8 @@
+{
+  "name": "swipeable-tabs",
+  "app_id": "523f61f0",
+  "type": "ionic-angular",
+  "integrations": {
+    "cordova": {}
+  }
+}

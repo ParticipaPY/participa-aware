@@ -1,0 +1,33 @@
+ <ion-menu [content]="content" [swipeEnabled]=true>
+
+  <!-- <ion-header>
+    <ion-toolbar color="custom-color">
+      <ion-title>Participa</ion-title>
+    </ion-toolbar>
+  </ion-header> -->
+
+  <ion-content class="side-menu-gradient">
+    <div class="profile-image"> 
+        <img src='assets/img/blank_profile.png'>
+        <h2 style="text-align: center; color: white;"> {{ account.name }} </h2>
+        <h3 style="text-align: center; color: white; font-size: 1.2rem;"> {{ account.email }} </h3>
+    </div>
+    <ion-list no-lines>
+      <!-- <button class="side-menu-item" ion-item *ngFor="let p of pages" (click)="openPage(p)">
+        {{p.title}}
+      </button> -->
+      <ion-item class="side-menu-item">
+        <ion-icon name="person" item-start></ion-icon>
+          Mi Perfil
+      </ion-item>
+
+      <button ion-item class="side-menu-item" (click)="logOut()">
+        <ion-icon name="exit" item-start></ion-icon>
+          Salir
+      </button>        
+    </ion-list>
+  </ion-content>
+
+</ion-menu> 
+
+<ion-nav [root]="rootPage" [rootParams]="rootParams" #content></ion-nav>

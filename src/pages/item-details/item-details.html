@@ -1,0 +1,88 @@
+<ion-header>
+  <ion-navbar color="custom-color">
+    <!--<button menuToggle *ngIf="!selectedItem">
+      <ion-icon name="menu"></ion-icon>
+    </button>-->
+    <ion-title>{{ selectedItem.title }}</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content>
+  <ion-card>
+    <ion-item text-wrap>
+      <ion-avatar item-start>
+        <img *ngIf="selectedItem.image" [src]="selectedItem.image">
+        <img *ngIf="!selectedItem.image" src='assets/img/blank_profile.png'>
+      </ion-avatar>
+      <h2>{{ selectedItem.title }}</h2>
+      <h3>{{ selectedItem.author }}</h3>      
+      <!-- <p>{{ selectedItem.date }}</p> -->
+    </ion-item>
+
+    <ion-card-content>
+      <p>{{ selectedItem.description }}</p>
+    </ion-card-content>
+
+    <ion-row>
+      <ion-col>
+        <button *ngIf="selectedItem.voted_up != 1" ion-button color="light-gray" clear small icon-left (click)="voteUp(selectedItem)">
+          <ion-icon name='thumbs-up'></ion-icon>
+          {{ selectedItem.votes_up }}
+        </button>
+        <button *ngIf="selectedItem.voted_up == 1" ion-button color="custom-color" clear small icon-left (click)="deleteVoteUp(selectedItem)">
+          <ion-icon name='thumbs-up'></ion-icon>
+          {{ selectedItem.votes_up }}
+        </button>          
+      </ion-col>
+      <ion-col>
+        <button *ngIf="selectedItem.voted_down != 1" ion-button color="light-gray" clear small icon-left (click)="voteDown(selectedItem)">
+          <ion-icon name='thumbs-down'></ion-icon>
+          {{ selectedItem.votes_down }}
+        </button>
+        <button *ngIf="selectedItem.voted_down == 1" ion-button color="custom-color" clear small icon-left (click)="deleteVoteDown(selectedItem)">
+          <ion-icon name='thumbs-down'></ion-icon>
+          {{ selectedItem.votes_down }}
+        </button> 
+      </ion-col>      
+      <ion-col>
+        <button ion-button color="light-gray" clear small icon-left>
+            <ion-icon name='text'></ion-icon>
+            {{ selectedItem.comments }}
+          </button>
+      </ion-col>
+    </ion-row>
+  </ion-card>
+  
+  <ion-label style="text-align:center;" *ngIf="selectedItem.comments > 0">Comentarios</ion-label>
+  <ion-list>
+    <button detail-none (click)="expandItem(item)" ion-item *ngFor="let item of comments">
+      <ion-avatar item-start>
+        <!--<ion-icon name="{{item.icon}}" item-left></ion-icon>-->
+        <img *ngIf="item.image" [src]="item.image">
+        <img *ngIf="!item.image" src='assets/img/blank_profile.png'>
+      </ion-avatar>
+      <h2>{{ item.author }}</h2>
+      <!-- <p>{{ item.date }}</p> -->
+      <p *ngIf="!item.expanded">{{ item.description }}</p>
+      <expandable [expandHeight]="itemExpandHeight" [expanded]="item.expanded" text-wrap>
+        <p> {{ item.description }} </p>
+      </expandable>
+    </button>
+  </ion-list>
+ 
+</ion-content>
+
+<ion-footer>
+  <ion-grid>
+    <ion-row align-items-end>
+      <ion-col col-10>
+        <ion-textarea style="border-radius: 25px;" type="text" placeholder="Escribe un comentario" [(ngModel)]="comment"></ion-textarea>
+      </ion-col>
+      <ion-col col-2 align-self-center>
+        <button  ion-button icon-only color="custom-color" type="button" item-right (click)="createComment()" *ngIf="comment.length > 0">
+          <ion-icon ios="ios-send" md="md-send"></ion-icon>
+        </button>
+      </ion-col>
+    </ion-row>
+  </ion-grid> 
+</ion-footer> 

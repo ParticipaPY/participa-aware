@@ -1,0 +1,92 @@
+page-hello-ionic {
+  .splash-bg {
+    position: relative;
+    background: url('../assets/img/vallejo_header.jpg') no-repeat transparent;
+    background-size: cover;
+    height: 35%;
+    z-index: 1;
+    background-repeat: repeat-x;
+    animation: animatedBackground 40s linear infinite;
+  }
+
+  @keyframes animatedBackground {
+    from { background-position: 0 0; }
+    to { background-position: 100% 0; }
+  }
+
+  .splash-info {
+    position: relative;
+    z-index: 2;
+    margin-top: -64px;
+    text-align: center;
+  }
+  .splash-logo {
+    margin: auto;
+    //background: url('../assets/img/appicon.png') repeat transparent;
+    background-size: 100%;
+    width: 128px;
+    height: 128px;
+  }
+  .splash-intro {
+    font-size: 18px;
+    font-weight: bold;
+    max-width: 80%;
+    margin: auto;
+  }
+  button.login {
+    margin-top: 15px;
+    // background-color: white;
+    //background-color: #11493b;
+    color: #fff;
+    box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.2);
+    // color: #333;
+
+    &.activated {
+      background-color: rgb(220, 220, 220);
+    }
+  }
+  button.signup {
+    float: right;
+    padding-right: 16px;
+  }
+
+  .cover{
+    background: -webkit-linear-gradient(left top, $SIDEMENU_TOP, $SIDEMENU_BOTTOM);
+    background: -o-linear-gradient(bottom right, $SIDEMENU_TOP, $SIDEMENU_BOTTOM);
+    background: -moz-linear-gradient(bottom right, $SIDEMENU_TOP, $SIDEMENU_BOTTOM);
+    background: linear-gradient(to bottom right, $SIDEMENU_TOP, $SIDEMENU_BOTTOM);
+  }
+
+  .cover-item{
+    width:290px;
+    background-color: rgba(255,255,255,0.7);
+    border-color: rgba(255,255,255,0);
+    // color:white;
+    font-weight:300;
+    border:0px;
+    &.top-input{
+      border-radius: 4px 4px 0px 0px;   
+    }
+        
+    &.bottom-input{
+        border-radius: 0px 0px 4px 4px;
+    }
+  }  
+
+  .center-form{
+    width:290px;
+    position: absolute;
+    top: 55%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+ 
+    label{
+        background-color: #bdbdbd;
+        border-color: rgba(255,255,255,0);
+    }    
+  }
+
+  .item{
+    padding-right: 16px;
+  }
+}

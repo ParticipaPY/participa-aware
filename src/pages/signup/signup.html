@@ -1,0 +1,310 @@
+<ion-header>
+  <ion-toolbar  color="custom-color">
+    <!--<button ion-button menuToggle>
+      <ion-icon class="icon icon-md ion-md-menu" name="menu"></ion-icon>
+    </button>-->
+    <ion-title>Registrarme</ion-title>
+  </ion-toolbar >
+</ion-header>
+
+<ion-content>
+  <!--<p *ngIf="submitAttempt" style="color: #ea6153;">Please fill out all details accurately.</p>-->
+  <form [formGroup]="signUpForm">
+    <ion-list>
+
+      <ion-item>        
+        <ion-label floating>
+          <ion-icon ios="ios-person" md="md-person"></ion-icon> 
+          Nombre*
+        </ion-label>
+        <ion-input type="text" formControlName="name" [class.invalid]="!signUpForm.controls.name.valid && (signUpForm.controls.name.dirty || submitAttempt)"></ion-input>
+      </ion-item>
+
+      <ion-item *ngIf="!signUpForm.controls.name.valid  && (signUpForm.controls.name.dirty || submitAttempt)">
+        <p>Por favor, ingrese un nombre válido.</p>
+      </ion-item>
+
+
+      <ion-item>        
+        <ion-label floating>
+          <ion-icon ios="ios-mail" md="md-mail"></ion-icon>
+          Correo*
+        </ion-label>
+        <ion-input type="email" formControlName="email" [class.invalid]="!signUpForm.controls.email.valid && (signUpForm.controls.email.dirty || submitAttempt)"></ion-input>
+      </ion-item>
+
+      <ion-item *ngIf="!signUpForm.controls.email.valid  && (signUpForm.controls.email.dirty || submitAttempt)">
+        <p>Por favor, ingrese un correo válido.</p>
+      </ion-item> 
+
+
+      <ion-item>        
+        <ion-label floating>
+          <ion-icon name="key"></ion-icon>
+          Contraseña*
+        </ion-label>
+        <ion-input type="password" formControlName="password"></ion-input>
+      </ion-item>
+
+      <ion-item>        
+        <ion-label floating>
+          <ion-icon name="key"></ion-icon>
+          Repetir Contraseña*
+        </ion-label>
+        <ion-input type="password" formControlName="confirm_password"></ion-input>
+      </ion-item>      
+
+      <ion-item *ngIf="!signUpForm.controls.password.valid  && (signUpForm.controls.password.dirty || submitAttempt)">
+        <p>Por favor, ingrese una contraseña válida.</p>
+      </ion-item>
+
+      <!--<ion-item>        
+        <ion-label floating>
+          <ion-icon name="home"></ion-icon>
+          Barrio*
+        </ion-label>
+        <ion-input type="text" formControlName="place_one"></ion-input>
+      </ion-item>-->
+
+      <ion-item>
+        <ion-label>
+          <ion-icon name="home"></ion-icon>
+          Barrio*
+        </ion-label>
+        <ion-select formControlName="place_one">         
+            <ion-option disabled>B</ion-option>
+            <ion-option *ngFor="let barrio of barriosList.B">
+              {{ barrio }}
+            </ion-option>
+            <ion-option disabled>C</ion-option>
+            <ion-option *ngFor="let barrio of barriosList.C">
+              {{ barrio }}
+            </ion-option>
+            <ion-option disabled>D</ion-option>
+            <ion-option *ngFor="let barrio of barriosList.D">
+              {{ barrio }}
+            </ion-option> 
+            <ion-option disabled>E</ion-option>
+            <ion-option *ngFor="let barrio of barriosList.E">
+              {{ barrio }}
+            </ion-option>
+            <ion-option disabled>G</ion-option>
+            <ion-option *ngFor="let barrio of barriosList.G">
+              {{ barrio }}
+            </ion-option>
+            <ion-option disabled>H</ion-option>
+            <ion-option *ngFor="let barrio of barriosList.H">
+              {{ barrio }}
+            </ion-option> 
+            <ion-option disabled>I</ion-option>
+            <ion-option *ngFor="let barrio of barriosList.I">
+              {{ barrio }}
+            </ion-option>
+            <ion-option disabled>J</ion-option>
+            <ion-option *ngFor="let barrio of barriosList.J">
+              {{ barrio }}
+            </ion-option>
+            <ion-option disabled>L</ion-option>
+            <ion-option *ngFor="let barrio of barriosList.L">
+              {{ barrio }}
+            </ion-option> 
+            <ion-option disabled>M</ion-option>
+            <ion-option *ngFor="let barrio of barriosList.M">
+              {{ barrio }}
+            </ion-option>
+            <ion-option disabled>N</ion-option>
+            <ion-option *ngFor="let barrio of barriosList.N">
+              {{ barrio }}
+            </ion-option>
+            <ion-option disabled>Ñ</ion-option>
+            <ion-option *ngFor="let barrio of barriosList.NH">
+              {{ barrio }}
+            </ion-option> 
+            <ion-option disabled>P</ion-option>
+            <ion-option *ngFor="let barrio of barriosList.P">
+              {{ barrio }}
+            </ion-option>
+            <ion-option disabled>R</ion-option>
+            <ion-option *ngFor="let barrio of barriosList.R">
+              {{ barrio }}
+            </ion-option> 
+            <ion-option disabled>S</ion-option>
+            <ion-option *ngFor="let barrio of barriosList.S">
+              {{ barrio }}
+            </ion-option>
+            <ion-option disabled>V</ion-option>
+            <ion-option *ngFor="let barrio of barriosList.V">
+              {{ barrio }}
+            </ion-option>
+            <ion-option disabled>Y</ion-option>
+            <ion-option *ngFor="let barrio of barriosList.Y">
+              {{ barrio }}
+            </ion-option>                                                                                                
+        </ion-select>
+
+      </ion-item>
+
+      <ion-item>        
+        <ion-label>
+          <ion-icon name="briefcase"></ion-icon>
+          Escuela/Trabajo
+        </ion-label>
+        <!--<ion-input type="text" formControlName="place_two"></ion-input>-->
+        <ion-select formControlName="place_two">         
+            <ion-option disabled>B</ion-option>
+            <ion-option *ngFor="let barrio of barriosList.B">
+              {{ barrio }}
+            </ion-option>
+            <ion-option disabled>C</ion-option>
+            <ion-option *ngFor="let barrio of barriosList.C">
+              {{ barrio }}
+            </ion-option>
+            <ion-option disabled>D</ion-option>
+            <ion-option *ngFor="let barrio of barriosList.D">
+              {{ barrio }}
+            </ion-option> 
+            <ion-option disabled>E</ion-option>
+            <ion-option *ngFor="let barrio of barriosList.E">
+              {{ barrio }}
+            </ion-option>
+            <ion-option disabled>G</ion-option>
+            <ion-option *ngFor="let barrio of barriosList.G">
+              {{ barrio }}
+            </ion-option>
+            <ion-option disabled>H</ion-option>
+            <ion-option *ngFor="let barrio of barriosList.H">
+              {{ barrio }}
+            </ion-option> 
+            <ion-option disabled>I</ion-option>
+            <ion-option *ngFor="let barrio of barriosList.I">
+              {{ barrio }}
+            </ion-option>
+            <ion-option disabled>J</ion-option>
+            <ion-option *ngFor="let barrio of barriosList.J">
+              {{ barrio }}
+            </ion-option>
+            <ion-option disabled>L</ion-option>
+            <ion-option *ngFor="let barrio of barriosList.L">
+              {{ barrio }}
+            </ion-option> 
+            <ion-option disabled>M</ion-option>
+            <ion-option *ngFor="let barrio of barriosList.M">
+              {{ barrio }}
+            </ion-option>
+            <ion-option disabled>N</ion-option>
+            <ion-option *ngFor="let barrio of barriosList.N">
+              {{ barrio }}
+            </ion-option>
+            <ion-option disabled>Ñ</ion-option>
+            <ion-option *ngFor="let barrio of barriosList.NH">
+              {{ barrio }}
+            </ion-option>
+            <ion-option disabled>P</ion-option>
+            <ion-option *ngFor="let barrio of barriosList.P">
+              {{ barrio }}
+            </ion-option>
+            <ion-option disabled>R</ion-option>
+            <ion-option *ngFor="let barrio of barriosList.R">
+              {{ barrio }}
+            </ion-option> 
+            <ion-option disabled>S</ion-option>
+            <ion-option *ngFor="let barrio of barriosList.S">
+              {{ barrio }}
+            </ion-option>
+            <ion-option disabled>V</ion-option>
+            <ion-option *ngFor="let barrio of barriosList.V">
+              {{ barrio }}
+            </ion-option>
+            <ion-option disabled>Y</ion-option>
+            <ion-option *ngFor="let barrio of barriosList.Y">
+              {{ barrio }}
+            </ion-option>                                                                                              
+        </ion-select>        
+      </ion-item>
+
+
+      <ion-item>        
+        <ion-label>
+          <ion-icon ios="ios-happy" md="md-happy"></ion-icon>
+          Distracción
+        </ion-label>
+        <!--<ion-input type="text" formControlName="place_three"></ion-input>-->
+        <ion-select formControlName="place_three">         
+            <ion-option disabled>B</ion-option>
+            <ion-option *ngFor="let barrio of barriosList.B">
+              {{ barrio }}
+            </ion-option>
+            <ion-option disabled>C</ion-option>
+            <ion-option *ngFor="let barrio of barriosList.C">
+              {{ barrio }}
+            </ion-option>
+            <ion-option disabled>D</ion-option>
+            <ion-option *ngFor="let barrio of barriosList.D">
+              {{ barrio }}
+            </ion-option> 
+            <ion-option disabled>E</ion-option>
+            <ion-option *ngFor="let barrio of barriosList.E">
+              {{ barrio }}
+            </ion-option>
+            <ion-option disabled>G</ion-option>
+            <ion-option *ngFor="let barrio of barriosList.G">
+              {{ barrio }}
+            </ion-option>
+            <ion-option disabled>H</ion-option>
+            <ion-option *ngFor="let barrio of barriosList.H">
+              {{ barrio }}
+            </ion-option> 
+            <ion-option disabled>I</ion-option>
+            <ion-option *ngFor="let barrio of barriosList.I">
+              {{ barrio }}
+            </ion-option>
+            <ion-option disabled>J</ion-option>
+            <ion-option *ngFor="let barrio of barriosList.J">
+              {{ barrio }}
+            </ion-option>
+            <ion-option disabled>L</ion-option>
+            <ion-option *ngFor="let barrio of barriosList.L">
+              {{ barrio }}
+            </ion-option> 
+            <ion-option disabled>M</ion-option>
+            <ion-option *ngFor="let barrio of barriosList.M">
+              {{ barrio }}
+            </ion-option>
+            <ion-option disabled>N</ion-option>
+            <ion-option *ngFor="let barrio of barriosList.N">
+              {{ barrio }}
+            </ion-option>
+            <ion-option disabled>Ñ</ion-option>
+            <ion-option *ngFor="let barrio of barriosList.NH">
+              {{ barrio }}
+            </ion-option> 
+            <ion-option disabled>P</ion-option>
+            <ion-option *ngFor="let barrio of barriosList.P">
+              {{ barrio }}
+            </ion-option>
+            <ion-option disabled>R</ion-option>
+            <ion-option *ngFor="let barrio of barriosList.R">
+              {{ barrio }}
+            </ion-option> 
+            <ion-option disabled>S</ion-option>
+            <ion-option *ngFor="let barrio of barriosList.S">
+              {{ barrio }}
+            </ion-option>
+            <ion-option disabled>V</ion-option>
+            <ion-option *ngFor="let barrio of barriosList.V">
+              {{ barrio }}
+            </ion-option>
+            <ion-option disabled>Y</ion-option>
+            <ion-option *ngFor="let barrio of barriosList.Y">
+              {{ barrio }}
+            </ion-option>                                                                                               
+        </ion-select>
+      </ion-item>      
+
+      <div padding>
+        <button ion-button color="custom-color" block (click)="doSignup()">Registrarme</button>
+      </div>
+
+    </ion-list>
+  </form>
+</ion-content>

@@ -1,0 +1,16 @@
+page-item-details {
+    .ios, .md {
+        page-home {
+            button {
+                align-items: baseline;
+            }
+        }
+    }
+
+    .ionic .item-text-wrap { /* negate the nowrap CSS from .ionic .item */
+        overflow: visible;
+        text-overflow: initial;
+        white-space: initial;
+    }
+    
+}

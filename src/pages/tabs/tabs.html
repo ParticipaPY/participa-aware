@@ -1,0 +1,24 @@
+ <ion-header>
+  <ion-toolbar color="custom-color">    
+    <button ion-button menuToggle>
+      <ion-icon class="icon icon-md ion-md-menu" name="menu"></ion-icon>
+    </button> 
+    <!-- Title -->
+     <ion-title *ngIf="!toggled">Ideas cerca de tu</ion-title> 
+    <!-- Search Bar -->
+    <!-- <ion-searchbar *ngIf="toggled" [(ngModel)]="searchTerm.term" [showCancelButton]="true" (ionCancel)="toggleSearch()" (ionInput)="setFilteredItems()"></ion-searchbar> -->
+    <!-- Search Icon -->    
+    <!-- <ion-buttons end *ngIf="!toggled">
+      <button ion-button icon-only (click)="toggleSearch()"><ion-icon name="search"></ion-icon></button>
+    </ion-buttons>  -->
+   </ion-toolbar>  
+</ion-header>
+
+<ion-content no-bounce>
+  <super-tabs [config]="{ sideMenu: 'left' }" height="100%" toolbarColor="light" toolbarBackground="custom-color" indicatorColor="light">
+    <super-tab [root]="tab1Root" [rootParams]="searchTerm" title="Casa"></super-tab>
+    <super-tab [root]="tab2Root" [rootParams]="searchTerm" title="Trabajo"></super-tab>
+    <super-tab [root]="tab3Root" [rootParams]="searchTerm" title="Otro"></super-tab>
+    <super-tab [root]="tab4Root" [rootParams]="searchTerm" title="Todas"></super-tab>
+  </super-tabs>
+</ion-content>
