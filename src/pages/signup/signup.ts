@@ -31,7 +31,7 @@ export class SignupPage {
         name: ['', Validators.compose([Validators.maxLength(30), Validators.pattern('[a-zA-Z ]*'), Validators.required])],
         email: ['', Validators.compose([Validators.maxLength(30), Validators.minLength(5), Validators.required])],
         password: ['', Validators.compose([Validators.maxLength(10), Validators.minLength(5), Validators.required])],
-        confirm_password: ['', Validators.compose([Validators.maxLength(10), Validators.minLength(5), Validators.required])],
+        repeatPassword: ['', Validators.compose([Validators.maxLength(10), Validators.minLength(5), Validators.required])],
         place_one: ['', Validators.required],
         place_two: [''],
         place_three: ['']

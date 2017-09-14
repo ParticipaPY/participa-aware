@@ -45,7 +45,7 @@ const cloudSettings: CloudSettings = {
         sound: true
       },
       android: {
-        iconColor: '#343434',
+        iconColor: '#193361',
         forceShow: true
       }
     }
