@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Storage } from '@ionic/storage';
-import { NavController, NavParams, ModalController, ToastController } from 'ionic-angular';
+import { NavController, NavParams, ModalController, ToastController, Platform } from 'ionic-angular';
 
 import { ItemDetailsPage } from '../item-details/item-details';
 import { ItemCreatePage } from '../item-create/item-create';
@@ -27,11 +27,13 @@ export class ListPage {
   searchTerm = "";
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public modalCtrl: ModalController, private databaseprovider: DatabaseProvider, public http: Http, 
-    public storage: Storage, public toastCtrl: ToastController) {
+    public storage: Storage, public toastCtrl: ToastController, public platform: Platform) {
       
     this.rootNavCtrl = this.navParams.get('rootNavCtrl'); 
     
-    this.getUserInfo();
+    this.platform.ready().then( () => {
+      this.getUserInfo();
+    }); 
   }
 
   getUserInfo() {      

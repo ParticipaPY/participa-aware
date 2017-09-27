@@ -1,65 +1,94 @@
-import { Component } from '@angular/core';
-import { NavController, ToastController } from 'ionic-angular';
-import {Validators, FormBuilder, FormGroup } from '@angular/forms';
+import { Component, ViewChild } from '@angular/core';
+import { NavController, ToastController, ViewController } from 'ionic-angular';
+import { Validators, FormBuilder, FormGroup } from '@angular/forms';
 
-import { TabsPage } from '../tabs/tabs';
 import { User } from "../../providers/user/user";
-import { Barrios } from "../../providers/barrios";
+import { DatabaseProvider } from '../../providers/database/database';
+import { Notification } from "../../providers/notification/notification"
 
 @Component({
   selector: 'page-signup',
   templateUrl: 'signup.html',
 })
 export class SignupPage {
+  @ViewChild('fileInput') fileInput;
 
-  barriosList: any;
-  account: { name: string, email: string, password: string } = {
-    name: 'Test Human',
-    email: 'test@example.com',
-    password: 'test'
-  };
-
-  // Our translated text strings
-  private signupErrorString: string; 
+  locations = [];
   private signUpForm : FormGroup; 
+  isReadyToSave: boolean = false;
   submitAttempt: boolean = false;
 
-  constructor(public navCtrl: NavController, public formBuilder: FormBuilder, public user: User, public barrios: Barrios, public toastCtrl: ToastController) {
-    this.barriosList = this.barrios.getBarrios();
+  constructor(public navCtrl: NavController, public viewCtrl: ViewController, public formBuilder: FormBuilder, public user: User, public toastCtrl: ToastController,
+              public databaseProvider: DatabaseProvider, public notification: Notification) {
     
     this.signUpForm = formBuilder.group({
-        name: ['', Validators.compose([Validators.maxLength(30), Validators.pattern('[a-zA-Z ]*'), Validators.required])],
-        email: ['', Validators.compose([Validators.maxLength(30), Validators.minLength(5), Validators.required])],
+        name: ['', Validators.compose([Validators.maxLength(80), Validators.pattern('[a-zA-Z ]*'), Validators.required])],
+        email: ['', Validators.compose([Validators.maxLength(30), Validators.minLength(5), Validators.pattern('[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+'), Validators.required])],
         password: ['', Validators.compose([Validators.maxLength(10), Validators.minLength(5), Validators.required])],
         repeatPassword: ['', Validators.compose([Validators.maxLength(10), Validators.minLength(5), Validators.required])],
         place_one: ['', Validators.required],
-        place_two: [''],
-        place_three: ['']
+        place_two: ['', Validators.required],
+        place_three: ['', Validators.required],
+        lang: "ES",
+        profile_pic: ""
     });
 
+    this.signUpForm.valueChanges.subscribe((v) => {
+      this.isReadyToSave = this.signUpForm.valid;
+    });    
   }
 
   ionViewDidLoad() {
     console.log('ionViewDidLoad SingupPage');
+    this.loadLocations();    
   }
 
+  loadLocations() {
+    this.databaseProvider.getAllLocations().then(data => {
+      this.locations = data;
+    });
+  }  
+
+  private presentToast(text) {
+    let toast = this.toastCtrl.create({
+      message: text,
+      duration: 3000,
+      position: 'top'
+    });
+    toast.present();
+  }
+   
   doSignup() {
     this.submitAttempt = true;
+    
     // Attempt to login in through our User service
-    this.user.signup(this.account).subscribe((resp) => {
-      this.navCtrl.push(TabsPage);
+    this.user.signup(this.signUpForm.value).subscribe((resp) => {   
+      this.signUpForm.controls['profile_pic'].patchValue(resp.profilePic.url);   
+      this.createAuthor();
+      this.viewCtrl.dismiss(this.signUpForm.value);
     }, (err) => {
-
-      this.navCtrl.push(TabsPage); // TODO: Remove this when you add your signup endpoint
-
-      // Unable to sign up
-      let toast = this.toastCtrl.create({
-        message: this.signupErrorString,
-        duration: 3000,
-        position: 'top'
-      });
-      toast.present();
+      this.presentToast(err);
     });
   }
+
+  createAuthor(){
+    this.databaseProvider.createAuthor(this.signUpForm.value).then( (data) => {
+      console.log("Author id: ", data.id);
+      this.notification.createUserNotificationConfig(data.id).subscribe( (resp) => {
+        console.log('Response from server: ', resp);
+      }, (err) => {
+        console.log('Error from server: ', err);
+      });     
+    });
+  }
+
+  cancel() {
+    this.viewCtrl.dismiss();
+  }
+
+  done() {
+    if (!this.signUpForm.valid) { return; }
+    this.doSignup();
+  }  
 
 }

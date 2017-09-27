@@ -6,6 +6,9 @@ import { CloudSettings, CloudModule } from '@ionic/cloud-angular';
 import { MyApp } from './app.component';
 
 import { Camera } from '@ionic-native/camera';
+import { File } from '@ionic-native/file';
+import { Transfer } from '@ionic-native/transfer';
+import { FilePath } from '@ionic-native/file-path';
 import { Geolocation } from '@ionic-native/geolocation';
 
 import { LocationThreePage } from '../pages/location-three/location-three';
@@ -21,17 +24,18 @@ import { ItemCreatePage } from '../pages/item-create/item-create';
 import { User } from '../providers/user/user';
 import { Api } from '../providers/api';
 import { Barrios } from '../providers/barrios';
+import { NotificationApi } from '../providers/notification-api/notification-api';
+import { Notification } from '../providers/notification/notification';
+import { DatabaseProvider } from '../providers/database/database';
 
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { SuperTabsModule } from 'ionic2-super-tabs';
-import { DatabaseProvider } from '../providers/database/database';
 
 import { IonicStorageModule } from '@ionic/storage';
 import { SQLitePorter } from '@ionic-native/sqlite-porter';
 import { SQLite } from '@ionic-native/sqlite';
 import { ExpandableComponent } from '../components/expandable/expandable';
-import { FilterProvider } from '../providers/filter/filter';
 
 const cloudSettings: CloudSettings = {
   core: {
@@ -64,7 +68,7 @@ const cloudSettings: CloudSettings = {
     ItemDetailsPage,
     ListPage,
     ItemCreatePage,
-    ExpandableComponent    
+    ExpandableComponent
   ],
   imports: [
     BrowserModule,
@@ -91,6 +95,9 @@ const cloudSettings: CloudSettings = {
     StatusBar,
     SplashScreen,
     Camera,
+    File,
+    Transfer,
+    FilePath,
     Geolocation,    
     User,
     Api,
@@ -99,7 +106,8 @@ const cloudSettings: CloudSettings = {
     DatabaseProvider,
     SQLitePorter,
     SQLite,
-    FilterProvider
+    NotificationApi,
+    Notification
   ]
 })
 export class AppModule {}

@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Http, Headers, RequestOptions } from '@angular/http';
 import { Api } from '../api';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/share';
@@ -26,8 +27,11 @@ import 'rxjs/add/operator/toPromise';
 @Injectable()
 export class User {
   _user: any;
+  headers = new Headers();
 
-  constructor(public api: Api) {
+  constructor(public api: Api, public http: Http) {
+    this.headers.append("Accept", 'application/json');
+    this.headers.append('Content-Type', 'application/json' );
   }
 
   /**
@@ -35,21 +39,9 @@ export class User {
    * the user entered on the form.
    */
   login(accountInfo: any) {
-    let seq = this.api.post('login', accountInfo).share();
-
-    seq
-      .map(res => res.json())
-      .subscribe(res => {
-        // If the API returned a successful response, mark the user as logged in
-        if (res.status == 'success') {
-          this._loggedIn(res);
-        } else {
-        }
-      }, err => {
-        console.error('ERROR', err);
-      });
-
-    return seq;
+    let options = new RequestOptions({ headers: this.headers });
+    
+    return this.api.post('user/login', accountInfo, options).map(res => res.json());
   }
 
   /**
@@ -57,20 +49,19 @@ export class User {
    * the user entered on the form.
    */
   signup(accountInfo: any) {
-    let seq = this.api.post('signup', accountInfo).share();
-
-    seq
-      .map(res => res.json())
-      .subscribe(res => {
-        // If the API returned a successful response, mark the user as logged in
-        if (res.status == 'success') {
-          this._loggedIn(res);
-        }
-      }, err => {
-        console.error('ERROR', err);
-      });
-
-    return seq;
+    let options = new RequestOptions({ headers: this.headers });
+    let data = {
+      "email": accountInfo.email,
+      "password": accountInfo.password,
+      "repeatPassword": accountInfo.repeatPassword,
+      "name": accountInfo.name,
+      "lang": accountInfo.lang,
+      "existingAssembly": {
+        "assemblyId": 9,
+        "uuid": "570dea1f-41e7-4951-94e0-1a752163cc40"
+      }
+    }
+    return this.api.post('user/signup', data, options).map(res => res.json());
   }
 
   /**

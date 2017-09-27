@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Storage } from '@ionic/storage';
-import { NavController, NavParams, ModalController, ToastController } from 'ionic-angular';
+import { NavController, NavParams, ModalController, ToastController, Platform } from 'ionic-angular';
 
 import { ItemDetailsPage } from '../item-details/item-details';
 import { ItemCreatePage } from '../item-create/item-create';
@@ -24,26 +24,17 @@ export class LocationTwoPage {
   email: string;
   searchTerm = "";
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, public modalCtrl: ModalController, 
+  constructor(public navCtrl: NavController, public navParams: NavParams, public modalCtrl: ModalController, public platform: Platform,  
     private databaseprovider: DatabaseProvider, public http: Http, public storage: Storage, public toastCtrl: ToastController) {
       
     this.rootNavCtrl = navParams.get('rootNavCtrl');  
-    this.getUserInfo();
+    
+    this.platform.ready().then( () => {
+      this.getUserInfo();
+    });
   }
 
-  getUserInfo() {
-    // this.storage.get('email').then( (val) => {
-    //   this.email = val;
-    // });
-    // this.storage.get('vote_up').then( (val) => {
-    //   this.vote_up = val;
-    // });
-    // this.storage.get('vote_down').then( (val) => {
-    //   this.vote_down = val;
-    // });
-    // this.storage.get('comment').then( (val) => {
-    //   this.comment = val;
-    // });          
+  getUserInfo() {         
     this.storage.get('location_two').then( (val) => {
       this.location_two = val;
     });  

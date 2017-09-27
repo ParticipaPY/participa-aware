@@ -8,9 +8,8 @@
   <ion-card *ngFor="let item of ideas">
     <ion-item (click)="itemTapped($event, item)">
       <ion-avatar item-start>
-        <!--<ion-icon name="{{item.icon}}" item-left></ion-icon>-->
-        <img *ngIf="item.image" [src]="item.image">
-        <img *ngIf="!item.image" src='assets/img/blank_profile.png'>
+        <img *ngIf="item.author_pic" [src]="item.author_pic">
+        <img *ngIf="!item.author_pic" src='assets/img/blank_profile.png'>
       </ion-avatar>
       <h2>{{ item.title }}</h2>
       <h3>{{ item.author }}</h3>   
@@ -56,14 +55,14 @@
       </ion-col>-->
     </ion-row>
 
-     <!-- <ion-row>
+    <ion-row>
       <ion-col>
         <ion-label>
           <ion-icon ios="ios-pin" md="md-pin"></ion-icon>
           {{ item.location }}
         </ion-label>
       </ion-col>
-    </ion-row>  -->
+    </ion-row> 
   </ion-card>
   <ion-fab right bottom>
     <button ion-fab color="custom-color" (click)="addItem()"><ion-icon name="add"></ion-icon></button>

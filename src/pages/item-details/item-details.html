@@ -11,8 +11,8 @@
   <ion-card>
     <ion-item text-wrap>
       <ion-avatar item-start>
-        <img *ngIf="selectedItem.image" [src]="selectedItem.image">
-        <img *ngIf="!selectedItem.image" src='assets/img/blank_profile.png'>
+        <img *ngIf="selectedItem.author_pic" [src]="selectedItem.author_pic">
+        <img *ngIf="!selectedItem.author_pic" src='assets/img/blank_profile.png'>
       </ion-avatar>
       <h2>{{ selectedItem.title }}</h2>
       <h3>{{ selectedItem.author }}</h3>      
@@ -57,9 +57,8 @@
   <ion-list>
     <button detail-none (click)="expandItem(item)" ion-item *ngFor="let item of comments">
       <ion-avatar item-start>
-        <!--<ion-icon name="{{item.icon}}" item-left></ion-icon>-->
-        <img *ngIf="item.image" [src]="item.image">
-        <img *ngIf="!item.image" src='assets/img/blank_profile.png'>
+        <img *ngIf="item.author_pic" [src]="item.author_pic">
+        <img *ngIf="!item.author_pic" src='assets/img/blank_profile.png'>
       </ion-avatar>
       <h2>{{ item.author }}</h2>
       <!-- <p>{{ item.date }}</p> -->

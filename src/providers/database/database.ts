@@ -111,6 +111,26 @@ export class DatabaseProvider {
     });    
   }
 
+  getAuthor(email){
+    let sql = "SELECT * FROM author WHERE email = ?;";
+    return this.database.executeSql(sql, [email]).then((data) => {
+      let author = [];
+      if (data.rows.length > 0) {
+        for (var i = 0; i < data.rows.length; i++) {
+          author.push({ 
+            id: data.rows.item(i).id, 
+            name: data.rows.item(i).name,
+            email: data.rows.item(i).email,
+            profile_pic: data.rows.item(i).profile_pic });
+        }
+      }
+      return author[0];
+    }, err => {
+      console.log('Error: ', err);
+      return {};
+    });    
+  }
+
   getAllIdeas(location?: string) {
     let where: string;
     let data;
@@ -127,9 +147,10 @@ export class DatabaseProvider {
       data = [];
     }
     
-    let sql = "SELECT i.id, i.idea_id, i.campaign_id, i.title, i.date, i.description, i.location_id, i.votes_up, i.votes_down, i.comments, i.voted_up, i.voted_down, a.name " +
+    let sql = "SELECT i.id, i.idea_id, i.campaign_id, i.title, i.date, i.description, i.location_id, i.votes_up, i.votes_down, i.comments, i.voted_up, i.voted_down, a.name, a.profile_pic, l.name as location_name " +
               "FROM idea i " + 
               "JOIN author a on (i.author_id = a.id) " +
+              "JOIN location l on (i.location_id = l.id)" + 
               where + 
               "ORDER BY i.date desc;"
 
@@ -150,7 +171,9 @@ export class DatabaseProvider {
             comments: data.rows.item(i).comments,
             voted_up: data.rows.item(i).voted_up,
             voted_down: data.rows.item(i).voted_down,
-            author: data.rows.item(i).name
+            author: data.rows.item(i).name,
+            author_pic : data.rows.item(i).profile_pic,
+            location: data.rows.item(i).location_name
           });
         }
       }
@@ -162,8 +185,9 @@ export class DatabaseProvider {
   }
 
   getIdeaComments(idea) {
-    let sql = "SELECT c.id, c.idea_id, c.date, c.description, a.name " +
-              "FROM comments c JOIN author a on (c.author_id = a.id) " +
+    let sql = "SELECT c.id, c.idea_id, c.date, c.description, a.name, a.profile_pic " +
+              "FROM comments c " + 
+              "JOIN author a on (c.author_id = a.id) " +
               "WHERE c.idea_id=?";
     
     return this.database.executeSql(sql, [idea.id]).then((data) => {
@@ -176,6 +200,7 @@ export class DatabaseProvider {
             date: data.rows.item(i).date, 
             description: data.rows.item(i).description,
             author: data.rows.item(i).name,
+            author_pic : data.rows.item(i).profile_pic,
             expanded: false
           });
         }
@@ -188,7 +213,7 @@ export class DatabaseProvider {
   }
  
   getIdea(id) {
-    let sql = "SELECT i.id, i.idea_id, i.campaign_id, i.title, i.date, i.description, i.location_id, i.votes_up, i.votes_down, i.comments, i.voted_up, i.voted_down, a.name " +
+    let sql = "SELECT i.id, i.idea_id, i.campaign_id, i.title, i.date, i.description, i.location_id, i.votes_up, i.votes_down, i.comments, i.voted_up, i.voted_down, a.name, a.profile_pic " +
               "FROM idea i " + 
               "JOIN author a on (i.author_id = a.id) " +
               "WHERE i.id=?;"
@@ -209,7 +234,8 @@ export class DatabaseProvider {
             comments: data.rows.item(i).comments,
             voted_up: data.rows.item(i).voted_up,
             voted_down: data.rows.item(i).voted_down,
-            author: data.rows.item(i).name
+            author: data.rows.item(i).name,
+            author_pic : data.rows.item(i).profile_pic
           });
         }
       }
@@ -237,6 +263,26 @@ export class DatabaseProvider {
       console.log('Error: ', err);
       return [];
     });        
+  }
+
+  getUsersLocation(author_id) {
+    let sql = "SELECT * FROM users_locations WHERE author_id = ?;";
+    
+    return this.database.executeSql(sql, [author_id]).then( (data) => {
+      let locations = [];
+      if (data.rows.length > 0) {
+        for (var i = 0; i < data.rows.length; i++){
+          locations.push({
+            location: data.rows.item(i).location,
+            location_id: data.rows.item(i).location_id
+          });
+        }
+      }
+      return locations;
+    }, err => {
+      console.log('Error getting user locations: ', err);
+      return [];
+    }); 
   }
 
   voteUp(idea) {
@@ -307,16 +353,25 @@ export class DatabaseProvider {
     });       
   }
 
-  createUserToken(user_id, token){
-    let sql  = "INSERT INTO users_push_token (user_id, token) VALUES (?, ?);";
-    let data = [parseInt(user_id), token];
+  createUserLocation(user, author_id){
+    this.database.executeSql("INSERT INTO users_locations (author_id, location, location_id) VALUES (?, 'CASA', ?);", [author_id, user.place_one]);
+    this.database.executeSql("INSERT INTO users_locations (author_id, location, location_id) VALUES (?, 'TRABAJO', ?);", [author_id, user.place_two]);
+    this.database.executeSql("INSERT INTO users_locations (author_id, location, location_id) VALUES (?, 'OTRO', ?);", [author_id, user.place_three]);
 
-    return this.database.executeSql(sql, data).then(data => {
-      return true;
-    }, err => {
-      console.log('Error: ', err);
-      return false;
-    });    
+    return this.getAuthor(user.email);
+  }
+
+  createAuthor(user){
+    let sql = "INSERT INTO author (name, email, session_key, profile_pic) VALUES(?, ?, ?, ?);"
+
+    return this.database.executeSql(sql, [user.name, user.email, user.session_key, user.profile_pic]).then( data => {
+        console.log("INSERT ID -> " , data.insertId);
+        // this.storage.set('user_id', data.insertId);
+        return this.createUserLocation(user, data.insertId);
+      }, err => {
+        console.error(err);
+        return {};
+      });
   }
 
   getCurrentDate() {
