@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { Http, Headers, RequestOptions } from '@angular/http';
 import { Api } from '../api';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/share';
@@ -27,11 +26,9 @@ import 'rxjs/add/operator/toPromise';
 @Injectable()
 export class User {
   _user: any;
-  headers = new Headers();
+  
+  constructor(public api: Api) {
 
-  constructor(public api: Api, public http: Http) {
-    this.headers.append("Accept", 'application/json');
-    this.headers.append('Content-Type', 'application/json' );
   }
 
   /**
@@ -39,9 +36,7 @@ export class User {
    * the user entered on the form.
    */
   login(accountInfo: any) {
-    let options = new RequestOptions({ headers: this.headers });
-    
-    return this.api.post('user/login', accountInfo, options).map(res => res.json());
+    return this.api.post('user/login', {email:accountInfo.email, password:accountInfo.password}, {});
   }
 
   /**
@@ -49,7 +44,6 @@ export class User {
    * the user entered on the form.
    */
   signup(accountInfo: any) {
-    let options = new RequestOptions({ headers: this.headers });
     let data = {
       "email": accountInfo.email,
       "password": accountInfo.password,
@@ -57,11 +51,11 @@ export class User {
       "name": accountInfo.name,
       "lang": accountInfo.lang,
       "existingAssembly": {
-        "assemblyId": 9,
-        "uuid": "570dea1f-41e7-4951-94e0-1a752163cc40"
+        "assemblyId": 111,
+        "uuid": "bfe4464b-549d-4231-acc0-7e1c24833ad9"
       }
     }
-    return this.api.post('user/signup', data, options).map(res => res.json());
+    return this.api.post('user/signup', data, {});
   }
 
   /**

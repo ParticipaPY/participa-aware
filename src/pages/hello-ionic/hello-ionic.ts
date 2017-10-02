@@ -1,11 +1,12 @@
 import { Component } from '@angular/core';
 import { Storage } from '@ionic/storage';
-import { NavController, ToastController, Events, ModalController } from 'ionic-angular';
-
-import { User } from '../../providers/user/user';
+import { NavController, ToastController, Events, ModalController, Platform } from 'ionic-angular';
+import { Keyboard } from '@ionic-native/keyboard';
+import { ScreenOrientation } from '@ionic-native/screen-orientation';
 
 import { SignupPage } from '../signup/signup';
 import { TabsPage } from '../tabs/tabs';
+import { User } from '../../providers/user/user';
 import { DatabaseProvider } from '../../providers/database/database';
 
 @Component({
@@ -14,23 +15,34 @@ import { DatabaseProvider } from '../../providers/database/database';
 })
 export class HelloIonicPage {
   account: { email: string, password: string, name: string, author_pic: string } = {email: "", password: "", name: "", author_pic: ""}
-  lat: any;
-  long: any;
+  reduce_icon: Boolean = false;
 
   constructor(public navCtrl: NavController, public user: User, public toastCtrl: ToastController, public databaseProvider: DatabaseProvider, 
-              private storage: Storage, public events: Events, public modalCtrl: ModalController) {
-   
+              private storage: Storage, public events: Events, public modalCtrl: ModalController, private screenOrientation: ScreenOrientation,
+              public keyboard: Keyboard, public platform: Platform) {
+    
+    this.platform.ready().then( () => {
+      this.screenOrientation.lock(this.screenOrientation.ORIENTATIONS.PORTRAIT);
+      this.keyboard.onKeyboardShow().subscribe(() => {
+        this.reduce_icon = true;
+      });
+      this.keyboard.onKeyboardHide().subscribe(() => {
+        this.reduce_icon = false;
+      });
+    });
+    
   }
 
-  doLogin() {    
-    this.user.login(this.account).subscribe( (resp) => {    
-      this.storeUserInfo(resp);
-      this.account.name = resp.name;
-      this.account.author_pic = resp.profilePic.url;
+  doLogin() {        
+    this.user.login(this.account).then( (resp) => {  
+      let result = JSON.parse(resp.data);        
+      this.storeUserInfo(result);
+      this.account.name = result.name;
+      this.account.author_pic = result.profilePic.url;
       this.events.publish('user:created', this.account);
       this.navCtrl.push(TabsPage);
       this.navCtrl.setRoot(TabsPage);  
-    }, (err) => {
+    }, (err) => {      
       let toast = this.toastCtrl.create({
         message: err,
         duration: 3000,
@@ -40,7 +52,7 @@ export class HelloIonicPage {
     });
   }
 
-  storeUserInfo (resp) {    
+  storeUserInfo (resp) {        
     this.storage.set('name', resp.name);
     this.storage.set('email', this.account.email);
     this.storage.set('session_key', resp.sessionKey);
@@ -74,4 +86,5 @@ export class HelloIonicPage {
 
     addModal.present();
   }  
+
 }

@@ -5,11 +5,14 @@ import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
 import { CloudSettings, CloudModule } from '@ionic/cloud-angular';
 import { MyApp } from './app.component';
 
+import { HTTP } from '@ionic-native/http';
 import { Camera } from '@ionic-native/camera';
 import { File } from '@ionic-native/file';
 import { Transfer } from '@ionic-native/transfer';
 import { FilePath } from '@ionic-native/file-path';
+import { Keyboard } from '@ionic-native/keyboard';
 import { Geolocation } from '@ionic-native/geolocation';
+import { ScreenOrientation } from '@ionic-native/screen-orientation';
 
 import { LocationThreePage } from '../pages/location-three/location-three';
 import { LocationTwoPage } from '../pages/location-two/location-two';
@@ -94,11 +97,14 @@ const cloudSettings: CloudSettings = {
   providers: [
     StatusBar,
     SplashScreen,
+    HTTP,
     Camera,
     File,
     Transfer,
     FilePath,
-    Geolocation,    
+    Keyboard,
+    Geolocation,
+    ScreenOrientation,    
     User,
     Api,
     Barrios,

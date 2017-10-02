@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Http, RequestOptions, URLSearchParams } from '@angular/http';
+import { HTTP } from '@ionic-native/http';
+import { RequestOptions, URLSearchParams } from '@angular/http';
 import 'rxjs/add/operator/map';
 
 /**
@@ -8,8 +9,11 @@ import 'rxjs/add/operator/map';
 @Injectable()
 export class Api {
   url: string = 'https://example.com/api/v1';
-
-  constructor(public http: Http) {
+  
+  constructor(public http: HTTP) {
+    this.http.setDataSerializer("json");
+    this.http.setHeader('Accept', 'application/json');
+    this.http.setHeader('Content-Type', 'application/json');
   }
 
   get(endpoint: string, params?: any, options?: RequestOptions) {
@@ -28,22 +32,22 @@ export class Api {
       options.search = !options.search && p || options.search;
     }
 
-    return this.http.get(this.url + '/' + endpoint, options);
+    return this.http.get(this.url + '/' + endpoint, {}, options);
   }
 
-  post(endpoint: string, body: any, options?: RequestOptions) {
+  post(endpoint: string, body: any, options: any) {
     return this.http.post(this.url + '/' + endpoint, body, options);
   }
 
-  put(endpoint: string, body: any, options?: RequestOptions) {
+  put(endpoint: string, body: any, options: any) {
     return this.http.put(this.url + '/' + endpoint, body, options);
   }
 
-  delete(endpoint: string, options?: RequestOptions) {
-    return this.http.delete(this.url + '/' + endpoint, options);
+  delete(endpoint: string, options: any) {
+    return this.http.delete(this.url + '/' + endpoint, {}, options);
   }
 
-  patch(endpoint: string, body: any, options?: RequestOptions) {
+  patch(endpoint: string, body: any, options: any) {
     return this.http.put(this.url + '/' + endpoint, body, options);
   }
 }

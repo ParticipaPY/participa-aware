@@ -62,11 +62,13 @@ export class SignupPage {
     this.submitAttempt = true;
     
     // Attempt to login in through our User service
-    this.user.signup(this.signUpForm.value).subscribe((resp) => {   
-      this.signUpForm.controls['profile_pic'].patchValue(resp.profilePic.url);   
+    this.user.signup(this.signUpForm.value).then((resp) => {   
+      let result = JSON.parse(resp.data);
+      this.signUpForm.controls['profile_pic'].patchValue(result.profilePic.url);   
       this.createAuthor();
       this.viewCtrl.dismiss(this.signUpForm.value);
     }, (err) => {
+      console.log("Error on SingUp: ", err);
       this.presentToast(err);
     });
   }

@@ -1,12 +1,13 @@
 page-hello-ionic {
   .splash-bg {
-    position: relative;
-    background: url('../assets/img/vallejo_header.jpg') no-repeat transparent;
-    background-size: cover;
-    height: 35%;
+    // position: relative;
+    // background: url('../assets/img/vallejo_header.jpg') no-repeat transparent;
+    background: url('../assets/img/ciudadela.jpg') repeat transparent;
+    // background-size: cover;
+    // height: 35%;
     z-index: 1;
-    background-repeat: repeat-x;
-    animation: animatedBackground 40s linear infinite;
+    // background-repeat: repeat-x;
+    animation: animatedBackground 80s linear infinite;
   }
 
   @keyframes animatedBackground {
@@ -17,21 +18,25 @@ page-hello-ionic {
   .splash-info {
     position: relative;
     z-index: 2;
-    margin-top: -64px;
+    // margin-top: -64px;
+    top: 10%;
     text-align: center;
   }
   .splash-logo {
     margin: auto;
-    //background: url('../assets/img/appicon.png') repeat transparent;
+    background: url('../assets/img/ciudadela-logo.jpg') repeat transparent;
     background-size: 100%;
+    border-radius:50%;
     width: 128px;
     height: 128px;
-  }
+  } 
   .splash-intro {
     font-size: 18px;
     font-weight: bold;
     max-width: 80%;
     margin: auto;
+    text-align: center;
+    color: #fff;
   }
   button.login {
     margin-top: 15px;
@@ -51,7 +56,7 @@ page-hello-ionic {
   }
 
   .cover{
-    background: url('../assets/img/asuncion.jpg') repeat transparent;
+    background: url('../assets/img/ciudadela.jpg') repeat transparent;
     // background: -webkit-linear-gradient(left top, $SIDEMENU_TOP, $SIDEMENU_BOTTOM);
     // background: -o-linear-gradient(bottom right, $SIDEMENU_TOP, $SIDEMENU_BOTTOM);
     // background: -moz-linear-gradient(bottom right, $SIDEMENU_TOP, $SIDEMENU_BOTTOM);
@@ -89,5 +94,11 @@ page-hello-ionic {
 
   .item{
     padding-right: 16px;
+  }
+
+  .signUp{
+    color: #193361;
+    background-color: #fff;
+    border: 1px solid #193361;
   }
 }
