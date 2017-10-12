@@ -18,7 +18,6 @@ export class MyApp implements OnInit{
   @ViewChild(Nav) nav: Nav;
 
   notificationTapped: boolean = false;
-  idea: any;
   rootPage: any;
   rootParams: any;
   account: { email: string, name: string, author_pic: string } = {email: "", name: "", author_pic: ""};
@@ -26,52 +25,49 @@ export class MyApp implements OnInit{
   constructor(public platform: Platform, public menu: MenuController, public statusBar: StatusBar, public splashScreen: SplashScreen, public push: Push, 
               public storage: Storage, public databaseprovider: DatabaseProvider, public events: Events, public notification: Notification) {
 
-    this.platform.ready().then(() => {
-      this.initializeApp();
-    });
+    this.initializeApp();
   }
   
-  initializeApp() {    
-    this.storage.get('email').then( (email) => {
-      if (this.notificationTapped === false){
-        if (email != null && email.length > 0){
-          this.rootPage = TabsPage;
-        } else {
-          this.rootPage = HelloIonicPage;
+  initializeApp() {  
+    this.platform.ready().then(() => {  
+      this.storage.get('email').then( (email) => {
+        if (this.notificationTapped === false){
+           if (email != null && email.length > 0){
+              this.rootPage = TabsPage;
+            } else {
+              this.rootPage = HelloIonicPage;
+            }
         }
-      } else {
-        this.rootPage   = ItemDetailsPage;
-        this.rootParams = this.idea;
-      }
-      this.storage.get('name').then( name => {
-        this.account.email = email;
-        this.account.name  = name;
-        this.storage.get('profile_pic').then( (profile_pic) => {
-          this.account.author_pic = profile_pic;
+        this.storage.get('name').then( name => {
+          this.account.email = email;
+          this.account.name  = name;
+          this.storage.get('profile_pic').then( (profile_pic) => {
+            this.account.author_pic = profile_pic;
+          });
         });
-      });
-    });  
-    this.statusBar.styleDefault();
-    this.splashScreen.hide();
-    this.listenToLogin();
+      });  
+      this.statusBar.styleDefault();
+      this.splashScreen.hide();      
+      this.registerPush();
+      this.listenToLogin();
+    });
   }
 
   ngOnInit(){       
     this.push.rx.notification().subscribe((notification) => {  
-        this.idea = notification.payload;    
-
-        if(notification.raw.additionalData.coldstart === true && this.notificationTapped === false) {
-          this.notificationTapped = true;
-		      if(this.idea) {
-            this.nav.setRoot(TabsPage).then( () => {              
-              this.nav.push(ItemDetailsPage, { item: this.idea });
-            });            
-          }
-        } else if(this.platform.is("android")) {
-          this.notificationTapped = true;
-          this.rootPage = TabsPage;
-          this.nav.push(ItemDetailsPage, { item: this.idea });
+      if(notification.raw.additionalData.coldstart === true && this.notificationTapped === false) {
+        this.notificationTapped = true;
+        
+        if(notification.payload) {
+          this.nav.setRoot(TabsPage).then( () => {              
+            this.nav.push(ItemDetailsPage, { item: notification.payload });
+          });            
         }
+      } else if(this.platform.is("android")) {        
+        this.notificationTapped = true;
+        this.rootPage = TabsPage;
+        this.nav.push(ItemDetailsPage, { item: notification.payload });
+      }
     });    
   }
 
@@ -99,7 +95,7 @@ export class MyApp implements OnInit{
         this.account.email = user.email;
         this.account.name  = user.name;
         this.account.author_pic = user.author_pic;
-        this.registerPush();
+        this.registerToken();
       }
     });
   }
@@ -108,15 +104,8 @@ export class MyApp implements OnInit{
     // Check that we are on a device
     if (this.platform.is('cordova')) {
       // Register push notifications with the push plugin
-      this.push.register().then((t: PushToken) => {
-        console.log('Generated Token' + JSON.stringify(t));
-        this.storage.get('user_id').then( id => {
-          this.notification.storeUserToken(id, t.token).subscribe( (resp) => {
-            console.log('Response from server: ', resp);
-          }, (err) => {
-            console.log('Error from server: ', err);
-          });
-        });        
+      this.push.register().then((t: PushToken) => {        
+        console.log('Generated Token' + JSON.stringify(t));       
         return this.push.saveToken(t);
       }).then((t: PushToken) => {
         console.log('Token Saved', t.token);
@@ -124,6 +113,16 @@ export class MyApp implements OnInit{
         console.log('Error Saving Token: ', err);
       });
     }
+  }
+
+  registerToken(){
+    this.storage.get('user_id').then( id => {
+      this.notification.storeUserToken(id, this.push.token.token).subscribe( (resp) => {
+        console.log('Response from server: ', resp);
+      }, (err) => {
+        console.log('Error from server: ', err);
+      });
+    });     
   }
 
 }

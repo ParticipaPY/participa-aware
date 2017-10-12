@@ -1,5 +1,5 @@
 import { Component, ViewChild } from '@angular/core';
-import { NavController, ToastController, ViewController } from 'ionic-angular';
+import { NavController, ToastController, ViewController, LoadingController } from 'ionic-angular';
 import { Validators, FormBuilder, FormGroup } from '@angular/forms';
 
 import { User } from "../../providers/user/user";
@@ -19,7 +19,7 @@ export class SignupPage {
   submitAttempt: boolean = false;
 
   constructor(public navCtrl: NavController, public viewCtrl: ViewController, public formBuilder: FormBuilder, public user: User, public toastCtrl: ToastController,
-              public databaseProvider: DatabaseProvider, public notification: Notification) {
+              public databaseProvider: DatabaseProvider, public notification: Notification, public loadingCtrl: LoadingController) {
     
     this.signUpForm = formBuilder.group({
         name: ['', Validators.compose([Validators.maxLength(80), Validators.pattern('[a-zA-Z ]*'), Validators.required])],
@@ -29,7 +29,7 @@ export class SignupPage {
         place_one: ['', Validators.required],
         place_two: ['', Validators.required],
         place_three: ['', Validators.required],
-        lang: "ES",
+        lang: "es-ES",
         profile_pic: ""
     });
 
@@ -61,13 +61,21 @@ export class SignupPage {
   doSignup() {
     this.submitAttempt = true;
     
-    // Attempt to login in through our User service
+    const loading = this.loadingCtrl.create({
+      spinner: 'bubbles',
+      showBackdrop: false
+    });
+  
+    loading.present();    
+    
     this.user.signup(this.signUpForm.value).then((resp) => {   
+      loading.dismiss();
       let result = JSON.parse(resp.data);
       this.signUpForm.controls['profile_pic'].patchValue(result.profilePic.url);   
-      this.createAuthor();
+      // this.createAuthor();
       this.viewCtrl.dismiss(this.signUpForm.value);
     }, (err) => {
+      loading.dismiss();
       console.log("Error on SingUp: ", err);
       this.presentToast(err);
     });

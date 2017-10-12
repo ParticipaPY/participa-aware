@@ -28,38 +28,18 @@ export class LocationThreePage {
     private databaseprovider: DatabaseProvider, public http: Http, public storage: Storage, public toastCtrl: ToastController) {
       
     this.rootNavCtrl = navParams.get('rootNavCtrl');  
-    this.getUserInfo();
   }
 
-  getUserInfo() {
-    // this.storage.get('email').then( (val) => {
-    //   this.email = val;
-    // });
-    // this.storage.get('vote_up').then( (val) => {
-    //   this.vote_up = val;
-    // });
-    // this.storage.get('vote_down').then( (val) => {
-    //   this.vote_down = val;
-    // });
-    // this.storage.get('comment').then( (val) => {
-    //   this.comment = val;
-    // });          
+  ionViewDidLoad() {
+    this.getUserInfo();
+    this.setFilteredItems();
+  }
+
+  getUserInfo() {         
     this.storage.get('location_three').then( (val) => {
       this.location_three = val;
     });  
-  }
-
-  // ionViewDidLoad(){
-  //   this.databaseprovider.getDatabaseState().subscribe(rdy => {
-  //     if (rdy) {
-  //       this.loadIdeas();
-  //     }
-  //   });  
-  // }
-
-  ionViewDidLoad() {
-    this.setFilteredItems();
-  }
+  }  
 
   setFilteredItems() {
     if (this.searchTerm && this.searchTerm.trim() != '')
@@ -97,9 +77,9 @@ export class LocationThreePage {
     let addModal = this.modalCtrl.create(ItemCreatePage, {location: this.location_three});
     addModal.onDidDismiss((item) => {
       
-      if (item == true) {
+      if (item > 0) {
         this.loadIdeas();             
-      } else if (item == false) {
+      } else if (item <= 0) {
         let toast = this.toastCtrl.create({
           message: "Error Creating Idea",
           duration: 3000,

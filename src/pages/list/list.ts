@@ -29,30 +29,25 @@ export class ListPage {
   constructor(public navCtrl: NavController, public navParams: NavParams, public modalCtrl: ModalController, private databaseprovider: DatabaseProvider, public http: Http, 
     public storage: Storage, public toastCtrl: ToastController, public platform: Platform) {
       
-    this.rootNavCtrl = this.navParams.get('rootNavCtrl'); 
-    
-    this.platform.ready().then( () => {
-      this.getUserInfo();
-    }); 
+    this.rootNavCtrl = this.navParams.get('rootNavCtrl');  
+  }
+ 
+  ionViewDidLoad() {
+    console.log("List Page DidLoad");
+    this.getUserInfo();
+    this.setFilteredItems();
+  }
+
+  ionViewWillEnter(){
+    console.log("List Page WillEnter");
+    this.getUserInfo();
+    this.setFilteredItems();    
   }
 
   getUserInfo() {      
     this.storage.get('location_one').then( (val) => {
       this.location_one = val;
     });  
-  }
-
-  // ionViewDidLoad(){
-  //   this.databaseprovider.getDatabaseState().subscribe(rdy => {
-  //     if (rdy) {
-  //       this.loadIdeas();
-  //     }
-  //   });  
-  // }
- 
- 
-  ionViewDidLoad() {
-    this.setFilteredItems();
   }
 
   setFilteredItems() {
@@ -91,9 +86,9 @@ export class ListPage {
     let addModal = this.modalCtrl.create(ItemCreatePage, {location: this.location_one});
     addModal.onDidDismiss((item) => {
       
-      if (item == true) {
+      if (item > 0) {
         this.loadIdeas();             
-      } else if (item == false) {
+      } else if (item <= 0) {
         let toast = this.toastCtrl.create({
           message: "Error Creating Idea",
           duration: 3000,

@@ -1,5 +1,5 @@
-import { Injectable } from '@angular/core';
-import { Platform } from 'ionic-angular';
+import { Injectable, OnInit } from '@angular/core';
+import { Platform, Events } from 'ionic-angular';
 import { SQLite, SQLiteObject } from '@ionic-native/sqlite';
 import { SQLitePorter } from '@ionic-native/sqlite-porter';
 import { Http } from '@angular/http';
@@ -8,7 +8,7 @@ import { BehaviorSubject } from 'rxjs/Rx';
 import { Storage } from '@ionic/storage';
  
 @Injectable()
-export class DatabaseProvider {
+export class DatabaseProvider implements OnInit{
   database: SQLiteObject;
   private databaseReady: BehaviorSubject<boolean>;
   author_id: any;
@@ -16,24 +16,12 @@ export class DatabaseProvider {
   location_two: any;
   location_three: any;
  
-  constructor(public sqlitePorter: SQLitePorter, private storage: Storage, private sqlite: SQLite, private platform: Platform, private http: Http) {
+  constructor(public sqlitePorter: SQLitePorter, private storage: Storage, private sqlite: SQLite, private platform: Platform, private http: Http, public events: Events) {
 
     this.databaseReady = new BehaviorSubject(false);
 
     this.platform.ready().then(() => {
-      this.storage.get('user_id').then( id => {
-        this.author_id = id;
-      });
-      this.storage.get('location_one').then( (val) => {
-        this.location_one = val;
-      });
-      this.storage.get('location_two').then( (val) => {
-        this.location_two = val;
-      });        
-      this.storage.get('location_three').then( (val) => {
-        this.location_three = val;
-      });
-
+      this.getUserInfo();
       this.sqlite.create({
         name: 'data.db',
         location: 'default'
@@ -50,7 +38,26 @@ export class DatabaseProvider {
       });
     });
   }
+
+  ngOnInit(){
+    this.getUserInfo();
+  }
  
+  getUserInfo(){
+    this.storage.get('user_id').then( id => {
+      this.author_id = id;
+    });
+    this.storage.get('location_one').then( (val) => {
+      this.location_one = val;
+    });
+    this.storage.get('location_two').then( (val) => {
+      this.location_two = val;
+    });        
+    this.storage.get('location_three').then( (val) => {
+      this.location_three = val;
+    });
+  }
+
   fillDatabase() {
     this.http.get('assets/ideas.sql')
       .map(res => res.text())
@@ -132,6 +139,7 @@ export class DatabaseProvider {
   }
 
   getAllIdeas(location?: string) {
+    this.getUserInfo();
     let where: string;
     let data;
     if (location) {
@@ -147,7 +155,7 @@ export class DatabaseProvider {
       data = [];
     }
     
-    let sql = "SELECT i.id, i.idea_id, i.campaign_id, i.title, i.date, i.description, i.location_id, i.votes_up, i.votes_down, i.comments, i.voted_up, i.voted_down, a.name, a.profile_pic, l.name as location_name " +
+    let sql = "SELECT i.id, i.idea_id, i.campaign_id, i.title, i.date, i.description, i.location_id, i.votes_up, i.votes_down, i.comments, i.voted_up, i.voted_down, i.resourceSpaceId, a.name, a.profile_pic, l.name as location_name " +
               "FROM idea i " + 
               "JOIN author a on (i.author_id = a.id) " +
               "JOIN location l on (i.location_id = l.id)" + 
@@ -173,7 +181,8 @@ export class DatabaseProvider {
             voted_down: data.rows.item(i).voted_down,
             author: data.rows.item(i).name,
             author_pic : data.rows.item(i).profile_pic,
-            location: data.rows.item(i).location_name
+            location: data.rows.item(i).location_name,
+            resourceSpaceId: data.rows.item(i).resourceSpaceId
           });
         }
       }
@@ -213,10 +222,10 @@ export class DatabaseProvider {
   }
  
   getIdea(id) {
-    let sql = "SELECT i.id, i.idea_id, i.campaign_id, i.title, i.date, i.description, i.location_id, i.votes_up, i.votes_down, i.comments, i.voted_up, i.voted_down, a.name, a.profile_pic " +
+    let sql = "SELECT i.id, i.idea_id, i.campaign_id, i.title, i.date, i.description, i.location_id, i.votes_up, i.votes_down, i.comments, i.voted_up, i.voted_down, i.resourceSpaceId, a.name, a.profile_pic " +
               "FROM idea i " + 
               "JOIN author a on (i.author_id = a.id) " +
-              "WHERE i.id=?;"
+              "WHERE i.idea_id=?;"
     return this.database.executeSql(sql, [id]).then((data) => {
       let ideas = [];
       if (data.rows.length > 0) {
@@ -235,7 +244,8 @@ export class DatabaseProvider {
             voted_up: data.rows.item(i).voted_up,
             voted_down: data.rows.item(i).voted_down,
             author: data.rows.item(i).name,
-            author_pic : data.rows.item(i).profile_pic
+            author_pic : data.rows.item(i).profile_pic,
+            resourceSpaceId: data.rows.item(i).resourceSpaceId
           });
         }
       }
@@ -254,7 +264,8 @@ export class DatabaseProvider {
           campaigns.push({ 
             id: data.rows.item(i).id,
             name: data.rows.item(i).name,
-            hashtag: data.rows.item(i).hashtag
+            hashtag: data.rows.item(i).hashtag,
+            resourceSpaceId: data.rows.item(i).resourceSpaceId
           });
         }
       }
@@ -262,6 +273,26 @@ export class DatabaseProvider {
     }, err => {
       console.log('Error: ', err);
       return [];
+    });        
+  }
+
+  getCampaign(id) {
+    return this.database.executeSql("SELECT * FROM campaign WHERE id = ?;", [id]).then( (data) => {
+      let campaigns = [];
+      if (data.rows.length > 0) {
+        for (var i = 0; i < data.rows.length; i++) {
+          campaigns.push({ 
+            id: data.rows.item(i).id,
+            name: data.rows.item(i).name,
+            hashtag: data.rows.item(i).hashtag,
+            resourceSpaceId: data.rows.item(i).resourceSpaceId
+          });
+        }
+      }
+      return campaigns[0];
+    }, err => {
+      console.log('Error: ', err);
+      return {};
     });        
   }
 
@@ -323,10 +354,10 @@ export class DatabaseProvider {
               "VALUES (?, ?, ?, ?, ?, ?, 0, 0, 0, 0, 0, 0);";
 
     return this.database.executeSql(sql, data).then(data => {
-      return true;
+      return data.insertId;
     }, err => {
       console.log('Error: ', err);
-      return false;
+      return 0;
     });
   }
 
@@ -337,7 +368,10 @@ export class DatabaseProvider {
               "VALUES (?, ?, ?, ?);"
 
     return this.database.executeSql(sql, data).then(data => {
-      return this.updateCommentCounter(idea);
+      return data.insertId;
+    }, err => {
+      console.log('Error: ', err);
+      return 0;
     });
   }
 
@@ -372,6 +406,39 @@ export class DatabaseProvider {
         console.error(err);
         return {};
       });
+  }
+
+  updateIdeaIdeaId (id, idea_id){
+    let sql = "UPDATE idea set idea_id = ? WHERE id = ?;"
+
+    return this.database.executeSql(sql, [idea_id, id]).then(data => {
+      return id;
+    }, err => {
+      console.log('Error: ', err);
+      return 0;
+    });     
+  }
+
+  updateIdeaRSID(id, resourceSpaceId){
+    let sql = "UPDATE idea set resourceSpaceId = ? WHERE id = ?;"
+    
+    return this.database.executeSql(sql, [resourceSpaceId, id]).then(data => {
+      return id;
+    }, err => {
+      console.log('Error: ', err);
+      return 0;
+    });     
+  }
+
+  updateCommentRSID(id, resourceSpaceId){
+    let sql = "UPDATE comments set resourceSpaceId = ? WHERE id = ?;"
+    
+    return this.database.executeSql(sql, [resourceSpaceId, id]).then(data => {
+      return id;
+    }, err => {
+      console.log('Error: ', err);
+      return 0;
+    });     
   }
 
   getCurrentDate() {

@@ -28,28 +28,17 @@ export class LocationTwoPage {
     private databaseprovider: DatabaseProvider, public http: Http, public storage: Storage, public toastCtrl: ToastController) {
       
     this.rootNavCtrl = navParams.get('rootNavCtrl');  
-    
-    this.platform.ready().then( () => {
-      this.getUserInfo();
-    });
+  }
+
+  ionViewDidLoad() {
+    this.getUserInfo();
+    this.setFilteredItems();
   }
 
   getUserInfo() {         
     this.storage.get('location_two').then( (val) => {
       this.location_two = val;
     });  
-  }
-
-  // ionViewDidLoad(){
-  //   this.databaseprovider.getDatabaseState().subscribe(rdy => {
-  //     if (rdy) {
-  //       this.loadIdeas();
-  //     }
-  //   });  
-  // }
-
-  ionViewDidLoad() {
-    this.setFilteredItems();
   }
 
   setFilteredItems() {
@@ -88,9 +77,9 @@ export class LocationTwoPage {
     let addModal = this.modalCtrl.create(ItemCreatePage, {location: this.location_two});
     addModal.onDidDismiss((item) => {
       
-      if (item == true) {
+      if (item > 0) {
         this.loadIdeas();             
-      } else if (item == false) {
+      } else if (item <= 0) {
         let toast = this.toastCtrl.create({
           message: "Error Creating Idea",
           duration: 3000,

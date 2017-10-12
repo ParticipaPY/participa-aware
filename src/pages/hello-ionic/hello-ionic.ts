@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Storage } from '@ionic/storage';
-import { NavController, ToastController, Events, ModalController, Platform } from 'ionic-angular';
+import { NavController, ToastController, Events, ModalController, Platform, LoadingController } from 'ionic-angular';
 import { Keyboard } from '@ionic-native/keyboard';
 import { ScreenOrientation } from '@ionic-native/screen-orientation';
 
@@ -19,8 +19,8 @@ export class HelloIonicPage {
 
   constructor(public navCtrl: NavController, public user: User, public toastCtrl: ToastController, public databaseProvider: DatabaseProvider, 
               private storage: Storage, public events: Events, public modalCtrl: ModalController, private screenOrientation: ScreenOrientation,
-              public keyboard: Keyboard, public platform: Platform) {
-    
+              public keyboard: Keyboard, public platform: Platform, public loadingCtrl: LoadingController) {
+
     this.platform.ready().then( () => {
       this.screenOrientation.lock(this.screenOrientation.ORIENTATIONS.PORTRAIT);
       this.keyboard.onKeyboardShow().subscribe(() => {
@@ -33,8 +33,23 @@ export class HelloIonicPage {
     
   }
 
+  presentLoading() {
+    const loading = this.loadingCtrl.create({
+      spinner: 'bubbles'
+    });
+  
+    loading.present();
+  }
+
   doLogin() {        
+    const loading = this.loadingCtrl.create({
+      spinner: 'bubbles'
+    });
+  
+    loading.present();
+
     this.user.login(this.account).then( (resp) => {  
+      loading.dismiss();
       let result = JSON.parse(resp.data);        
       this.storeUserInfo(result);
       this.account.name = result.name;
@@ -43,6 +58,7 @@ export class HelloIonicPage {
       this.navCtrl.push(TabsPage);
       this.navCtrl.setRoot(TabsPage);  
     }, (err) => {      
+      loading.dismiss();
       let toast = this.toastCtrl.create({
         message: err,
         duration: 3000,

@@ -1,8 +1,9 @@
 import { Component } from '@angular/core';
 import { Storage } from '@ionic/storage';
 
-import { NavController, NavParams } from 'ionic-angular';
+import { NavController, NavParams, ToastController } from 'ionic-angular';
 import { DatabaseProvider } from "../../providers/database/database";
+import { CommentsProvider } from '../../providers/comments/comments';
 
 @Component({
   selector: 'page-item-details',
@@ -15,7 +16,7 @@ export class ItemDetailsPage {
   comments = [];
   itemExpandHeight: number = 100;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, private databaseprovider: DatabaseProvider, public storage: Storage) {
+  constructor(public navCtrl: NavController, public navParams: NavParams, private databaseprovider: DatabaseProvider, public storage: Storage, public commentProvider: CommentsProvider, public toastCtrl: ToastController) {
     // If we navigated to this page, we will have an item available as a nav param
     this.selectedItem = navParams.get('item');      
   } 
@@ -30,7 +31,7 @@ export class ItemDetailsPage {
   }
 
   getIdea() {
-    this.databaseprovider.getIdea(this.selectedItem.id).then(data => {
+    this.databaseprovider.getIdea(this.selectedItem.idea_id).then(data => {
       this.selectedItem = data;
     });
   }
@@ -74,10 +75,28 @@ export class ItemDetailsPage {
   }
 
   createComment(){
-    this.databaseprovider.createComment(this.comment, this.selectedItem).then(data => {
+    this.databaseprovider.createComment(this.comment, this.selectedItem).then( (data) => {
+      this.databaseprovider.updateCommentCounter(this.selectedItem);
+      this.commentProvider.postComment(this.selectedItem.resourceSpaceId, this.comment, "DISCUSSION").then ( (resp) => {
+        let response = JSON.parse(resp.data);
+        console.log("Status: ", resp.status);
+        console.log("Data: ", resp.data);
+        console.log("===> Comment ID: ", data);
+        console.log("===> Comment Contribution ID: ", response.contributionId);
+        console.log("===> Comment Resource Space ID: ", response.resourceSpaceId);        
+        this.databaseprovider.updateCommentRSID(data, response.resourceSpaceId);
+      }).catch((error) => {
+        let toast = this.toastCtrl.create({
+          message: 'Error al crear Comentario en AppCivist',
+          duration: 3000,
+          position: 'top'
+        });
+        toast.present();        
+        console.log("Error creating Comment: ", error);
+      });
       this.getIdea();
       this.loadIdeaComments();
-      this.comment = "";
+      this.comment = "";      
     });
   }
 

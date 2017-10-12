@@ -117,7 +117,7 @@
       </ion-item>      
 
       <div padding>
-        <button ion-button color="custom-color" block (click)="doSignup()">Registrarme</button>
+        <button ion-button color="custom-color" block (click)="doSignup()" [disabled]="!isReadyToSave">Registrarme</button>
       </div>
 
     </ion-list>

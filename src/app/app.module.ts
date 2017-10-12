@@ -39,6 +39,8 @@ import { IonicStorageModule } from '@ionic/storage';
 import { SQLitePorter } from '@ionic-native/sqlite-porter';
 import { SQLite } from '@ionic-native/sqlite';
 import { ExpandableComponent } from '../components/expandable/expandable';
+import { IdeasProvider } from '../providers/ideas/ideas';
+import { CommentsProvider } from '../providers/comments/comments';
 
 const cloudSettings: CloudSettings = {
   core: {
@@ -113,7 +115,9 @@ const cloudSettings: CloudSettings = {
     SQLitePorter,
     SQLite,
     NotificationApi,
-    Notification
+    Notification,
+    IdeasProvider,
+    CommentsProvider
   ]
 })
 export class AppModule {}

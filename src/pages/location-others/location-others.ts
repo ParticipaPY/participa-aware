@@ -26,32 +26,8 @@ export class LocationOthersPage {
   constructor(public navCtrl: NavController, public navParams: NavParams, public modalCtrl: ModalController, 
     private databaseprovider: DatabaseProvider, public http: Http, public storage: Storage, public toastCtrl: ToastController) {
       
-    this.rootNavCtrl = navParams.get('rootNavCtrl');  
-    //this.getUserInfo();
+    this.rootNavCtrl = navParams.get('rootNavCtrl');      
   }
-
-  getUserInfo() {
-    this.storage.get('email').then( (val) => {
-      this.email = val;
-    });
-    this.storage.get('vote_up').then( (val) => {
-      this.vote_up = val;
-    });
-    this.storage.get('vote_down').then( (val) => {
-      this.vote_down = val;
-    });
-    this.storage.get('comment').then( (val) => {
-      this.comment = val;
-    });            
-  }
-
-  // ionViewDidLoad(){
-  //   this.databaseprovider.getDatabaseState().subscribe(rdy => {
-  //     if (rdy) {
-  //       this.loadIdeas();
-  //     }
-  //   });  
-  // }
 
   ionViewDidLoad() {
     this.setFilteredItems();
@@ -93,9 +69,9 @@ export class LocationOthersPage {
     let addModal = this.modalCtrl.create(ItemCreatePage);
     addModal.onDidDismiss((item) => {
       
-      if (item == true) {
+      if (item > 0) {
         this.loadIdeas();             
-      } else if (item == false) {
+      } else if (item <= 0) {
         let toast = this.toastCtrl.create({
           message: "Error Creating Idea",
           duration: 3000,

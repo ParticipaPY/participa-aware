@@ -65,7 +65,7 @@
     },
     "devDependencies": {
         "@ionic/app-scripts": "1.3.12",
-        "ionic": "3.9.2",
+        "ionic": "3.13.0",
         "typescript": "2.3.4"
     },
     "description": "An Ionic project",
@@ -78,7 +78,6 @@
             "cordova-plugin-whitelist": {},
             "ionic-plugin-keyboard": {},
             "cordova-plugin-camera": {},
-            "cordova-plugin-geolocation": {},
             "phonegap-plugin-push": {
                 "SENDER_ID": "283358254869"
             },
@@ -87,7 +86,8 @@
             "cordova-plugin-file": {},
             "cordova-plugin-filepath": {},
             "cordova-plugin-advanced-http": {},
-            "cordova-plugin-screen-orientation": {}
+            "cordova-plugin-screen-orientation": {},
+            "cordova-plugin-geolocation": {}
         },
         "platforms": [
             "android"
