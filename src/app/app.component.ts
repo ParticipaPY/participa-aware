@@ -8,6 +8,7 @@ import { Push, PushToken } from '@ionic/cloud-angular';
 import { HelloIonicPage } from '../pages/hello-ionic/hello-ionic';
 import { TabsPage } from '../pages/tabs/tabs';
 import { ItemDetailsPage } from '../pages/item-details/item-details';
+import { MyProfilePage } from '../pages/my-profile/my-profile'; 
 import { DatabaseProvider } from "../providers/database/database";
 import { Notification } from "../providers/notification/notification";
 
@@ -20,11 +21,13 @@ export class MyApp implements OnInit{
   notificationTapped: boolean = false;
   rootPage: any;
   rootParams: any;
-  account: { email: string, name: string, author_pic: string } = {email: "", name: "", author_pic: ""};
+  myProfile;
+  account: { user_id: number, email: string, name: string, author_pic: string } = {user_id: 0, email: "", name: "", author_pic: ""};
 
   constructor(public platform: Platform, public menu: MenuController, public statusBar: StatusBar, public splashScreen: SplashScreen, public push: Push, 
               public storage: Storage, public databaseprovider: DatabaseProvider, public events: Events, public notification: Notification) {
 
+    this.myProfile = MyProfilePage;
     this.initializeApp();
   }
   
@@ -38,11 +41,14 @@ export class MyApp implements OnInit{
               this.rootPage = HelloIonicPage;
             }
         }
-        this.storage.get('name').then( name => {
+        this.storage.get('name').then( (name) => {
           this.account.email = email;
           this.account.name  = name;
           this.storage.get('profile_pic').then( (profile_pic) => {
             this.account.author_pic = profile_pic;
+          });
+          this.storage.get('userId').then( (id) => {
+            this.account.user_id = id;
           });
         });
       });  
@@ -79,6 +85,7 @@ export class MyApp implements OnInit{
     this.storage.remove("comment");
     this.storage.remove('name');
     this.storage.remove('user_id');    
+    this.storage.remove('userId');
     this.storage.remove('profile_pic');
     this.storage.remove('session_key');
     this.storage.remove('location_one');
@@ -91,12 +98,14 @@ export class MyApp implements OnInit{
 
   listenToLogin() {
     this.events.subscribe('user:created', (user) => {
-      if (user) {        
+      if (user) {       
+        this.account.user_id = user.user_id; 
         this.account.email = user.email;
         this.account.name  = user.name;
         this.account.author_pic = user.author_pic;
         this.registerToken();
       }
+      
     });
   }
 
@@ -116,13 +125,19 @@ export class MyApp implements OnInit{
   }
 
   registerToken(){
-    this.storage.get('user_id').then( id => {
+    this.storage.get('userId').then( id => {
       this.notification.storeUserToken(id, this.push.token.token).subscribe( (resp) => {
         console.log('Response from server: ', resp);
       }, (err) => {
         console.log('Error from server: ', err);
       });
     });     
+  }
+
+  openPage(page){
+    console.log("Page: ", page);
+    this.nav.push(page, {account: this.account});
+    this.menu.close();
   }
 
 }

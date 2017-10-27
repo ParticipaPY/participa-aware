@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Api } from '../api';
+import { Storage } from '@ionic/storage';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/share';
 import 'rxjs/add/operator/toPromise';
@@ -7,9 +8,12 @@ import 'rxjs/add/operator/toPromise';
 @Injectable()
 export class User {
   _user: any;
+  session_key: string;
   
-  constructor(public api: Api) {
-
+  constructor(public api: Api,  public storage: Storage) {
+    this.storage.get('session_key').then( (key) => {
+      this.session_key = key
+    });
   }
 
   /**
@@ -17,14 +21,19 @@ export class User {
    * the user entered on the form.
    */
   login(accountInfo: any) {
-    return this.api.post('user/login', {email:accountInfo.email, password:accountInfo.password}, {});
+    let data = {
+      "email": accountInfo.email, 
+      "password": accountInfo.password
+    }
+
+    return this.api.post('user/login', data, {});
   }
 
   /**
    * Send a POST request to our signup endpoint with the data
    * the user entered on the form.
    */
-  signup(accountInfo: any) {
+  signup(accountInfo) {
     let data = {
       "email": accountInfo.email,
       "password": accountInfo.password,
@@ -36,7 +45,19 @@ export class User {
         "uuid": "bfe4464b-549d-4231-acc0-7e1c24833ad9"
       }
     }
+
     return this.api.post('user/signup', data, {});
+  }
+
+  editProfile(user_id, accountInfo){
+    let data = {
+      "uid": user_id,
+      "email": accountInfo.email,
+      "name": accountInfo.name,
+      "lang": accountInfo.lang,
+    }
+
+    return this.api.put('user/' + user_id, data, {'SESSION_KEY': this.session_key});
   }
 
   /**

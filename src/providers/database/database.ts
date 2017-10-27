@@ -1,12 +1,12 @@
 import { Injectable, OnInit } from '@angular/core';
-import { Platform, Events } from 'ionic-angular';
+import { Platform } from 'ionic-angular';
 import { SQLite, SQLiteObject } from '@ionic-native/sqlite';
 import { SQLitePorter } from '@ionic-native/sqlite-porter';
 import { Http } from '@angular/http';
 import 'rxjs/add/operator/map';
 import { BehaviorSubject } from 'rxjs/Rx';
 import { Storage } from '@ionic/storage';
- 
+
 @Injectable()
 export class DatabaseProvider implements OnInit{
   database: SQLiteObject;
@@ -16,7 +16,7 @@ export class DatabaseProvider implements OnInit{
   location_two: any;
   location_three: any;
  
-  constructor(public sqlitePorter: SQLitePorter, private storage: Storage, private sqlite: SQLite, private platform: Platform, private http: Http, public events: Events) {
+  constructor(public sqlitePorter: SQLitePorter, private storage: Storage, private sqlite: SQLite, private platform: Platform, private http: Http) {
 
     this.databaseReady = new BehaviorSubject(false);
 
@@ -121,17 +121,18 @@ export class DatabaseProvider implements OnInit{
   getAuthor(email){
     let sql = "SELECT * FROM author WHERE email = ?;";
     return this.database.executeSql(sql, [email]).then((data) => {
-      let author = [];
+      let author;
       if (data.rows.length > 0) {
-        for (var i = 0; i < data.rows.length; i++) {
-          author.push({ 
-            id: data.rows.item(i).id, 
-            name: data.rows.item(i).name,
-            email: data.rows.item(i).email,
-            profile_pic: data.rows.item(i).profile_pic });
-        }
+        author = { 
+          id: data.rows.item(0).id, 
+          name: data.rows.item(0).name,
+          email: data.rows.item(0).email,
+          profile_pic: data.rows.item(0).profile_pic 
+        };
+      } else {
+        author = {};
       }
-      return author[0];
+      return author;
     }, err => {
       console.log('Error: ', err);
       return {};
@@ -227,29 +228,29 @@ export class DatabaseProvider implements OnInit{
               "JOIN author a on (i.author_id = a.id) " +
               "WHERE i.idea_id=?;"
     return this.database.executeSql(sql, [id]).then((data) => {
-      let ideas = [];
+      let ideas;
       if (data.rows.length > 0) {
-        for (var i = 0; i < data.rows.length; i++) {
-          ideas.push({ 
-            id: data.rows.item(i).id,
-            idea_id: data.rows.item(i).idea_id,
-            campaign_id: data.rows.item(i).campaign_id,
-            title: data.rows.item(i).title, 
-            date: data.rows.item(i).date, 
-            description: data.rows.item(i).description,
-            location_id: data.rows.item(i).location_id,
-            votes_up: data.rows.item(i).votes_up,
-            votes_down: data.rows.item(i).votes_down,
-            comments: data.rows.item(i).comments,
-            voted_up: data.rows.item(i).voted_up,
-            voted_down: data.rows.item(i).voted_down,
-            author: data.rows.item(i).name,
-            author_pic : data.rows.item(i).profile_pic,
-            resourceSpaceId: data.rows.item(i).resourceSpaceId
-          });
-        }
+        ideas = { 
+          id: data.rows.item(0).id,
+          idea_id: data.rows.item(0).idea_id,
+          campaign_id: data.rows.item(0).campaign_id,
+          title: data.rows.item(0).title, 
+          date: data.rows.item(0).date, 
+          description: data.rows.item(0).description,
+          location_id: data.rows.item(0).location_id,
+          votes_up: data.rows.item(0).votes_up,
+          votes_down: data.rows.item(0).votes_down,
+          comments: data.rows.item(0).comments,
+          voted_up: data.rows.item(0).voted_up,
+          voted_down: data.rows.item(0).voted_down,
+          author: data.rows.item(0).name,
+          author_pic : data.rows.item(0).profile_pic,
+          resourceSpaceId: data.rows.item(0).resourceSpaceId
+        };
+      } else {
+        ideas = {};
       }
-      return ideas[0];
+      return ideas;
     }, err => {
       console.log('Error: ', err);
       return {};
@@ -278,18 +279,18 @@ export class DatabaseProvider implements OnInit{
 
   getCampaign(id) {
     return this.database.executeSql("SELECT * FROM campaign WHERE id = ?;", [id]).then( (data) => {
-      let campaigns = [];
+      let campaign;
       if (data.rows.length > 0) {
-        for (var i = 0; i < data.rows.length; i++) {
-          campaigns.push({ 
-            id: data.rows.item(i).id,
-            name: data.rows.item(i).name,
-            hashtag: data.rows.item(i).hashtag,
-            resourceSpaceId: data.rows.item(i).resourceSpaceId
-          });
-        }
+        campaign = { 
+          id: data.rows.item(0).id,
+          name: data.rows.item(0).name,
+          hashtag: data.rows.item(0).hashtag,
+          resourceSpaceId: data.rows.item(0).resourceSpaceId
+        };
+      } else {
+        campaign = {};
       }
-      return campaigns[0];
+      return campaign;
     }, err => {
       console.log('Error: ', err);
       return {};
@@ -321,7 +322,7 @@ export class DatabaseProvider implements OnInit{
     let sql = "UPDATE idea SET votes_up=?, voted_up=1 WHERE id=?;";
 
     this.database.executeSql(sql, [votes, parseInt(idea.id)]); 
-    return this.getIdea(idea.id);
+    return this.getIdea(idea.idea_id);
   }
 
   deleteVoteUp(idea) {
@@ -329,7 +330,7 @@ export class DatabaseProvider implements OnInit{
     let sql = "UPDATE idea SET votes_up=?, voted_up=0 WHERE id=?;";
 
     this.database.executeSql(sql, [votes, parseInt(idea.id)]); 
-    return this.getIdea(idea.id);    
+    return this.getIdea(idea.idea_id);    
   }
 
   voteDown(idea) {
@@ -337,7 +338,7 @@ export class DatabaseProvider implements OnInit{
     let sql = "UPDATE idea SET votes_down=?, voted_down=1 WHERE id=?;";
 
     this.database.executeSql(sql, [votes, parseInt(idea.id)]); 
-    return this.getIdea(idea.id);
+    return this.getIdea(idea.idea_id);
   }
 
   deleteVoteDown(idea) {
@@ -345,7 +346,7 @@ export class DatabaseProvider implements OnInit{
     let sql = "UPDATE idea SET votes_down=?, voted_down=0 WHERE id=?;";
 
     this.database.executeSql(sql, [votes, parseInt(idea.id)]); 
-    return this.getIdea(idea.id);    
+    return this.getIdea(idea.idea_id);    
   }
 
   createIdea(idea) {    
@@ -395,18 +396,43 @@ export class DatabaseProvider implements OnInit{
     return this.getAuthor(user.email);
   }
 
-  createAuthor(user){
-    let sql = "INSERT INTO author (name, email, session_key, profile_pic) VALUES(?, ?, ?, ?);"
+  createAuthor(user_id, user){
+    let sql = "INSERT INTO author (name, email, session_key, profile_pic, user_id) VALUES(?, ?, ?, ?,?);"
 
-    return this.database.executeSql(sql, [user.name, user.email, user.session_key, user.profile_pic]).then( data => {
+    return this.database.executeSql(sql, [user.name, user.email, user.session_key, user.profile_pic, user_id]).then( data => {
         console.log("INSERT ID -> " , data.insertId);
-        // this.storage.set('user_id', data.insertId);
-        return this.createUserLocation(user, data.insertId);
+        this.createUserLocation(user, data.insertId);
+        return data.insertId;
       }, err => {
-        console.error(err);
-        return {};
+        console.log('Error: ', err);
+        return 0;
       });
   }
+
+  createIdeaAC(idea) {
+    let data = [idea.author_id, idea.idea_id, idea.date, idea.campaign_id, idea.location_id, idea.title, idea.description, idea.ups, idea.downs, idea.comments, idea.resourceSpaceId];
+    let sql = "INSERT INTO idea (author_id, idea_id, date, campaign_id, location_id, title, description, votes_up, votes_down, comments, resourceSpaceId, voted_up, voted_down) "+
+              "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 0);";
+
+    return this.database.executeSql(sql, data).then(data => {
+      return data.insertId;
+    }, err => {
+      console.log('Error: ', err);
+      return 0;
+    });
+
+  }
+  
+  createAuthorAC(author) {
+    let sql = "INSERT INTO author (name, email) VALUES(?, ?);"
+    
+    return this.database.executeSql(sql, [author.name, author.email]).then( data => {        
+        return data.insertId;
+      }, err => {
+        console.error(err);
+        return 0;
+      });    
+  }  
 
   updateIdeaIdeaId (id, idea_id){
     let sql = "UPDATE idea set idea_id = ? WHERE id = ?;"

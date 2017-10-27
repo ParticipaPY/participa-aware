@@ -71,8 +71,9 @@ export class SignupPage {
     this.user.signup(this.signUpForm.value).then((resp) => {   
       loading.dismiss();
       let result = JSON.parse(resp.data);
+      console.log("AppCivist User ID: ", result.userId);
       this.signUpForm.controls['profile_pic'].patchValue(result.profilePic.url);   
-      // this.createAuthor();
+      this.createAuthor(result.userId);
       this.viewCtrl.dismiss(this.signUpForm.value);
     }, (err) => {
       loading.dismiss();
@@ -81,14 +82,33 @@ export class SignupPage {
     });
   }
 
-  createAuthor(){
-    this.databaseProvider.createAuthor(this.signUpForm.value).then( (data) => {
+  createAuthor(user_id){
+    this.databaseProvider.createAuthor(user_id, this.signUpForm.value).then( (data) => {
       console.log("Author id: ", data.id);
-      this.notification.createUserNotificationConfig(data.id).subscribe( (resp) => {
-        console.log('Response from server: ', resp);
-      }, (err) => {
-        console.log('Error from server: ', err);
-      });     
+      this.createNotificationConfig(user_id);
+      this.storeUserLocation(user_id);
+    });
+  }
+
+  createNotificationConfig(user){
+    this.notification.createUserNotificationConfig(user).subscribe( (resp) => {
+      console.log('Response from server: ', resp);
+    }, (err) => {
+      console.log('Error creating user notification config: ', err);
+    });
+  }
+
+  storeUserLocation(user){
+    let locations = {
+      "home" : this.signUpForm.controls['place_one'].value,
+      "work" : this.signUpForm.controls['place_two'].value,
+      "other": this.signUpForm.controls['place_three'].value
+    }
+
+    this.notification.storeUserLocation(user, locations).subscribe( (resp) => {
+      console.log('Response from server: ', resp);
+    }, (err) => {
+      console.log('Error storing user location: ', err);
     });
   }
 

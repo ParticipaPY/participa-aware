@@ -19,11 +19,39 @@ export class Notification {
     this.headers.append('Content-Type', 'application/json');        
   }
 
+  getUserLocations(user_id){
+    let options = new RequestOptions({ headers: this.headers });
+    
+    return this.api.get('user/' + user_id + '/locations', {}, options).map(res => res.json());    
+  }
+
+  storeUserLocation(user_id, locations){
+    let options = new RequestOptions({ headers: this.headers });
+    let data = {
+      "home": locations.home,
+      "work": locations.work,
+      "other": locations.other
+    };
+    
+    return this.api.post('user/' + user_id + '/register-location', data, options).map(res => res.json());
+  }
+
+  updateUserLocation(user_id, locations){
+    let options = new RequestOptions({ headers: this.headers });
+    let data = {
+      "home": locations.home,
+      "work": locations.work,
+      "other": locations.other
+    };
+    
+    return this.api.put('user/' + user_id + '/locations', data, options).map(res => res.json());
+  }
+
   storeUserToken(user_id, token){
     console.log("Calling Service to Store User Token for user: ", user_id);
     let options = new RequestOptions({ headers: this.headers });
     let data = {
-      "user_id": parseInt(user_id),
+      "user": parseInt(user_id),
       "token": token
     };
     
@@ -36,4 +64,5 @@ export class Notification {
 
     return this.api.post('user/' + user_id + '/config-notification', [], options).map(res => res.json());    
   }
+
 }

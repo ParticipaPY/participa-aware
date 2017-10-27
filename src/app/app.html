@@ -9,10 +9,10 @@
     </div>
     <ion-list no-lines>
 
-      <ion-item class="side-menu-item">
+      <button ion-item class="side-menu-item" (click)="openPage(myProfile)">
         <ion-icon name="person" item-start></ion-icon>
           Mi Perfil
-      </ion-item>
+      </button>
 
       <button ion-item class="side-menu-item" (click)="logOut()">
         <ion-icon name="exit" item-start></ion-icon>

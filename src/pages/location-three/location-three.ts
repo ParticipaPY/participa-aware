@@ -6,6 +6,7 @@ import { ItemDetailsPage } from '../item-details/item-details';
 import { ItemCreatePage } from '../item-create/item-create';
 import { DatabaseProvider } from "./../../providers/database/database";
 import { Http } from "@angular/http";
+import { IdeasProvider } from '../../providers/ideas/ideas';
 
 @Component({
   selector: 'page-location-three',
@@ -24,7 +25,7 @@ export class LocationThreePage {
   location_three: any;
   searchTerm = "";
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, public modalCtrl: ModalController, 
+  constructor(public navCtrl: NavController, public navParams: NavParams, public modalCtrl: ModalController, private ideaProvider: IdeasProvider, 
     private databaseprovider: DatabaseProvider, public http: Http, public storage: Storage, public toastCtrl: ToastController) {
       
     this.rootNavCtrl = navParams.get('rootNavCtrl');  
@@ -33,6 +34,11 @@ export class LocationThreePage {
   ionViewDidLoad() {
     this.getUserInfo();
     this.setFilteredItems();
+  }
+
+  ionViewWillEnter(){    
+    this.getUserInfo();
+    this.setFilteredItems();    
   }
 
   getUserInfo() {         
@@ -99,6 +105,25 @@ export class LocationThreePage {
         this.ideas[index] = data;
       }
     });
+
+    let data = {
+      "up": true, 
+      "down": false,
+      "campaign_id": idea.campaign_id,
+      "idea_id": idea.idea_id
+    }
+    this.ideaProvider.ideaFeedback(data).then( (resp) => {
+      console.log("Status: ", resp.status);
+      console.log("Data: ", resp.data);
+    }).catch((error) => {
+      let toast = this.toastCtrl.create({
+        message: 'Error al crear feedback en AppCivist',
+        duration: 3000,
+        position: 'top'
+      });
+      toast.present();        
+      console.log("Error creating feedback: ", error);
+    });    
   }
 
   deleteVoteUp(idea) {
@@ -118,6 +143,25 @@ export class LocationThreePage {
       if(index > -1){
         this.ideas[index] = data;
       }
+    });
+
+    let data = {
+      "up": false, 
+      "down": true,
+      "campaign_id": idea.campaign_id,
+      "idea_id": idea.idea_id
+    }
+    this.ideaProvider.ideaFeedback(data).then( (resp) => {
+      console.log("Status: ", resp.status);
+      console.log("Data: ", resp.data);
+    }).catch((error) => {
+      let toast = this.toastCtrl.create({
+        message: 'Error al crear feedback en AppCivist',
+        duration: 3000,
+        position: 'top'
+      });
+      toast.present();        
+      console.log("Error creating feedback: ", error);
     });
   }
   

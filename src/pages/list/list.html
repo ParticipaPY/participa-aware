@@ -23,7 +23,8 @@
     </ion-item>
 
     <ion-card-content (click)="itemTapped($event, item)">
-      <p>{{ item.description | slice:0:250 }}{{item.description.length > 250 ? '...' : ''}}</p>
+      <p *ngIf="item.description">{{ item.description | slice:0:250 }}{{item.description.length > 250 ? '...' : ''}}</p>
+      <p *ngIf="!item.description">Esta idea no tiene descripción</p>
     </ion-card-content>
 
     <ion-row>

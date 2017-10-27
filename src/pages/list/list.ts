@@ -6,7 +6,9 @@ import { ItemDetailsPage } from '../item-details/item-details';
 import { ItemCreatePage } from '../item-create/item-create';
 import { DatabaseProvider } from "./../../providers/database/database";
 import { Http } from "@angular/http";
+import { IdeasProvider } from '../../providers/ideas/ideas';
 
+import { IdeaModel } from '../../models/idea-model'
 
 @Component({
   selector: 'page-list',
@@ -27,7 +29,7 @@ export class ListPage {
   searchTerm = "";
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public modalCtrl: ModalController, private databaseprovider: DatabaseProvider, public http: Http, 
-    public storage: Storage, public toastCtrl: ToastController, public platform: Platform) {
+    public storage: Storage, public toastCtrl: ToastController, public platform: Platform, private ideaProvider: IdeasProvider) {
       
     this.rootNavCtrl = this.navParams.get('rootNavCtrl');  
   }
@@ -108,6 +110,25 @@ export class ListPage {
 
       this.loadIdeas();
     });
+
+    let data = {
+      "up": true, 
+      "down": false,
+      "campaign_id": idea.campaign_id,
+      "idea_id": idea.idea_id
+    }
+    this.ideaProvider.ideaFeedback(data).then( (resp) => {
+      console.log("Status: ", resp.status);
+      console.log("Data: ", resp.data);
+    }).catch((error) => {
+      let toast = this.toastCtrl.create({
+        message: 'Error al crear feedback en AppCivist',
+        duration: 3000,
+        position: 'top'
+      });
+      toast.present();        
+      console.log("Error creating feedback: ", error);
+    });        
   }
 
   deleteVoteUp(idea) {
@@ -128,6 +149,25 @@ export class ListPage {
       
       this.loadIdeas();
     });      
+
+    let data = {
+      "up": false, 
+      "down": true,
+      "campaign_id": idea.campaign_id,
+      "idea_id": idea.idea_id
+    }
+    this.ideaProvider.ideaFeedback(data).then( (resp) => {
+      console.log("Status: ", resp.status);
+      console.log("Data: ", resp.data);
+    }).catch((error) => {
+      let toast = this.toastCtrl.create({
+        message: 'Error al crear feedback en AppCivist',
+        duration: 3000,
+        position: 'top'
+      });
+      toast.present();        
+      console.log("Error creating feedback: ", error);
+    });    
   }
   
   deleteVoteDown(idea) {

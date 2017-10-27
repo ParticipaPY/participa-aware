@@ -18,8 +18,8 @@ export class CommentsProvider {
 
   }
 
-  getComments(){
-
+  getComments(sid){
+    return this.api.get('space/' + sid + '/contribution', {'type': 'comment', 'sorting': 'date_desc'}, {'SESSION_KEY': this.session_key});
   }
 
   postComment(sid, comment: string, type){
@@ -30,7 +30,7 @@ export class CommentsProvider {
       "type"     : type,      
       "status"   : "PUBLISHED"     
     }
-    console.log ("DATA: ", data);
+    console.log ("SESSION_KEY: ", this.session_key);
     return this.api.post('space/' + sid + '/contribution', data, {'SESSION_KEY': this.session_key});
   }
 

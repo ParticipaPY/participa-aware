@@ -23,6 +23,7 @@ import { SignupPage } from '../pages/signup/signup';
 import { ItemDetailsPage } from '../pages/item-details/item-details';
 import { ListPage } from '../pages/list/list';
 import { ItemCreatePage } from '../pages/item-create/item-create';
+import { MyProfilePage } from '../pages/my-profile/my-profile';
 
 import { User } from '../providers/user/user';
 import { Api } from '../providers/api';
@@ -73,6 +74,7 @@ const cloudSettings: CloudSettings = {
     ItemDetailsPage,
     ListPage,
     ItemCreatePage,
+    MyProfilePage,
     ExpandableComponent
   ],
   imports: [
@@ -94,7 +96,8 @@ const cloudSettings: CloudSettings = {
     SignupPage,
     ItemDetailsPage,
     ListPage,
-    ItemCreatePage    
+    ItemCreatePage,
+    MyProfilePage
   ],
   providers: [
     StatusBar,
