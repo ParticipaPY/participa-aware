@@ -10,8 +10,7 @@
     <img *ngIf="user.author_pic" [src]="user.author_pic">
     <img *ngIf="!user.author_pic" src='assets/img/blank_profile.png'>
     <h2 style="text-align: center;"> {{ user.name }} </h2>
-    <h3 style="text-align: center; font-size: 1.2rem;"> {{ user.email }} </h3>
-    <p>User Id: {{ user.user_id }}</p>
+    <h3 style="text-align: center; font-size: 1.2rem;"> {{ user.email }} </h3>    
   </div>
 
   <form [formGroup]="signUpForm">

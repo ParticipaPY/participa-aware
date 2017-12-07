@@ -1,0 +1,43 @@
+<ion-header>
+  
+    <ion-navbar color="custom-color">
+      <ion-title>Editar Comentario</ion-title>
+      <ion-buttons start>
+        <button ion-button (click)="cancel()">
+          <span color="primary" showWhen="ios">
+            Cancelar
+          </span>
+          <ion-icon name="md-close" showWhen="android,windows"></ion-icon>
+        </button>
+      </ion-buttons>
+      <ion-buttons end>
+        <button ion-button (click)="done()" [disabled]="!isReadyToSave" strong>
+          <span color="primary" showWhen="ios">
+            Aceptar
+          </span>
+          <ion-icon name="md-checkmark" showWhen="core,android,windows"></ion-icon>
+        </button>
+      </ion-buttons>    
+    </ion-navbar>
+  </ion-header>
+
+<ion-content padding>
+  <ion-grid>
+    <ion-row align-items-start>
+      <ion-col col-2 align-self-start>
+        <div>
+          <img style="border-radius: 50%;" *ngIf="comment.author_pic" [src]="comment.author_pic">
+          <img style="border-radius: 50%;" *ngIf="!comment.author_pic" src='assets/img/blank_profile.png'>          
+        </div>
+      </ion-col>
+      <ion-col col-10 align-self-center>
+        <ion-textarea #input autosize="200" type="text" [(ngModel)]="comment.description" (ionChange)="commentChange()"></ion-textarea>
+      </ion-col>
+    </ion-row>
+  </ion-grid> 
+
+  <div padding>
+    <button ion-button color="custom-color" (click)="done()" [disabled]="!isReadyToSave">Actualizar</button>
+    <button ion-button color="light" (click)="cancel()">Cancelar</button>
+  </div>
+</ion-content>

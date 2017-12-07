@@ -8,6 +8,15 @@
 </ion-header>
 
 <ion-content>
+  <ion-refresher (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content
+      pullingIcon="arrow-dropdown"
+      pullingText="Pull to refresh"
+      refreshingSpinner="circles"
+      refreshingText="Actualizando ...">
+    </ion-refresher-content>
+  </ion-refresher>
+    
   <ion-card>
     <ion-item text-wrap>
       <ion-avatar item-start>
@@ -17,6 +26,9 @@
       <h2>{{ selectedItem.title }}</h2>
       <h3>{{ selectedItem.author }}</h3>      
       <!-- <p>{{ selectedItem.date }}</p> -->
+      <button *ngIf="selectedItem.author_id == (user_id | async)" clear ion-button icon-only (click)="presentIdeaPopover($event)" item-end>
+        <ion-icon name="md-more"></ion-icon>
+      </button>
     </ion-item>
 
     <ion-card-content>
@@ -55,27 +67,30 @@
   
   <ion-label style="text-align:center;" *ngIf="selectedItem.comments > 0">Comentarios</ion-label>
   <ion-list>
-    <button detail-none (click)="expandItem(item)" ion-item *ngFor="let item of comments">
+    <button detail-none *ngFor="let item of comments" (click)="expandItem(item)" ion-item>
       <ion-avatar item-start>
         <img *ngIf="item.author_pic" [src]="item.author_pic">
         <img *ngIf="!item.author_pic" src='assets/img/blank_profile.png'>
-      </ion-avatar>
-      <h2>{{ item.author }}</h2>
-      <!-- <p>{{ item.date }}</p> -->
+      </ion-avatar>      
+      <h2>{{ item.author }}</h2>        
+      
+      <button *ngIf="item.author_id == (user_id | async)" clear ion-button icon-only (click)="presentCommentPopover($event, item)" item-end>
+        <ion-icon name="md-more"></ion-icon>
+      </button>
+      
       <p *ngIf="!item.expanded">{{ item.description }}</p>
       <expandable [expandHeight]="itemExpandHeight" [expanded]="item.expanded" text-wrap>
         <p> {{ item.description }} </p>
       </expandable>
-    </button>
+    </button>    
   </ion-list>
- 
 </ion-content>
 
-<ion-footer>
+<ion-footer style="clear: both">
   <ion-grid>
     <ion-row align-items-end>
       <ion-col col-10>
-        <ion-textarea style="border-radius: 25px;" type="text" placeholder="Escribe un comentario" [(ngModel)]="comment"></ion-textarea>
+        <ion-textarea autosize="100" type="text" placeholder="Escribe un comentario" [(ngModel)]="comment"></ion-textarea>
       </ion-col>
       <ion-col col-2 align-self-center>
         <button  ion-button icon-only color="custom-color" type="button" item-right (click)="createComment()" *ngIf="comment.length > 0">

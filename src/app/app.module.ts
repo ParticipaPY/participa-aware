@@ -24,6 +24,10 @@ import { ItemDetailsPage } from '../pages/item-details/item-details';
 import { ListPage } from '../pages/list/list';
 import { ItemCreatePage } from '../pages/item-create/item-create';
 import { MyProfilePage } from '../pages/my-profile/my-profile';
+import { CommentPopoverPage } from '../pages/comment-popover/comment-popover';
+import { IdeaPopoverPage } from '../pages/idea-popover/idea-popover';
+import { EditIdeaPage } from '../pages/edit-idea/edit-idea';
+import { EditCommentPage } from '../pages/edit-comment/edit-comment';
 
 import { User } from '../providers/user/user';
 import { Api } from '../providers/api';
@@ -42,6 +46,7 @@ import { SQLite } from '@ionic-native/sqlite';
 import { ExpandableComponent } from '../components/expandable/expandable';
 import { IdeasProvider } from '../providers/ideas/ideas';
 import { CommentsProvider } from '../providers/comments/comments';
+import { Autosize } from '../directives/autosize/autosize';
 
 const cloudSettings: CloudSettings = {
   core: {
@@ -75,7 +80,12 @@ const cloudSettings: CloudSettings = {
     ListPage,
     ItemCreatePage,
     MyProfilePage,
-    ExpandableComponent
+    CommentPopoverPage,
+    IdeaPopoverPage,
+    EditIdeaPage,
+    EditCommentPage,
+    ExpandableComponent,
+    Autosize
   ],
   imports: [
     BrowserModule,
@@ -97,7 +107,11 @@ const cloudSettings: CloudSettings = {
     ItemDetailsPage,
     ListPage,
     ItemCreatePage,
-    MyProfilePage
+    MyProfilePage,
+    CommentPopoverPage,
+    IdeaPopoverPage,
+    EditIdeaPage,
+    EditCommentPage
   ],
   providers: [
     StatusBar,

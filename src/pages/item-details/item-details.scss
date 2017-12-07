@@ -12,5 +12,11 @@ page-item-details {
         text-overflow: initial;
         white-space: initial;
     }
-    
+
+    ion-input, ion-select, ion-textarea {
+        background-color: #e8e5e5; 
+        border-radius: 5px;
+        border: 1px solid rgba(100, 99, 99, 0.4);
+        padding: 3px 3px;        
+    }    
 }

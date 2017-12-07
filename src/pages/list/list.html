@@ -10,7 +10,7 @@
   </div> -->
 
   <ion-card *ngFor="let item of ideas">
-    <ion-item (click)="itemTapped($event, item)">
+    <ion-item >
       <ion-avatar item-start>
         <!--<ion-icon name="{{item.icon}}" item-left></ion-icon>-->
         <img *ngIf="item.author_pic" [src]="item.author_pic">
@@ -18,6 +18,9 @@
       </ion-avatar>
       <h2>{{ item.title }}</h2>
       <h3>{{ item.author }}</h3>   
+      <button *ngIf="item.author_id == (user_id | async)" clear ion-button icon-only (click)="presentIdeaPopover($event, item)" item-end>
+        <ion-icon name="md-more"></ion-icon>
+      </button>      
       <!-- <p>{{ item.campaign_id }}</p>   
       <p>{{item.date}}</p>  -->
     </ion-item>

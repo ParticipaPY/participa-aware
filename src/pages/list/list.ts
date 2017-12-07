@@ -1,12 +1,13 @@
 import { Component } from '@angular/core';
 import { Storage } from '@ionic/storage';
-import { NavController, NavParams, ModalController, ToastController, Platform } from 'ionic-angular';
+import { Http } from "@angular/http";
+import { NavController, NavParams, ModalController, ToastController, Platform , PopoverController} from 'ionic-angular';
 
 import { ItemDetailsPage } from '../item-details/item-details';
 import { ItemCreatePage } from '../item-create/item-create';
 import { DatabaseProvider } from "./../../providers/database/database";
-import { Http } from "@angular/http";
 import { IdeasProvider } from '../../providers/ideas/ideas';
+import { IdeaPopoverPage } from '../idea-popover/idea-popover';
 
 import { IdeaModel } from '../../models/idea-model'
 
@@ -27,13 +28,18 @@ export class ListPage {
   email: string;
   location_one: any;
   searchTerm = "";
+  user_id: any;
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public modalCtrl: ModalController, private databaseprovider: DatabaseProvider, public http: Http, 
-    public storage: Storage, public toastCtrl: ToastController, public platform: Platform, private ideaProvider: IdeasProvider) {
+    public storage: Storage, public toastCtrl: ToastController, public platform: Platform, private ideaProvider: IdeasProvider, public popoverCtrl: PopoverController) {
       
     this.rootNavCtrl = this.navParams.get('rootNavCtrl');  
   }
  
+  ionViewWillLoad() {
+    this.user_id      = this.getUserID(); 
+  }
+
   ionViewDidLoad() {
     console.log("List Page DidLoad");
     this.getUserInfo();
@@ -50,6 +56,10 @@ export class ListPage {
     this.storage.get('location_one').then( (val) => {
       this.location_one = val;
     });  
+  }
+
+  async getUserID() {
+    return await this.storage.get('user_id');
   }
 
   setFilteredItems() {
@@ -103,89 +113,64 @@ export class ListPage {
   }  
 
   voteUp(idea) {
-    this.databaseprovider.voteUp(idea).then(data => {
-      if (idea.voted_down == 1) {
-        this.deleteVoteDown(idea);        
-      }
-
+    this.ideaProvider.voteUp(idea).then( () => {
       this.loadIdeas();
-    });
-
-    let data = {
-      "up": true, 
-      "down": false,
-      "campaign_id": idea.campaign_id,
-      "idea_id": idea.idea_id
-    }
-    this.ideaProvider.ideaFeedback(data).then( (resp) => {
-      console.log("Status: ", resp.status);
-      console.log("Data: ", resp.data);
-    }).catch((error) => {
-      let toast = this.toastCtrl.create({
-        message: 'Error al crear feedback en AppCivist',
-        duration: 3000,
-        position: 'top'
-      });
-      toast.present();        
-      console.log("Error creating feedback: ", error);
     });        
   }
 
-  deleteVoteUp(idea) {
-    this.databaseprovider.deleteVoteUp(idea).then(data => {
-      let index = this.ideas.indexOf(idea);
-
-      if(index > -1){
-        this.ideas[index] = data;
-      }
-    });
-  }
-
   voteDown(idea) {
-    this.databaseprovider.voteDown(idea).then(data => {
-      if (idea.voted_up == 1) {
-        this.deleteVoteUp(idea);        
-      }
-      
+    console.log("VOte Down from List");
+    this.ideaProvider.voteDown(idea).then( () => {
       this.loadIdeas();
-    });      
-
-    let data = {
-      "up": false, 
-      "down": true,
-      "campaign_id": idea.campaign_id,
-      "idea_id": idea.idea_id
-    }
-    this.ideaProvider.ideaFeedback(data).then( (resp) => {
-      console.log("Status: ", resp.status);
-      console.log("Data: ", resp.data);
-    }).catch((error) => {
-      let toast = this.toastCtrl.create({
-        message: 'Error al crear feedback en AppCivist',
-        duration: 3000,
-        position: 'top'
-      });
-      toast.present();        
-      console.log("Error creating feedback: ", error);
-    });    
-  }
-  
-  deleteVoteDown(idea) {
-    this.databaseprovider.deleteVoteDown(idea).then(data => {
-      let index = this.ideas.indexOf(idea);
-
-      if(index > -1){
-        this.ideas[index] = data;
-      }
     });
   }
-    
+
+  deleteVoteUp(idea){
+    this.ideaProvider.deleteVoteUp(idea).then( () => {
+      this.loadIdeas();
+    });
+  }
+
+  deleteVoteDown(idea){
+    this.ideaProvider.deleteVoteDown(idea).then( () => {
+      this.loadIdeas();
+    });
+  }    
+
   doRefresh(refresher) {
     console.log('Begin async operation', refresher);
 
-    setTimeout(() => {
-      console.log('Async operation has ended');
-      refresher.complete();
-    }, 2000);
+    this.ideaProvider.getIdeas().then( (res) => {
+      let response = JSON.parse(res.data);
+      let newIdeas = [];
+      newIdeas     = response.list;
+
+      if (newIdeas.length > 0) {
+        for (var i = 0; i < newIdeas.length; i++){      
+          this.ideaProvider.createEditIdea(newIdeas[i]);//.then( () => {          
+            if (i == newIdeas.length){            
+              refresher.complete();
+              this.loadIdeas();
+            }
+          //});
+        }
+      } else {
+        refresher.complete();
+      }
+    });
   } 
+
+  presentIdeaPopover(myEvent, idea) {
+    let popover = this.popoverCtrl.create(IdeaPopoverPage, {idea: idea});
+    
+    popover.present({
+      ev: myEvent
+    });
+    
+    popover.onDidDismiss( (type) => {
+      console.log("Popover Dismessed");
+      this.loadIdeas();
+    });    
+  }  
+
 }

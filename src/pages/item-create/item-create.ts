@@ -28,13 +28,12 @@ export class ItemCreatePage {
     if (params.get('location'))
       this.location = parseInt(params.get('location'));
     else
-      this.location = 4;
+      this.location = 1;
 
     this.form = formBuilder.group({
-      location_id: this.location,
+      location_id: [this.location, Validators.required],
       title: ['', Validators.required],
       description: ['', Validators.required],
-      campaign_id: ['', Validators.required],
       date: this.getCurrentDate()
     });
 
@@ -75,12 +74,13 @@ export class ItemCreatePage {
     }
 
     this.databaseprovider.createIdea(this.form.value).then( data => {
+      console.log("datos: ", data);
       let sid = this.campaigns.filter(c => c.id == this.form.controls['campaign_id'].value)[0];
-      this.ideaProvider.postIdea(sid.resourceSpaceId, this.form.value).then( (resp) => {
+      let locationData = this.locations.filter(l => l.id == this.form.controls['location_id'].value)[0];
+      console.log("Location => ", locationData);
+      this.ideaProvider.postIdea(this.form.value, locationData).then( (resp) => {
         let response = JSON.parse(resp.data)
         console.log("===> IDEA ID: ", data);
-        console.log("===> IDEA Contribution ID: ", response.contributionId);
-        console.log("===> IDEA Resource Space ID: ", response.resourceSpaceId);
         this.databaseprovider.updateIdeaIdeaId(data, response.contributionId);
         this.databaseprovider.updateIdeaRSID(data, response.resourceSpaceId);
       }).catch((error) => {

@@ -1,34 +1,46 @@
 import { Component } from '@angular/core';
 import { Storage } from '@ionic/storage';
-
-import { NavController, NavParams, ToastController } from 'ionic-angular';
+import { NavController, NavParams, ToastController, PopoverController } from 'ionic-angular';
 import { DatabaseProvider } from "../../providers/database/database";
 import { CommentsProvider } from '../../providers/comments/comments';
 import { IdeasProvider } from '../../providers/ideas/ideas';
+import { IdeaPopoverPage } from '../idea-popover/idea-popover';
+import { CommentPopoverPage } from '../comment-popover/comment-popover';
 
 @Component({
   selector: 'page-item-details',
   templateUrl: 'item-details.html'
 })
 export class ItemDetailsPage {
+  rootNavCtrl: NavController;
   selectedItem: any;
   comment: string = "";  
   ideas = [];
   comments = [];
   itemExpandHeight: number = 100;
+  user_id: any;
 
   constructor(public navCtrl: NavController, public navParams: NavParams, private databaseprovider: DatabaseProvider, public storage: Storage, public commentProvider: CommentsProvider, 
-    public toastCtrl: ToastController, public ideaProvider: IdeasProvider) {
-    // If we navigated to this page, we will have an item available as a nav param
-    this.selectedItem = navParams.get('item');      
-  } 
+              public toastCtrl: ToastController, public ideaProvider: IdeasProvider, public popoverCtrl: PopoverController) {
+   
+    this.rootNavCtrl = this.navParams.get('rootNavCtrl'); 
+  }
 
-  ionViewDidLoad(){
+  ionViewWillLoad() {
+    this.selectedItem = this.navParams.get('item');
+    this.user_id      = this.getUserID(); 
+  }
+
+  ionViewDidLoad() {
     this.databaseprovider.getDatabaseState().subscribe( (rdy) => {
       if (rdy) {
         this.getIdea();       
       }
     })
+  }
+
+  async getUserID() {
+    return await this.storage.get('user_id');
   }
 
   getIdea() {
@@ -51,86 +63,36 @@ export class ItemDetailsPage {
   }
 
   voteUp(idea) {
-    this.databaseprovider.voteUp(idea).then( (data) => {
-      if (idea.voted_down == 1) {
-        this.deleteVoteDown(idea);        
-      }
-
+    this.ideaProvider.voteUp(idea).then( () => {
       this.getIdea();
-    });
-
-    let data = {
-      "up": true, 
-      "down": false,
-      "campaign_id": idea.campaign_id,
-      "idea_id": idea.idea_id
-    }
-    this.ideaProvider.ideaFeedback(data).then( (resp) => {
-      console.log("Status: ", resp.status);
-      console.log("Data: ", resp.data);
-    }).catch((error) => {
-      let toast = this.toastCtrl.create({
-        message: 'Error al crear feedback en AppCivist',
-        duration: 3000,
-        position: 'top'
-      });
-      toast.present();        
-      console.log("Error creating feedback: ", error);
     });  
   }
 
-  deleteVoteUp(idea) {
-    this.databaseprovider.deleteVoteUp(idea).then( (data) => {
-      this.selectedItem = data;
+  voteDown(idea) {
+    this.ideaProvider.voteDown(idea).then( () => {
+      this.getIdea();
+    });    
+  } 
+
+  deleteVoteUp(idea){
+    this.ideaProvider.deleteVoteUp(idea).then( () => {
+      this.getIdea();
     });
   }
 
-  voteDown(idea) {
-    this.databaseprovider.voteDown(idea).then( (data) => {
-      if (idea.voted_up == 1) {
-        this.deleteVoteUp(idea);        
-      }
-      
+  deleteVoteDown(idea){
+    this.ideaProvider.deleteVoteDown(idea).then( () => {
       this.getIdea();
-    }); 
-
-    let data = {
-      "up": false, 
-      "down": true, 
-      "campaign_id": idea.campaign_id,
-      "idea_id": idea.idea_id
-    }
-    this.ideaProvider.ideaFeedback(data).then( (resp) => {
-      console.log("Status: ", resp.status);
-      console.log("Data: ", resp.data);
-    }).catch((error) => {
-      let toast = this.toastCtrl.create({
-        message: 'Error al crear feedback en AppCivist',
-        duration: 3000,
-        position: 'top'
-      });
-      toast.present();        
-      console.log("Error creating feedback: ", error);
-    });     
-  } 
-
-  deleteVoteDown(idea) {
-    this.databaseprovider.deleteVoteDown(idea).then( (data) => {
-      this.selectedItem = data;
     });
   }
 
   createComment(){
-    this.databaseprovider.createComment(this.comment, this.selectedItem).then( (data) => {
-      this.databaseprovider.updateCommentCounter(this.selectedItem);
+    this.databaseprovider.createComment(this.comment, this.selectedItem).then( (data) => {      
+      this.databaseprovider.updateCommentCounter(this.selectedItem, "create");
       this.commentProvider.postComment(this.selectedItem.resourceSpaceId, this.comment, "DISCUSSION").then ( (resp) => {
         let response = JSON.parse(resp.data);
-        console.log("Status: ", resp.status);
-        console.log("Data: ", resp.data);
-        console.log("===> Comment ID: ", data);
-        console.log("===> Comment Contribution ID: ", response.contributionId);
-        console.log("===> Comment Resource Space ID: ", response.resourceSpaceId);        
-        this.databaseprovider.updateCommentRSID(data, response.resourceSpaceId);
+        console.log("Status Create Comment: ", resp.status);      
+        this.databaseprovider.updateCommentRSID(data, response.contributionId, response.resourceSpaceId);
       }).catch((error) => {
         let toast = this.toastCtrl.create({
           message: 'Error al crear Comentario en AppCivist',
@@ -203,4 +165,74 @@ export class ItemDetailsPage {
       });
     }); 
   }
+
+  doRefresh(refresher) {
+    console.log('Begin async operation', refresher);
+
+    this.ideaProvider.getIdea(this.selectedItem.idea_id).then( (res) => {
+      console.log("GET IDEA FROM AC STATUS", res.status);      
+      let response = JSON.parse(res.data);
+      let feedback;     
+      let userfeedback; 
+      this.ideaProvider.getIdeaFeedBack({campaign_id: response.campaignIds[0], idea_id: response.contributionId}).then( (f) => {
+        feedback = f;
+        this.ideaProvider.getUserIdeaFeedback({campaign_id: response.campaignIds[0], idea_id: response.contributionId}).then( (uf) => {
+          userfeedback = uf;
+          this.ideaProvider.editIdea(response, feedback, userfeedback).then( () => {
+            this.commentProvider.getComments(response.resourceSpaceId).then( (resp) => {
+              console.log("GET COMMENT FROM AC STATUS: ", resp.status);              
+              let response    = JSON.parse(resp.data);
+              let newComments = [];
+              newComments     = response.list;
+                            
+              if (newComments.length > 0) {
+                for (var i = 0; i < newComments.length; i++){      
+                  this.commentProvider.createEditCommet(newComments[i], this.selectedItem.id).then( () => {
+                    if (i == newComments.length){
+                      refresher.complete();
+                      this.getIdea();
+                    }
+                  });
+                }
+              } else {
+                refresher.complete();
+                this.getIdea();
+              }
+            })        
+          })
+        })
+      })    
+    });
+  }  
+
+  presentIdeaPopover(myEvent) {
+    let popover = this.popoverCtrl.create(IdeaPopoverPage, {idea: this.selectedItem});
+    
+    popover.present({
+      ev: myEvent
+    });
+    
+    popover.onDidDismiss( (type) => {
+      console.log("Popover Dismessed");
+
+      if (type == "edit")
+        this.getIdea();
+      else
+        this.rootNavCtrl.pop();
+    });    
+  }
+
+  presentCommentPopover(myEvent, comment) {
+    let popover = this.popoverCtrl.create(CommentPopoverPage, {idea: this.selectedItem, comment: comment});
+    
+    popover.present({
+      ev: myEvent
+    });
+    
+    popover.onDidDismiss( () => {
+      console.log("Popover Dismessed");
+      this.getIdea();
+    });    
+  }
+
 }
