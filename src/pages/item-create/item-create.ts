@@ -75,7 +75,7 @@ export class ItemCreatePage {
 
     this.databaseprovider.createIdea(this.form.value).then( data => {
       console.log("datos: ", data);
-      let sid = this.campaigns.filter(c => c.id == this.form.controls['campaign_id'].value)[0];
+      // let sid = this.campaigns.filter(c => c.id == this.form.controls['campaign_id'].value)[0];
       let locationData = this.locations.filter(l => l.id == this.form.controls['location_id'].value)[0];
       console.log("Location => ", locationData);
       this.ideaProvider.postIdea(this.form.value, locationData).then( (resp) => {

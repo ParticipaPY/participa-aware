@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ToastController } from 'ionic-angular';
 import { Storage } from '@ionic/storage';
-import { Headers, RequestOptions } from '@angular/http';
 import { Api } from '../api';
 import { DatabaseProvider } from '../database/database';
 import 'rxjs/add/operator/map';
@@ -229,7 +228,7 @@ export class IdeasProvider {
     let feedback;     
     let userfeedback; 
 
-    this.databaseProvider.getIdea(data.contributionId).then( (res) => {
+    this.databaseProvider.getIdea("idea_id", data.contributionId).then( (res) => {
       this.getIdeaFeedBack({campaign_id: data.campaignIds[0], idea_id: data.contributionId}).then( (f) => {
         feedback = f;
         this.getUserIdeaFeedback({campaign_id: data.campaignIds[0], idea_id: data.contributionId}).then( (uf) => {

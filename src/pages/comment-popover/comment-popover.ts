@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { NavController, NavParams, ViewController, ModalController } from 'ionic-angular';
+import { NavParams, ViewController, ModalController, AlertController } from 'ionic-angular';
 import { DatabaseProvider } from '../../providers/database/database';
 import { CommentsProvider } from '../../providers/comments/comments';
 import { EditCommentPage } from '../edit-comment/edit-comment';
@@ -14,7 +14,8 @@ export class CommentPopoverPage {
   comment: any;
   
   constructor(public viewCtrl: ViewController, private navParams: NavParams, public databaseProvider: DatabaseProvider, public commentProvider: CommentsProvider,
-              public modalCtrl: ModalController) {
+              public modalCtrl: ModalController, private alertCtrl: AlertController) {
+
     if (this.navParams.data) {      
       this.idea    = this.navParams.get('idea');      
       this.comment = this.navParams.get('comment');
@@ -30,14 +31,41 @@ export class CommentPopoverPage {
   }
 
   deleteComment() {
-    console.log("Popover Comment Id: ", this.comment.comment_id);
-    this.commentProvider.deleteComment(this.comment.comment_id).then( (resp) => {
-      console.log("Delete Comment Status: ", resp.status);      
+    let alert = this.alertCtrl.create({
+      title: 'Borrar Idea',
+      message: 'Estás seguro de que deseas borrar esta idea?',
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+          handler: () => {
+            console.log('El borrado del comentario ha sido cancelado');            
+            alert.dismiss().then( () => {
+              this.viewCtrl.dismiss();
+            });
+            return false;
+          }
+        },
+        {
+          text: 'Aceptar',
+          handler: () => {
+            console.log('Borrar comentario');
+            alert.dismiss().then( () => { 
+              console.log("Popover Comment Id: ", this.comment.comment_id);
+              this.commentProvider.deleteComment(this.comment.comment_id).then( (resp) => {
+                console.log("Delete Comment Status: ", resp.status);      
+              });
+              this.databaseProvider.deleteComment(this.comment.id).then( () => {
+                this.databaseProvider.updateCommentCounter(this.idea, "delete").then( () => {
+                  this.viewCtrl.dismiss();
+                });
+              });
+            });
+            return false;
+          }
+        }
+      ]
     });
-    this.databaseProvider.deleteComment(this.comment.id).then( () => {
-      this.databaseProvider.updateCommentCounter(this.idea, "delete").then( () => {
-        this.viewCtrl.dismiss();
-      });
-    });    
+    alert.present();
   }  
 }

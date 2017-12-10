@@ -9,8 +9,6 @@ import { DatabaseProvider } from "./../../providers/database/database";
 import { IdeasProvider } from '../../providers/ideas/ideas';
 import { IdeaPopoverPage } from '../idea-popover/idea-popover';
 
-import { IdeaModel } from '../../models/idea-model'
-
 @Component({
   selector: 'page-list',
   templateUrl: 'list.html'
@@ -33,7 +31,7 @@ export class ListPage {
   constructor(public navCtrl: NavController, public navParams: NavParams, public modalCtrl: ModalController, private databaseprovider: DatabaseProvider, public http: Http, 
     public storage: Storage, public toastCtrl: ToastController, public platform: Platform, private ideaProvider: IdeasProvider, public popoverCtrl: PopoverController) {
       
-    this.rootNavCtrl = this.navParams.get('rootNavCtrl');  
+    this.rootNavCtrl = this.navParams.get('rootNavCtrl'); 
   }
  
   ionViewWillLoad() {

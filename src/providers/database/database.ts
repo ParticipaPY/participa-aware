@@ -281,12 +281,21 @@ export class DatabaseProvider implements OnInit{
     });      
   }
  
-  getIdea(id) {
-    let sql = "SELECT i.id, i.idea_id, i.campaign_id, i.title, i.date, i.description, i.location_id, i.votes_up, i.votes_down, " + 
-              "i.comments, i.voted_up, i.voted_down, i.resourceSpaceId, i.author_id, a.name, a.profile_pic " +
-              "FROM idea i " + 
-              "JOIN author a on (i.author_id = a.id) " +
-              "WHERE i.idea_id=?;"
+  getIdea(param: string, id) {
+    let sql;
+    if (param === "idea_id")
+      sql = "SELECT i.id, i.idea_id, i.campaign_id, i.title, i.date, i.description, i.location_id, i.votes_up, i.votes_down, " + 
+            "i.comments, i.voted_up, i.voted_down, i.resourceSpaceId, i.author_id, a.name, a.profile_pic " +
+            "FROM idea i " + 
+            "JOIN author a on (i.author_id = a.id) " +
+            "WHERE i.idea_id=?;"
+    else
+      sql = "SELECT i.id, i.idea_id, i.campaign_id, i.title, i.date, i.description, i.location_id, i.votes_up, i.votes_down, " + 
+      "i.comments, i.voted_up, i.voted_down, i.resourceSpaceId, i.author_id, a.name, a.profile_pic " +
+      "FROM idea i " + 
+      "JOIN author a on (i.author_id = a.id) " +
+      "WHERE i.id = ?;"
+
     return this.database.executeSql(sql, [id]).then((data) => {
       let ideas;
       if (data.rows.length > 0) {
@@ -383,7 +392,7 @@ export class DatabaseProvider implements OnInit{
     let sql = "UPDATE idea SET votes_up=?, voted_up=1 WHERE id=?;";
 
     this.database.executeSql(sql, [votes, parseInt(idea.id)]); 
-    return this.getIdea(idea.idea_id);
+    return this.getIdea("idea_id", idea.idea_id);
   }
 
   deleteVoteUp(idea) {
@@ -391,7 +400,7 @@ export class DatabaseProvider implements OnInit{
     let sql = "UPDATE idea SET votes_up=?, voted_up=0 WHERE id=?;";
 
     this.database.executeSql(sql, [votes, parseInt(idea.id)]); 
-    return this.getIdea(idea.idea_id);    
+    return this.getIdea("idea_id", idea.idea_id);    
   }
 
   voteDown(idea) {
@@ -399,7 +408,7 @@ export class DatabaseProvider implements OnInit{
     let sql = "UPDATE idea SET votes_down=?, voted_down=1 WHERE id=?;";
 
     this.database.executeSql(sql, [votes, parseInt(idea.id)]); 
-    return this.getIdea(idea.idea_id);
+    return this.getIdea("idea_id", idea.idea_id);
   }
 
   deleteVoteDown(idea) {
@@ -407,7 +416,7 @@ export class DatabaseProvider implements OnInit{
     let sql = "UPDATE idea SET votes_down=?, voted_down=0 WHERE id=?;";
 
     this.database.executeSql(sql, [votes, parseInt(idea.id)]); 
-    return this.getIdea(idea.idea_id);    
+    return this.getIdea("idea_id", idea.idea_id);    
   }
 
   createIdea(idea) {    
@@ -421,8 +430,7 @@ export class DatabaseProvider implements OnInit{
     }, err => {
       console.log('Error: ', err);
       return 0;
-    });
-    // return this.getAuthor("rebeca.arteta@uc.edu.py");
+    });    
   }
 
   createComment(comment, idea) {
@@ -578,9 +586,9 @@ export class DatabaseProvider implements OnInit{
   }
 
   updateIdeaByAuthor(idea) {
-    let sql  = "UPDATE idea set title = ?, description = ?, location_id = ? WHERE idea_id = ?";
+    let sql  = "UPDATE idea set title = ?, description = ?, location_id = ? WHERE id = ?";
 
-    let data = [idea.title, idea.description, idea.location_id];
+    let data = [idea.title, idea.description, idea.location_id, idea.id];
 
     return this.database.executeSql(sql, data).then( res => {
         return res;
@@ -591,9 +599,9 @@ export class DatabaseProvider implements OnInit{
   }
 
   updateComment(comment){
-    let sql = "UPDATE comments set description = ? WHERE comment_id = ?;"
+    let sql = "UPDATE comments set description = ? WHERE id = ?;"
     
-    return this.database.executeSql(sql, [comment.description, comment.comment_id]).then( (data) => {
+    return this.database.executeSql(sql, [comment.description, comment.id]).then( (data) => {
       return data;
     }, err => {
       console.log('Error: ', err);

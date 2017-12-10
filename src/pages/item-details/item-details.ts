@@ -44,16 +44,31 @@ export class ItemDetailsPage {
   }
 
   getIdea() {
-    this.databaseprovider.getIdea(this.selectedItem.idea_id).then( (data) => {
-      if (data.id) {
-        console.log("Idea Exists");
-        this.selectedItem = data;
-      } else {
-        console.log("Idea does not exist on database");                
-        this.getIdeaAuthor();
-      }
-      this.loadIdeaComments();
-    });
+    console.log("Selected Item: ", this.selectedItem);
+    if (this.selectedItem.idea_id != null) {
+      this.databaseprovider.getIdea("idea_id", this.selectedItem.idea_id).then( (data) => {
+        if (data.id) {
+          console.log("Idea Exists");
+          this.selectedItem = data;
+        } else {
+          console.log("Idea does not exist on database");                
+          this.getIdeaAuthor();
+        }
+        this.loadIdeaComments();
+      });
+    } else {
+      console.log("Idea_id is null");
+      this.databaseprovider.getIdea("id", this.selectedItem.id).then( (data) => {
+        if (data.id) {
+          console.log("Idea Exists");
+          this.selectedItem = data;
+        } else {
+          console.log("Idea does not exist on database");                
+          this.getIdeaAuthor();
+        }
+        this.loadIdeaComments();
+      });
+    }
   }
 
   loadIdeaComments () {
@@ -159,7 +174,7 @@ export class ItemDetailsPage {
 
     this.databaseprovider.createIdeaAC(new_idea).then( (id) => {
       console.log("Idea ID ", id);            
-      this.databaseprovider.getIdea(this.selectedItem.idea_id).then( (new_idea) => {
+      this.databaseprovider.getIdea("idea_id", this.selectedItem.idea_id).then( (new_idea) => {
         console.log("New Idea: ", new_idea);
         this.selectedItem = new_idea;
       });
@@ -214,11 +229,11 @@ export class ItemDetailsPage {
     
     popover.onDidDismiss( (type) => {
       console.log("Popover Dismessed");
-
+      console.log("Type: ", type);
       if (type == "edit")
         this.getIdea();
-      else
-        this.rootNavCtrl.pop();
+      else if (type == "delete")
+        this.navCtrl.pop();
     });    
   }
 

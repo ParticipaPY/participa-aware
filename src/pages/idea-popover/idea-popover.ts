@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { NavController, NavParams, ViewController, ModalController } from 'ionic-angular';
+import { NavController, NavParams, ViewController, ModalController, AlertController } from 'ionic-angular';
 import { DatabaseProvider } from '../../providers/database/database';
 import { IdeasProvider } from '../../providers/ideas/ideas';
 import { CommentsProvider } from '../../providers/comments/comments';
@@ -14,7 +14,7 @@ export class IdeaPopoverPage {
   idea: any;
 
   constructor(public viewCtrl: ViewController, public navCtrl: NavController, public navParams: NavParams, public databaseProvider: DatabaseProvider, 
-              public ideaProvider: IdeasProvider, public commentProvider: CommentsProvider, public modalCtrl: ModalController) {
+              public ideaProvider: IdeasProvider, public commentProvider: CommentsProvider, public modalCtrl: ModalController, private alertCtrl: AlertController) {
    
     if (this.navParams.data) {      
       this.idea = this.navParams.get('idea');                        
@@ -26,19 +26,46 @@ export class IdeaPopoverPage {
     
     modal.present();
     modal.onDidDismiss( () => {
-      this.viewCtrl.dismiss({type:"edit"});
+      this.viewCtrl.dismiss("edit");
     })
   }
 
   deleteIdea() {
     console.log("Popover Idea Id: ", this.idea.idea_id);
-    this.ideaProvider.deleteIdea(this.idea.idea_id).then( (resp) => {
-      console.log("Delete Idea Status: ", resp.status);      
+    let alert = this.alertCtrl.create({
+      title: 'Borrar Idea',
+      message: 'Estás seguro de que deseas borrar esta idea?',
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+          handler: () => {
+            console.log('El borrado de la idea ha sido cancelado');            
+            alert.dismiss().then( () => {
+              this.viewCtrl.dismiss();
+            });
+            return false;          
+          }
+        },
+        {
+          text: 'Aceptar',
+          handler: () => {
+            console.log('Borrar idea');
+            alert.dismiss().then( () => { 
+              this.ideaProvider.deleteIdea(this.idea.idea_id).then( (resp) => {
+                console.log("Delete Idea Status: ", resp.status);      
+              });
+              this.databaseProvider.deleteIdea(this.idea.id).then( () => {         
+                this.viewCtrl.dismiss("delete");
+              });
+              this.deleteIdeaComments();
+            });
+            return false;
+          }
+        }
+      ]
     });
-    this.databaseProvider.deleteIdea(this.idea.id).then( () => {      
-      this.viewCtrl.dismiss({type:"delete"});
-    });
-    this.deleteIdeaComments();
+    alert.present();
   }  
 
   deleteIdeaComments() {

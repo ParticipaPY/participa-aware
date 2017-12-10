@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component } from '@angular/core';
 import { Storage } from '@ionic/storage';
 import { DatabaseProvider } from '../../providers/database/database';
 import { ViewController, NavParams, ToastController } from 'ionic-angular';

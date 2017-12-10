@@ -24,6 +24,7 @@ export class EditIdeaPage {
     this.idea = this.navParams.get('idea');
     
     this.form = formBuilder.group({
+      id: this.idea.id,
       idea_id: this.idea.idea_id,
       location_id: [this.idea.location_id, Validators.required],
       title: [this.idea.title, Validators.required],      
@@ -58,7 +59,7 @@ export class EditIdeaPage {
     if (!this.form.valid) { 
        return; 
     }
- 
+    console.log("Form Value: ", this.form.value);
     this.databaseProvider.updateIdeaByAuthor(this.form.value).then( () => {
       this.viewCtrl.dismiss();
     });
