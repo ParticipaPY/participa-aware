@@ -35,7 +35,7 @@ export class ListPage {
   }
  
   ionViewWillLoad() {
-    this.user_id      = this.getUserID(); 
+    this.user_id = this.getUserID(); 
   }
 
   ionViewDidLoad() {
@@ -87,9 +87,16 @@ export class ListPage {
   }
 
   itemTapped(event, item) {
-    this.rootNavCtrl.push(ItemDetailsPage, {
-      item: item
+    // this.rootNavCtrl.push(ItemDetailsPage, {
+    //   item: item
+    // });
+    let addModal = this.modalCtrl.create(ItemDetailsPage, {item: item});
+    
+    addModal.onDidDismiss((item) => {
+      this.loadIdeas();             
     });
+
+    addModal.present();    
   }
 
   addItem() {
@@ -136,21 +143,21 @@ export class ListPage {
   }    
 
   doRefresh(refresher) {
-    console.log('Begin async operation', refresher);
-
     this.ideaProvider.getIdeas().then( (res) => {
       let response = JSON.parse(res.data);
       let newIdeas = [];
       newIdeas     = response.list;
 
-      if (newIdeas.length > 0) {
+      console.log("GET IDEA RESPONSE STATUS: ", res.status);
+
+      if (newIdeas.length > 0) {        
         for (var i = 0; i < newIdeas.length; i++){      
-          this.ideaProvider.createEditIdea(newIdeas[i]);//.then( () => {          
+          this.ideaProvider.createEditIdea(newIdeas[i]).then( () => {          
             if (i == newIdeas.length){            
               refresher.complete();
               this.loadIdeas();
             }
-          //});
+          });
         }
       } else {
         refresher.complete();

@@ -1,12 +1,13 @@
 import { Component } from '@angular/core';
 import { Storage } from '@ionic/storage';
-import { NavController, NavParams, ModalController, ToastController, Platform } from 'ionic-angular';
+import { NavController, NavParams, ModalController, ToastController, Platform, PopoverController } from 'ionic-angular';
 
 import { ItemDetailsPage } from '../item-details/item-details';
 import { ItemCreatePage } from '../item-create/item-create';
 import { DatabaseProvider } from "./../../providers/database/database";
 import { Http } from "@angular/http";
 import { IdeasProvider } from '../../providers/ideas/ideas';
+import { IdeaPopoverPage } from '../idea-popover/idea-popover';
 
 @Component({
   selector: 'page-location-two',
@@ -24,11 +25,17 @@ export class LocationTwoPage {
   comment: any;
   email: string;
   searchTerm = "";
+  user_id: any;
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public modalCtrl: ModalController, public platform: Platform,  
-    private databaseprovider: DatabaseProvider, public http: Http, public storage: Storage, public toastCtrl: ToastController, private ideaProvider: IdeasProvider) {
+    private databaseprovider: DatabaseProvider, public http: Http, public storage: Storage, public toastCtrl: ToastController, private ideaProvider: IdeasProvider,
+    public popoverCtrl: PopoverController) {
       
     this.rootNavCtrl = navParams.get('rootNavCtrl');  
+  }
+
+  ionViewWillLoad() {
+    this.user_id = this.getUserID(); 
   }
 
   ionViewDidLoad() {
@@ -45,6 +52,10 @@ export class LocationTwoPage {
     this.storage.get('location_two').then( (val) => {
       this.location_two = val;
     });  
+  }
+
+  async getUserID() {
+    return await this.storage.get('user_id');
   }
 
   setFilteredItems() {
@@ -74,9 +85,13 @@ export class LocationTwoPage {
   }
 
   itemTapped(event, item) {
-    this.rootNavCtrl.push(ItemDetailsPage, {
-      item: item
+    let addModal = this.modalCtrl.create(ItemDetailsPage, {item: item});
+    
+    addModal.onDidDismiss((item) => {
+      this.loadIdeas();             
     });
+
+    addModal.present();   
   }
 
   addItem() {
@@ -132,16 +147,29 @@ export class LocationTwoPage {
 
       if (newIdeas.length > 0) {
         for (var i = 0; i < newIdeas.length; i++){      
-          this.ideaProvider.createEditIdea(newIdeas[i]);//.then( () => {          
+          this.ideaProvider.createEditIdea(newIdeas[i]).then( () => {          
             if (i == newIdeas.length){            
               refresher.complete();
               this.loadIdeas();
             }
-          // });
+          });
         }
       } else {
         refresher.complete();
       }
     });
+  }  
+
+  presentIdeaPopover(myEvent, idea) {
+    let popover = this.popoverCtrl.create(IdeaPopoverPage, {idea: idea});
+    
+    popover.present({
+      ev: myEvent
+    });
+    
+    popover.onDidDismiss( (type) => {
+      console.log("Popover Dismessed");
+      this.loadIdeas();
+    });    
   }  
 }

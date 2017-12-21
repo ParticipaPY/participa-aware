@@ -13,8 +13,9 @@
       </ion-avatar>
       <h2>{{ item.title }}</h2>
       <h3>{{ item.author }}</h3>   
-      <!-- <p>{{ item.campaign_id }}</p>   
-      <p>{{item.date}}</p>  -->
+      <button *ngIf="item.author_id == (user_id | async)" clear ion-button icon-only (click)="presentIdeaPopover($event, item)" item-end>
+        <ion-icon name="md-more"></ion-icon>
+      </button> 
     </ion-item>
 
     <ion-card-content (click)="itemTapped($event, item)">
