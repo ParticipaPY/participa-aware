@@ -28,8 +28,8 @@ export class IdeasProvider {
     let params = {
       'type': 'idea',
       'page': 0,
-      'pageSize': 2,
-      'sorting': 'date_asc'
+      'pageSize': 35,
+      'sorting': 'date_desc'
     }
     return this.api.get('space/' + this.csid + '/contribution', params, {'SESSION_KEY': this.session_key});
   }
@@ -52,16 +52,10 @@ export class IdeasProvider {
       "campaigns": [this.cid],
       "location" : {
         "placeName": location.name,
-        "geoJson"  : [
-          {
-            "type"       : "Polygon",
-            "coordinates": [final]
-          }
-        ]
+        "geoJson"  : "[{\"type\": \"Polygon\",\"coordinates\": [final]}]"
       }
     }
 
-    console.log ("DATA: ", data);
     return this.api.post('space/' + this.csid + '/contribution', data, {'SESSION_KEY': this.session_key});
   }
 
@@ -80,13 +74,10 @@ export class IdeasProvider {
       "type"     : "IDEA",      
       "status"   : "PUBLISHED",
       "location" : {
-        "placeName": location.name,
-        "geoJson"  : [
-          {
-            "type"       : "Polygon",
-            "coordinates": [final]
-          }
-        ]
+        "location" : {
+          "placeName": location.name,
+          "geoJson"  : "[{\"type\": \"Polygon\",\"coordinates\": [final]}]"
+        }
       },      
       "contributionId": idea.idea_id
     }
@@ -225,27 +216,22 @@ export class IdeasProvider {
   }
 
   createEditIdea(data){
-    let feedback;     
-    let userfeedback; 
 
-    this.databaseProvider.getIdea("idea_id", data.contributionId).then( (res) => {
-      this.getIdeaFeedBack({campaign_id: data.campaignIds[0], idea_id: data.contributionId}).then( (f) => {
-        feedback = f;
-        this.getUserIdeaFeedback({campaign_id: data.campaignIds[0], idea_id: data.contributionId}).then( (uf) => {
-          userfeedback = uf;
-          if (res.id) {
-            console.log("Edit Idea");
-            this.editIdea(data, feedback, userfeedback);
+    return this.databaseProvider.getIdea("idea_id", data.contributionId).then( (res) => {      
+      return this.getIdeaFeedBack({campaign_id: data.campaignIds[0], idea_id: data.contributionId}).then( (feedback) => {        
+        return this.getUserIdeaFeedback({campaign_id: data.campaignIds[0], idea_id: data.contributionId}).then( (userfeedback) => {          
+          if (res.id != null) {
+            console.log("Edit Idea ID: ", data.contributionId);
+            return this.editIdea(data, feedback, userfeedback);
           } else {
-            console.log("Create Idea");
-            let author;
-            let location;
-            this.getIdeaAuthor(data).then( (author_id) => {
-              author = author_id;
-              this.getIdeaLocation(data.location.placeName).then( (location_id) => {
-                location = location_id;
-                this.createIdea(data, author, location, feedback, userfeedback);
-              });          
+            console.log("Create Idea ID: ", data.contributionId);                        
+            return this.getIdeaAuthor(data).then( (author_id) => {
+              if (data.location != null && data.location.placeName != null)              
+                this.getIdeaLocation(data.location.placeName).then( (location_id) => {                  
+                  return this.createIdea(data, author_id, location_id, feedback, userfeedback);
+                });
+              else
+                return this.createIdea(data, author_id, null, feedback, userfeedback);
             });        
           }
         })
@@ -301,8 +287,7 @@ export class IdeasProvider {
       email = data.firstAuthor.email;
       name  = data.firstAuthor.name;
       image = data.firstAuthor.profilePic.urlAsString;
-    }
-    console.log("===> AUTHOR: ", [email, name, image]);
+    }    
     return this.databaseProvider.getAuthor(email).then( (res) => {
       if (res.id) {
         console.log("GET AUTHOR ID: ", res.id);
@@ -315,19 +300,13 @@ export class IdeasProvider {
       }
       return author_id;      
     });
-
-    // console.log("AUTHOR ID: ", author_id);
   }
 
   getIdeaLocation(name){
-    let location;
-
-    return this.databaseProvider.getLocation("name", name).then( (res) => {
-      location = res.id;
-      return location;
+    return this.databaseProvider.getLocationByName(name).then( (res) => {
+      console.log("Location FROM DB", res);
+      return res.id;
     });
-
-    // console.log("Location ", location);
   }
 
   getIdeaFeedBack(data){
@@ -346,6 +325,7 @@ export class IdeasProvider {
     let feedback = { up: 0, down: 0};
     
     return this.userFeedback(data).then( (resp) => {
+      console.log("GET USER FEDDBACK STATUS: ", resp.status);
       let response = JSON.parse(resp.data);
       if (resp.status == 200) {
         if (response.up)
@@ -354,6 +334,8 @@ export class IdeasProvider {
         if (response.down)
           feedback.down = 1;
       }
+      return feedback;
+    }).catch( (error) => {      
       return feedback;
     });
 

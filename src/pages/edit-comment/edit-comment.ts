@@ -15,7 +15,8 @@ export class EditCommentPage {
 
   constructor (public viewCtrl: ViewController, public navCtrl: NavController, public navParams: NavParams, public commentProvider: CommentsProvider, 
               public databaseProvider: DatabaseProvider) {
-
+              
+    this.comment = this.navParams.get('comment');
   }
 
   ionViewWillLoad () {

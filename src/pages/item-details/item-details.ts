@@ -29,6 +29,7 @@ export class ItemDetailsPage {
   ionViewWillLoad() {
     this.selectedItem = this.navParams.get('item');
     this.user_id      = this.getUserID(); 
+    this.loadIdeaComments();
   }
 
   ionViewDidLoad() {

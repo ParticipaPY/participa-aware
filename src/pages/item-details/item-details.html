@@ -26,8 +26,8 @@
       <h2>{{ selectedItem.title }}</h2>
       <h3>{{ selectedItem.author }}</h3>      
       <!-- <p>{{ selectedItem.date }}</p> -->
-      <!-- <button *ngIf="selectedItem.author_id == (user_id | async)" clear ion-button icon-only (click)="presentIdeaPopover($event)" item-end> -->
-      <button clear ion-button icon-only (click)="presentIdeaPopover($event)" item-end>
+      <button *ngIf="selectedItem.author_id == (user_id | async)" clear ion-button icon-only (click)="presentIdeaPopover($event)" item-end>
+      <!-- <button clear ion-button icon-only (click)="presentIdeaPopover($event)" item-end> -->
         <ion-icon name="md-more"></ion-icon>
       </button>
     </ion-item>

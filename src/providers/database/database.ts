@@ -103,15 +103,9 @@ export class DatabaseProvider implements OnInit{
     });    
   }
 
-  getLocation(search, param) {    
-    let where = "WHERE " + search + " = ?;";
-    let sql = "SELECT * FROM location " + where;
-    if (search == "name") {
-      param = String(param).toUpperCase;
-      console.log("PARAM: ", param);
-    }
-    console.log("PARAM: ", param);
-    return this.database.executeSql(sql, [param]).then((data) => {
+  getLocationByName(name: string) {    
+    let sql = "SELECT * FROM location WHERE name = ? OR name = ?;";
+    return this.database.executeSql(sql, [name.toUpperCase(), "BARRIO " + name.toUpperCase()]).then((data) => {
       let location;
       if (data.rows.length > 0) {
         location = { 
@@ -283,7 +277,7 @@ export class DatabaseProvider implements OnInit{
  
   getIdea(param: string, id) {
     let sql;
-    if (param === "idea_id")
+    if (param == "idea_id")
       sql = "SELECT i.id, i.idea_id, i.campaign_id, i.title, i.date, i.description, i.location_id, i.votes_up, i.votes_down, " + 
             "i.comments, i.voted_up, i.voted_down, i.resourceSpaceId, i.author_id, a.name, a.profile_pic " +
             "FROM idea i " + 
