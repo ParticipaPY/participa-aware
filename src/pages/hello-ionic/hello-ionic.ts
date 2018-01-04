@@ -15,7 +15,8 @@ import { Notification } from '../../providers/notification/notification';
   templateUrl: 'hello-ionic.html'
 })
 export class HelloIonicPage {
-  account: { user_id: number, email: string, password: string, name: string, author_pic: string } = {user_id: 0, email: "", password: "", name: "", author_pic: ""}
+  account: { user_id: number, email: string, password: string, name: string, author_pic: string, location_one: number, location_two: number, location_three: number } = 
+          {user_id: 0, email: "", password: "", name: "", author_pic: "", location_one: 0, location_two: 0, location_three: 0};
   reduce_icon: Boolean = false;
   loading;
   
@@ -96,14 +97,21 @@ export class HelloIonicPage {
       console.log("====> author id: ", author);
       this.storage.set('user_id', author);
       this.userLocations.getUserLocations(resp.userId).subscribe( (data) => {
-        // console.log("Response User Locations: ", data);
-        let home = data.filter(d => d.location === "CASA");
-        let work = data.filter(d => d.location === "TRABAJO");
-        let other = data.filter(d => d.location === "OTRO");
-  
-        this.storage.set("location_one", home[0].location_id);
-        this.storage.set("location_two", work[0].location_id);
-        this.storage.set("location_three", other[0].location_id);      
+        console.log("Response User Locations: ", data);
+
+        if (data.length > 0) {
+          let home = data.filter(d => d.location === "CASA");
+          let work = data.filter(d => d.location === "TRABAJO");
+          let other = data.filter(d => d.location === "OTRO");
+    
+          this.storage.set("location_one", home[0].location_id);
+          this.storage.set("location_two", work[0].location_id);
+          this.storage.set("location_three", other[0].location_id);
+          
+          this.account.location_one = home[0].location_id;
+          this.account.location_two = home[0].location_id;
+          this.account.location_three = home[0].location_id;  
+        }
         
         this.loading.dismiss();
         this.navCtrl.push(TabsPage);

@@ -2,7 +2,7 @@ page-hello-ionic {
   .splash-bg {
     // position: relative;
     // background: url('../assets/img/vallejo_header.jpg') no-repeat transparent;
-    background: url('../assets/img/ciudadela.jpg') repeat transparent;
+    background: url('../assets/img/asuncion.jpg') repeat transparent;
     // background-size: cover;
     // height: 35%;
     z-index: 1;
@@ -24,15 +24,18 @@ page-hello-ionic {
   }
   .splash-logo {
     margin: auto;
-    background: url('../assets/img/ciudadela-logo.jpg') repeat transparent;
-    background-size: 100%;
-    border-radius:50%;
-    width: 128px;
-    height: 128px;
+    background: url('../assets/img/logo.jpg') transparent;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    border-radius: 50%;
+    width: 10rem;
+    height: 10rem;
   } 
   .splash-intro {
     font-size: 18px;
     font-weight: bold;
+    text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
     max-width: 80%;
     margin: auto;
     text-align: center;
@@ -56,7 +59,7 @@ page-hello-ionic {
   }
 
   .cover{
-    background: url('../assets/img/ciudadela.jpg') repeat transparent;
+    background: url('../assets/img/asuncion.jpg') repeat transparent;
     // background: -webkit-linear-gradient(left top, $SIDEMENU_TOP, $SIDEMENU_BOTTOM);
     // background: -o-linear-gradient(bottom right, $SIDEMENU_TOP, $SIDEMENU_BOTTOM);
     // background: -moz-linear-gradient(bottom right, $SIDEMENU_TOP, $SIDEMENU_BOTTOM);
