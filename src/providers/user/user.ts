@@ -54,7 +54,7 @@ export class User {
       "uid": user_id,
       "email": accountInfo.email,
       "name": accountInfo.name,
-      "lang": accountInfo.lang,
+      "lang": accountInfo.lang
     }
 
     return this.api.put('user/' + user_id, data, {'SESSION_KEY': this.session_key});
