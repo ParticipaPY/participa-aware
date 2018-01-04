@@ -8,8 +8,8 @@ import 'rxjs/add/operator/map';
 export class CommentsProvider {
 
   session_key: string;
-  aid  = 111;
-  csid = 4091;  
+  aid  = 112;
+  csid = 7903;  
 
   constructor(public api: Api, public storage: Storage, public databaseProvider: DatabaseProvider) {
     this.storage.get('session_key').then( (key) => {

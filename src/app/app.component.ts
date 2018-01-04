@@ -11,6 +11,7 @@ import { ItemDetailsPage } from '../pages/item-details/item-details';
 import { MyProfilePage } from '../pages/my-profile/my-profile'; 
 import { DatabaseProvider } from "../providers/database/database";
 import { Notification } from "../providers/notification/notification";
+import { IdeasProvider } from '../providers/ideas/ideas';
 
 @Component({
   templateUrl: 'app.html'
@@ -22,10 +23,11 @@ export class MyApp implements OnInit{
   rootPage: any;
   rootParams: any;
   myProfile;
-  account: { user_id: number, email: string, name: string, author_pic: string } = {user_id: 0, email: "", name: "", author_pic: ""};
+  account: { user_id: number, email: string, name: string, author_pic: string, location_one: number, location_two: number, location_three: number} = 
+  {user_id: 0, email: "", name: "", author_pic: "", location_one: 0, location_two: 0, location_three: 0};
 
   constructor(public platform: Platform, public menu: MenuController, public statusBar: StatusBar, public splashScreen: SplashScreen, public push: Push, 
-              public storage: Storage, public databaseprovider: DatabaseProvider, public events: Events, public notification: Notification) {
+              public storage: Storage, public databaseprovider: DatabaseProvider, public events: Events, public notification: Notification, public ideaProvider: IdeasProvider) {
 
     this.myProfile = MyProfilePage;
     this.initializeApp();
@@ -51,12 +53,22 @@ export class MyApp implements OnInit{
             this.account.user_id = id;
           });
         });
+        this.storage.get('location_one').then( (val) => {
+          this.account.location_one = val;
+        });
+        this.storage.get('location_two').then( (val) => {
+          this.account.location_two = val;
+        });        
+        this.storage.get('location_three').then( (val) => {
+          this.account.location_three = val;
+        });        
       });  
       this.statusBar.styleDefault();
       this.splashScreen.hide();      
       this.registerPush();
       this.listenToLogin();
     });
+    this.ideaProvider.getIdeas();
   }
 
   ngOnInit(){       
@@ -100,9 +112,12 @@ export class MyApp implements OnInit{
     this.events.subscribe('user:created', (user) => {
       if (user) {       
         this.account.user_id = user.user_id; 
-        this.account.email = user.email;
-        this.account.name  = user.name;
-        this.account.author_pic = user.author_pic;
+        this.account.email   = user.email;
+        this.account.name    = user.name;
+        this.account.author_pic     = user.author_pic;
+        this.account.location_one   = user.location_one;
+        this.account.location_two   = user.location_two;
+        this.account.location_three = user.location_three;
         this.registerToken();
       }
       

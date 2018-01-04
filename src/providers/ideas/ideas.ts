@@ -10,9 +10,9 @@ import 'rxjs/add/operator/map';
 export class IdeasProvider {
 
   session_key: string;
-  aid  = 111;
-  cid  = 211;
-  csid = 4091;
+  aid  = 112;
+  cid  = 209;
+  csid = 7903;
 
   constructor(public api: Api,  public storage: Storage, public databaseProvider: DatabaseProvider, public toastCtrl: ToastController) {
     this.storage.get('session_key').then( (key) => {
