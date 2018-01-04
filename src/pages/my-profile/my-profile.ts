@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Storage } from '@ionic/storage';
 import { DatabaseProvider } from '../../providers/database/database';
-import { ViewController, NavParams, ToastController } from 'ionic-angular';
+import { ViewController, NavParams, ToastController, NavController } from 'ionic-angular';
 import { Validators, FormBuilder, FormGroup } from '@angular/forms';
 import { User } from '../../providers/user/user';
 import { Notification } from '../../providers/notification/notification';
@@ -18,16 +18,16 @@ export class MyProfilePage {
   locations = [];
   user: any;
 
-  constructor(public viewCtrl: ViewController, public navParams: NavParams, public formBuilder: FormBuilder, public databaseProvider: DatabaseProvider, private userProvider: User,
+  constructor(public navCtrl: NavController, public viewCtrl: ViewController, public navParams: NavParams, public formBuilder: FormBuilder, public databaseProvider: DatabaseProvider, private userProvider: User,
               public toastCtrl: ToastController, public userLocation: Notification, private storage: Storage) {
     this.user = navParams.get('account'); 
 
     this.signUpForm = formBuilder.group({
       name: [this.user.name, Validators.compose([Validators.maxLength(80), Validators.pattern('[a-zA-Z ]*'), Validators.required])],
       email: [this.user.email, Validators.compose([Validators.maxLength(30), Validators.minLength(5), Validators.pattern('[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+'), Validators.required])],
-      place_one: ['', Validators.required],
-      place_two: ['', Validators.required],
-      place_three: ['', Validators.required],
+      place_one: [this.user.location_one, Validators.required],
+      place_two: [this.user.location_two, Validators.required],
+      place_three: [this.user.location_three, Validators.required],
       lang: "es-ES",
       profile_pic: this.user.author_pic
   });
@@ -56,11 +56,18 @@ export class MyProfilePage {
     this.updateUserInfo();
     this.updateUserLocation();
     this.updateStorageInfo();
+    this.viewCtrl.dismiss();
   }
 
   updateUserInfo(){
     this.userProvider.editProfile(this.user.user_id, this.signUpForm.value).then( (resp) => {
       console.log('Response from server: ', resp);
+      let toast = this.toastCtrl.create({
+        message: "Tu perfil ha sido actualizado",
+        duration: 3000,
+        position: 'top'
+      });
+      toast.present();      
     }, (err) => {
       console.log('Error updating user profile: ', err);
       let toast = this.toastCtrl.create({
