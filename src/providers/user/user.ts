@@ -41,8 +41,8 @@ export class User {
       "name": accountInfo.name,
       "lang": accountInfo.lang,
       "existingAssembly": {
-        "assemblyId": 111,
-        "uuid": "bfe4464b-549d-4231-acc0-7e1c24833ad9"
+        "assemblyId": 112,
+        "uuid": "467eb262-2008-4368-9beb-e28b229b9579"
       }
     }
 
@@ -56,7 +56,7 @@ export class User {
       "name": accountInfo.name,
       "lang": accountInfo.lang
     }
-
+    console.log("AC - Data to edit profile: ", data);
     return this.api.put('user/' + user_id, data, {'SESSION_KEY': this.session_key});
   }
 
