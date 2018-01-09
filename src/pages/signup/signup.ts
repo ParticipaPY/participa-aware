@@ -52,7 +52,7 @@ export class SignupPage {
   private presentToast(text) {
     let toast = this.toastCtrl.create({
       message: text,
-      duration: 3000,
+      duration: 5000,
       position: 'top'
     });
     toast.present();
@@ -68,17 +68,26 @@ export class SignupPage {
   
     loading.present();    
     
-    this.user.signup(this.signUpForm.value).then((resp) => {   
+    this.user.signup(this.signUpForm.value).then( (resp) => {   
       loading.dismiss();
       let result = JSON.parse(resp.data);
-      console.log("AppCivist User ID: ", result.userId);
+      console.log("AC - SignUp User Response: ", result.userId);
       this.signUpForm.controls['profile_pic'].patchValue(result.profilePic.url);   
       this.createAuthor(result.userId);
-      this.viewCtrl.dismiss(this.signUpForm.value);
-    }, (err) => {
+      this.viewCtrl.dismiss(this.signUpForm.value);     
+    }).catch( (error) => {
       loading.dismiss();
-      console.log("Error on SingUp: ", err);
-      this.presentToast(err);
+      if (error.status != 500) {
+        let err = JSON.parse(error.error);
+        console.log("AC - Error on SingUp: ", error);
+        if (err.statusMessage) {
+          console.log("AC - Error on SingUp Message: ", err.statusMessage);
+          this.presentToast(err.statusMessage);
+        } 
+      }else {
+        console.log("AC - Error on SingUp Message: ", error);
+        this.presentToast("Error desde AppCivist al crear usuario");
+      }
     });
   }
 
