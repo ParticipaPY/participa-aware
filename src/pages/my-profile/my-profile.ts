@@ -42,6 +42,15 @@ export class MyProfilePage {
     this.loadLocations();    
   }
 
+  private presentToast(text) {
+    let toast = this.toastCtrl.create({
+      message: text,
+      duration: 5000,
+      position: 'top'
+    });
+    toast.present();
+  }
+
   loadLocations() {
     this.databaseProvider.getAllLocations().then(data => {
       this.locations = data;
@@ -61,21 +70,25 @@ export class MyProfilePage {
 
   updateUserInfo(){
     this.userProvider.editProfile(this.user.user_id, this.signUpForm.value).then( (resp) => {
-      console.log('Response from server: ', resp);
+      console.log('AC - Update User Profile Response: ', resp);
       let toast = this.toastCtrl.create({
         message: "Tu perfil ha sido actualizado",
         duration: 3000,
         position: 'top'
       });
-      toast.present();      
-    }, (err) => {
-      console.log('Error updating user profile: ', err);
-      let toast = this.toastCtrl.create({
-        message: err,
-        duration: 3000,
-        position: 'top'
-      });
       toast.present();
+    }).catch( (error) => {      
+      if (error.status != 500) {
+        let err = JSON.parse(error.error);
+        console.log("AC - Error updating user profile: ", error);
+        if (err.statusMessage) {
+          console.log("AC - Error updating user profile Message: ", err.statusMessage);
+          this.presentToast(err.statusMessage);
+        } 
+      }else {
+        console.log("AC - Error updating user profile Message: ", error);
+        this.presentToast("Error desde AppCivist al editar usuario");
+      }
     });
   }
 
