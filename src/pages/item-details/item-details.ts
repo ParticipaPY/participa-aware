@@ -183,43 +183,39 @@ export class ItemDetailsPage {
   }
 
   doRefresh(refresher) {
-    console.log('Begin async operation', refresher);
+    this.updateContent().then( () => {
+      setTimeout( () => {
+        this.getIdea();
+        refresher.complete();    
+      }, 2000);
+    });
+  }  
 
-    this.ideaProvider.getIdea(this.selectedItem.idea_id).then( (res) => {
+  updateContent(){
+    return this.ideaProvider.getIdea(this.selectedItem.idea_id).then( (res) => {
       console.log("GET IDEA FROM AC STATUS", res.status);      
       let response = JSON.parse(res.data);
-      let feedback;     
-      let userfeedback; 
-      this.ideaProvider.getIdeaFeedBack({campaign_id: response.campaignIds[0], idea_id: response.contributionId}).then( (f) => {
-        feedback = f;
-        this.ideaProvider.getUserIdeaFeedback({campaign_id: response.campaignIds[0], idea_id: response.contributionId}).then( (uf) => {
-          userfeedback = uf;
-          this.ideaProvider.editIdea(response, feedback, userfeedback).then( () => {
-            this.commentProvider.getComments(response.resourceSpaceId).then( (resp) => {
+      
+      return this.ideaProvider.getIdeaFeedBack({campaign_id: response.campaignIds[0], idea_id: response.contributionId}).then( (feedback) => {          
+        return this.ideaProvider.getUserIdeaFeedback({campaign_id: response.campaignIds[0], idea_id: response.contributionId}).then( (userfeedback) => {            
+          return this.ideaProvider.editIdea(response, feedback, userfeedback).then( () => {
+            return this.commentProvider.getComments(response.resourceSpaceId).then( (resp) => {
               console.log("GET COMMENT FROM AC STATUS: ", resp.status);              
               let response    = JSON.parse(resp.data);
               let newComments = [];
               newComments     = response.list;
-                            
-              if (newComments.length > 0) {
-                for (var i = 0; i < newComments.length; i++){      
-                  this.commentProvider.createEditCommet(newComments[i], this.selectedItem.id).then( () => {
-                    if (i == newComments.length){
-                      refresher.complete();
-                      this.getIdea();
-                    }
-                  });
-                }
-              } else {
-                refresher.complete();
-                this.getIdea();
+                        
+              for (var i = 0; i < newComments.length; i++){                          
+                console.log("I VALUE ==> ", i);
+                this.commentProvider.createEditCommet(newComments[i], this.selectedItem.id);
               }
-            })        
-          })
-        })
-      })    
-    });
-  }  
+              return;
+            });
+          });
+        });
+      });
+    });    
+  }
 
   presentIdeaPopover(myEvent) {
     let popover = this.popoverCtrl.create(IdeaPopoverPage, {idea: this.selectedItem});

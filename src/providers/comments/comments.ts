@@ -54,18 +54,15 @@ export class CommentsProvider {
     return this.api.put('assembly/' + this.aid + '/contribution/' + comment_id + '/softremoval', {}, {'SESSION_KEY': this.session_key});
   }  
 
-  createEditCommet(data, idea_id){
-    console.log("Idea ID CE: ", idea_id);
+  createEditCommet(data, idea_id){    
     return this.databaseProvider.getComment(data.contributionId).then( (res) => {
-      if (res.id) {
+      if (res.id != null) {
         console.log("Edit Comment");
-        this.editComment(data);
+        return this.editComment(data);
       } else {
-        console.log("Create Comment");
-        let author;        
-        this.getCommentAuthor(data).then( (author_id) => {
-          author = author_id;          
-            this.createComment(data, author, idea_id);          
+        console.log("Create Comment");        
+        return this.getCommentAuthor(data).then( (author_id) => {          
+          return this.createComment(data, author_id, idea_id);          
         });        
       }
     });
@@ -81,8 +78,7 @@ export class CommentsProvider {
     return this.databaseProvider.updateComment(comment);
   }
 
-  createComment(data, author, idea_id){   
-    console.log("IDEA ID C: ", idea_id); 
+  createComment(data, author, idea_id){       
     let comment = {
       "comment_id" : data.contributionId,
       "idea_id"    : idea_id,
@@ -111,15 +107,17 @@ export class CommentsProvider {
     }
     console.log("===> AUTHOR: ", [email, name, image]);
     return this.databaseProvider.getAuthor(email).then( (res) => {
-      if (res.id) {        
-        author_id = res.id;        
+      if (res.id != null) {        
+        author_id = res.id;
+        console.log("COMMENT AUTHOR ID EXISTS: ", author_id);
+        return author_id;
       } else {
-        this.databaseProvider.createAuthorAC({name: name, email: email, image: image}).then( (id) => {        
+        return this.databaseProvider.createAuthorAC({name: name, email: email, image: image}).then( (id) => {        
           author_id = id;
+          console.log("COMMENT AUTHOR ID CREATED: ", author_id);
+          return author_id;
         });
-      }
-      console.log("AUTHOR ID: ", author_id);
-      return author_id;      
+      }           
     });
   }
 
