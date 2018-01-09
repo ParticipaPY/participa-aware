@@ -45,6 +45,15 @@ export class EditIdeaPage {
      }); 
    }
  
+   private presentToast(text) {
+    let toast = this.toastCtrl.create({
+      message: text,
+      duration: 5000,
+      position: 'top'
+    });
+    toast.present();
+  } 
+
    loadLocations() {
      this.databaseProvider.getAllLocations().then(data => {
        this.locations = data;
@@ -59,14 +68,26 @@ export class EditIdeaPage {
     if (!this.form.valid) { 
        return; 
     }
-    console.log("Form Value: ", this.form.value);
+    
     this.databaseProvider.updateIdeaByAuthor(this.form.value).then( () => {
       this.viewCtrl.dismiss();
     });
 
     let locationData = this.locations.filter(l => l.id == this.form.controls['location_id'].value)[0];
     this.ideaProvider.putIdea(this.form.value, locationData).then( (resp) => {
-      console.log("Update Idea Status: ", resp.status);      
+      console.log("AC - Update Idea Status: ", resp.status);      
+    }).catch( (error) => {
+      if (error.status != 500) {
+        let err = JSON.parse(error.error);
+        console.log("AC - Error Editing Idea: ", error);
+        if (err.statusMessage) {
+          console.log("AC - Error on Editing Idea Message: ", err.statusMessage);
+          this.presentToast(err.statusMessage);
+        } 
+      } else {
+        console.log("AC - Error on Editing Idea Message: ", error);
+        this.presentToast("Error desde AppCivist al editar idea");
+      }                
     });
    }
  
@@ -80,15 +101,9 @@ export class EditIdeaPage {
              this.form.controls['location_id'].patchValue(location.id);          
              break;
            } 
-         }
-         
+         }         
        }).catch((error) => {
-         let toast = this.toastCtrl.create({
-           message: 'Error al obtener ubicación',
-           duration: 3000,
-           position: 'top'
-         });
-         toast.present();
+         this.presentToast('Error al obtener ubicación');         
          console.log('Error getting location Code', error.code);
          console.log('Error getting location Code', error.message);
        });

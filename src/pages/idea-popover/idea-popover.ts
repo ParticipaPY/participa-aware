@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { NavController, NavParams, ViewController, ModalController, AlertController } from 'ionic-angular';
+import { NavController, NavParams, ViewController, ModalController, AlertController, ToastController } from 'ionic-angular';
 import { DatabaseProvider } from '../../providers/database/database';
 import { IdeasProvider } from '../../providers/ideas/ideas';
 import { CommentsProvider } from '../../providers/comments/comments';
@@ -14,11 +14,21 @@ export class IdeaPopoverPage {
   idea: any;
 
   constructor(public viewCtrl: ViewController, public navCtrl: NavController, public navParams: NavParams, public databaseProvider: DatabaseProvider, 
-              public ideaProvider: IdeasProvider, public commentProvider: CommentsProvider, public modalCtrl: ModalController, private alertCtrl: AlertController) {
+              public ideaProvider: IdeasProvider, public commentProvider: CommentsProvider, public modalCtrl: ModalController, private alertCtrl: AlertController,
+              public toastCtrl: ToastController) {
    
     if (this.navParams.data) {      
       this.idea = this.navParams.get('idea');                        
     }
+  }
+
+  private presentToast(text) {
+    let toast = this.toastCtrl.create({
+      message: text,
+      duration: 5000,
+      position: 'top'
+    });
+    toast.present();
   }
 
   editIdea() {
@@ -34,7 +44,7 @@ export class IdeaPopoverPage {
     console.log("Popover Idea Id: ", this.idea.idea_id);
     let alert = this.alertCtrl.create({
       title: 'Borrar Idea',
-      message: 'Estás seguro de que deseas borrar esta idea?',
+      message: '¿Estás seguro de que deseas borrar esta idea?',
       buttons: [
         {
           text: 'Cancelar',
@@ -54,6 +64,18 @@ export class IdeaPopoverPage {
             alert.dismiss().then( () => { 
               this.ideaProvider.deleteIdea(this.idea.idea_id).then( (resp) => {
                 console.log("Delete Idea Status: ", resp.status);      
+              }).catch( (error) => {
+                if (error.status != 500) {
+                  let err = JSON.parse(error.error);
+                  console.log("AC - Error Deleting Idea: ", error);
+                  if (err.statusMessage) {
+                    console.log("AC - Error on Deleting Idea Message: ", err.statusMessage);
+                    this.presentToast(err.statusMessage);
+                  } 
+                }else {
+                  console.log("AC - Error on Deleting Idea Message: ", error);
+                  this.presentToast("Error desde AppCivist al borrar idea");
+                }
               });
               this.databaseProvider.deleteIdea(this.idea.id).then( () => {         
                 this.viewCtrl.dismiss("delete");
@@ -71,8 +93,7 @@ export class IdeaPopoverPage {
   deleteIdeaComments() {
     this.databaseProvider.getIdeaComments(this.idea).then( (comments) => {
       for(var l = 0; l < comments.length; l++){
-        this.databaseProvider.deleteComment(comments[l].id);
-        this.commentProvider.deleteComment(comments[l].comment_id);
+        this.databaseProvider.deleteComment(comments[l].id);        
       }
     });
   }
