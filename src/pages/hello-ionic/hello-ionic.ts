@@ -78,11 +78,11 @@ export class HelloIonicPage {
     this.getUserLocations(resp);
   }
 
-  getUserLocations(resp) {
-    let author;
+  getUserLocations(resp) {    
     this.databaseProvider.getAuthor(this.account.email).then( (res) => {
-      if (res.id){
-        author = res.id;
+      if (res.id != null){
+        console.log("====> author id: ", res.id);
+        this.storage.set('user_id', res.id);
       }else{
         let user = {
           name: resp.name, 
@@ -90,12 +90,12 @@ export class HelloIonicPage {
           session_key: resp.session_key, 
           profile_pic: resp.profilePic.url
         }
-        this.databaseProvider.createAuthor(resp.userId, user).then( (id) => {
-          author = id;
+        this.databaseProvider.createAuthor(resp.userId, user).then( (id) => {          
+          console.log("====> author id: ", id);
+          this.storage.set('user_id', id);
         })
       }
-      console.log("====> author id: ", author);
-      this.storage.set('user_id', author);
+
       this.userLocations.getUserLocations(resp.userId).subscribe( (data) => {
         console.log("Response User Locations: ", data);
 
