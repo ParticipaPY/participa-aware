@@ -4,6 +4,7 @@ import { Platform, MenuController, Nav, Events } from 'ionic-angular';
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { Push, PushToken } from '@ionic/cloud-angular';
+import { OneSignal } from '@ionic-native/onesignal';
 
 import { HelloIonicPage } from '../pages/hello-ionic/hello-ionic';
 import { TabsPage } from '../pages/tabs/tabs';
@@ -27,48 +28,49 @@ export class MyApp implements OnInit{
   {user_id: 0, email: "", name: "", author_pic: "", location_one: 0, location_two: 0, location_three: 0};
 
   constructor(public platform: Platform, public menu: MenuController, public statusBar: StatusBar, public splashScreen: SplashScreen, public push: Push, 
-              public storage: Storage, public databaseprovider: DatabaseProvider, public events: Events, public notification: Notification, public ideaProvider: IdeasProvider) {
+              public storage: Storage, public databaseprovider: DatabaseProvider, public events: Events, public notification: Notification, public ideaProvider: IdeasProvider,
+              private oneSignal: OneSignal) {
 
-    this.myProfile = MyProfilePage;
-    this.initializeApp();
+    this.platform.ready().then(() => {
+      this.myProfile = MyProfilePage;
+      this.initializeApp();
+      this.initializeOneSignal();
+    });
   }
   
-  initializeApp() {  
-    this.platform.ready().then(() => {  
-      this.storage.get('email').then( (email) => {
-        if (this.notificationTapped === false){
-           if (email != null && email.length > 0){
-              this.rootPage = TabsPage;
-            } else {
-              this.rootPage = HelloIonicPage;
-            }
-        }
-        this.storage.get('name').then( (name) => {
-          this.account.email = email;
-          this.account.name  = name;
-          this.storage.get('profile_pic').then( (profile_pic) => {
-            this.account.author_pic = profile_pic;
-          });
-          this.storage.get('userId').then( (id) => {
-            this.account.user_id = id;
-          });
+  initializeApp() {        
+    this.storage.get('email').then( (email) => {
+      if (this.notificationTapped === false){
+          if (email != null && email.length > 0){
+            this.rootPage = TabsPage;
+          } else {
+            this.rootPage = HelloIonicPage;
+          }
+      }
+      this.storage.get('name').then( (name) => {
+        this.account.email = email;
+        this.account.name  = name;
+        this.storage.get('profile_pic').then( (profile_pic) => {
+          this.account.author_pic = profile_pic;
         });
-        this.storage.get('location_one').then( (val) => {
-          this.account.location_one = val;
+        this.storage.get('userId').then( (id) => {
+          this.account.user_id = id;
         });
-        this.storage.get('location_two').then( (val) => {
-          this.account.location_two = val;
-        });        
-        this.storage.get('location_three').then( (val) => {
-          this.account.location_three = val;
-        });        
-      });  
-      this.statusBar.styleDefault();
-      this.splashScreen.hide();      
-      this.registerPush();
-      this.listenToLogin();
-    });
-    this.ideaProvider.getIdeas();
+      });
+      this.storage.get('location_one').then( (val) => {
+        this.account.location_one = val;
+      });
+      this.storage.get('location_two').then( (val) => {
+        this.account.location_two = val;
+      });        
+      this.storage.get('location_three').then( (val) => {
+        this.account.location_three = val;
+      });        
+    });  
+    this.statusBar.styleDefault();
+    this.splashScreen.hide();            
+    this.listenToLogin();    
+    // this.ideaProvider.getIdeas();
   }
 
   ngOnInit(){       
@@ -89,23 +91,21 @@ export class MyApp implements OnInit{
     });    
   }
 
-  logOut(){
-    // this.storage.remove('database_filled');
+  logOut(){   
     this.storage.remove("email");
-    this.storage.remove("vote_up");
-    this.storage.remove("vote_down");
-    this.storage.remove("comment");
     this.storage.remove('name');
-    this.storage.remove('user_id');    
+    this.storage.remove('user_id');
     this.storage.remove('userId');
     this.storage.remove('profile_pic');
     this.storage.remove('session_key');
     this.storage.remove('location_one');
     this.storage.remove('location_two');
     this.storage.remove('location_three');
-    // this.databaseprovider.deleteDatabase();
-    this.menu.close();
-    this.nav.setRoot(HelloIonicPage);
+    
+    setTimeout( () => {
+      this.menu.close();
+      this.nav.setRoot(HelloIonicPage);
+    }, 2000);
   }
 
   listenToLogin() {
@@ -124,27 +124,16 @@ export class MyApp implements OnInit{
     });
   }
 
-  registerPush() {
-    // Check that we are on a device
-    if (this.platform.is('cordova')) {
-      // Register push notifications with the push plugin
-      this.push.register().then((t: PushToken) => {        
-        console.log('Generated Token' + JSON.stringify(t));       
-        return this.push.saveToken(t);
-      }).then((t: PushToken) => {
-        console.log('Token Saved', t.token);
-      }).catch((err) => {
-        console.log('Error Saving Token: ', err);
-      });
-    }
-  }
-
   registerToken(){
-    this.storage.get('userId').then( id => {
-      this.notification.storeUserToken(id, this.push.token.token).subscribe( (resp) => {
-        console.log('Response from server: ', resp);
-      }, (err) => {
-        console.log('Error from server: ', err);
+    this.storage.get('userId').then( (id) => {
+      this.oneSignal.getIds().then( (resp) => {
+        console.log("OS - GetID => userId: ", resp.userId);        
+      
+        this.notification.storeUserToken(id, resp.userId).subscribe( (resp) => {
+          console.log('Store User Token - Response from server: ', resp);
+        }, (err) => {
+          console.log('Store User Token - Error from server: ', err);
+        });
       });
     });     
   }
@@ -155,24 +144,23 @@ export class MyApp implements OnInit{
     this.menu.close();
   }
 
+  initializeOneSignal(){
+    this.oneSignal.startInit('de859cc6-f435-4234-87a8-1c0f7980670d', '283358254869');
+
+    this.oneSignal.inFocusDisplaying(this.oneSignal.OSInFocusDisplayOption.Notification);
+    
+    this.oneSignal.handleNotificationReceived().subscribe( (resp) => {
+     // do something when notification is received
+    });
+    
+    this.oneSignal.handleNotificationOpened().subscribe( (res) => {
+      // do something when a notification is opened
+      if (res.action.type == 1 && res.action.actionID == "id1")
+        console.log("OS ActionTake 'Voto Positivo' pressed");
+        alert('Vote Up called');
+    });
+    
+    this.oneSignal.endInit();    
+  }
+
 }
-
-window['voteUpAction'] = (data)  => {
-  let idea = data.additionalData.payload;
-
-  alert('Vote Up called');
-};
-
-window['voteDownAction'] = function (data: any) {
-  let idea = data.additionalData.payload;
-
-  alert('Vore Down called'); 
-};
-
-window['commentAction'] = function (data: any) {
-  let idea    = data.additionalData.payload;
-  let comment = data.additionalData.inlineReply;
-
-  console.log("Reply: ", data.additionalData.inlineReply);
-  alert('Comment called');   
-};

@@ -4,6 +4,7 @@ import { HttpModule } from '@angular/http';
 import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
 import { CloudSettings, CloudModule } from '@ionic/cloud-angular';
 import { MyApp } from './app.component';
+import { OneSignal } from '@ionic-native/onesignal';
 
 import { HTTP } from '@ionic-native/http';
 import { Camera } from '@ionic-native/camera';
@@ -134,7 +135,8 @@ const cloudSettings: CloudSettings = {
     NotificationApi,
     Notification,
     IdeasProvider,
-    CommentsProvider
+    CommentsProvider,
+    OneSignal
   ]
 })
 export class AppModule {}
