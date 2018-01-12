@@ -26,6 +26,10 @@ export class LocationTwoPage {
   email: string;
   searchTerm = "";
   user_id: any;
+  page: number      = 0;
+  perPage: number   = 0;
+  totalData: number = 0;
+  totalPage: number = 0;
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public modalCtrl: ModalController, public platform: Platform,  
     private databaseprovider: DatabaseProvider, public http: Http, public storage: Storage, public toastCtrl: ToastController, private ideaProvider: IdeasProvider,
@@ -138,27 +142,52 @@ export class LocationTwoPage {
   }   
 
   doRefresh(refresher) {
-    console.log('Begin async operation', refresher);
+    this.page = 0;
+    this.perPage = 0;
+    this.updateContent().then( () => {
+      setTimeout( () => {
+        this.loadIdeas();
+        refresher.complete();    
+      }, 3500);
+    });
+  } 
 
-    this.ideaProvider.getIdeas().then( (res) => {
+  updateContent() {
+    return this.ideaProvider.getIdeas(this.page).then( (res) => {
+      console.log("PAGE VALUE: ", this.page);
+      console.log("GET IDEA RESPONSE STATUS: ", res.status);
       let response = JSON.parse(res.data);
+      this.perPage = 5;
+      this.totalData = response.total;
+      this.totalPage = Math.ceil(response.total/5);
       let newIdeas = [];
       newIdeas     = response.list;
-
-      if (newIdeas.length > 0) {
-        for (var i = 0; i < newIdeas.length; i++){      
-          this.ideaProvider.createEditIdea(newIdeas[i]).then( () => {          
-            if (i == newIdeas.length){            
-              refresher.complete();
-              this.loadIdeas();
-            }
-          });
-        }
-      } else {
-        refresher.complete();
+      for (var i = 0; i < newIdeas.length; i++){      
+        this.ideaProvider.createEditIdea(newIdeas[i]);
       }
+      return;
+    }).catch( (error) => {
+      let err = JSON.parse(error.error);
+      console.log("AC - Error getting ideas message: ", err);
+      let toast = this.toastCtrl.create({
+        message: "Error al actualizar ideas",
+        duration: 3000,
+        position: 'top'
+      });
+      toast.present()
+      return;
     });
-  }  
+  }   
+
+  doInfinite(infiniteScroll) {
+    this.page = this.page + 1;
+    this.updateContent().then( () => {
+      setTimeout( () => {
+        this.loadIdeas();
+        infiniteScroll.complete();    
+      }, 2000);
+    });
+  }
 
   presentIdeaPopover(myEvent, idea) {
     let popover = this.popoverCtrl.create(IdeaPopoverPage, {idea: idea});

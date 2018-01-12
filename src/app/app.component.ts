@@ -69,8 +69,7 @@ export class MyApp implements OnInit{
     });  
     this.statusBar.styleDefault();
     this.splashScreen.hide();            
-    this.listenToLogin();    
-    // this.ideaProvider.getIdeas();
+    this.listenToLogin();
   }
 
   ngOnInit(){       

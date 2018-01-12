@@ -205,8 +205,7 @@ export class ItemDetailsPage {
               let newComments = [];
               newComments     = response.list;
                         
-              for (var i = 0; i < newComments.length; i++){                          
-                console.log("I VALUE ==> ", i);
+              for (var i = 0; i < newComments.length; i++){                                          
                 this.commentProvider.createEditCommet(newComments[i], this.selectedItem.id);
               }
               return;

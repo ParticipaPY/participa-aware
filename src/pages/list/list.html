@@ -73,6 +73,14 @@
       </ion-col>
     </ion-row> 
   </ion-card>
+
+  <ion-infinite-scroll (ionInfinite)="doInfinite($event)" *ngIf="page < totalPage">
+    <ion-infinite-scroll-content 
+      loadingSpinner="bubbles" 
+      loadingText="Cargando Ideas ...">
+    </ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+
   <ion-fab right bottom>
     <button ion-fab color="custom-color" (click)="addItem()"><ion-icon name="add"></ion-icon></button>
   </ion-fab>
