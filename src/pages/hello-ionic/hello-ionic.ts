@@ -24,11 +24,7 @@ export class HelloIonicPage {
               private storage: Storage, public events: Events, public modalCtrl: ModalController, private screenOrientation: ScreenOrientation,
               public keyboard: Keyboard, public platform: Platform, public loadingCtrl: LoadingController, public userLocations: Notification) {
 
-    this.platform.ready().then( () => {
-      this.loading = this.loadingCtrl.create({
-        spinner: 'bubbles'
-      });
-      
+    this.platform.ready().then( () => {      
       this.screenOrientation.lock(this.screenOrientation.ORIENTATIONS.PORTRAIT);
       this.keyboard.onKeyboardShow().subscribe(() => {
         this.reduce_icon = true;
@@ -40,32 +36,52 @@ export class HelloIonicPage {
     
   }
 
-  presentLoading() {
-    const loading = this.loadingCtrl.create({
+  doLogin() {        
+    this.loading = this.loadingCtrl.create({
       spinner: 'bubbles'
     });
-  
-    loading.present();
-  }
-
-  doLogin() {        
     this.loading.present();
     this.user.login(this.account).then( (resp) => {        
       let result = JSON.parse(resp.data);        
-      this.storeUserInfo(result);
+
       this.account.user_id = result.userId;
       this.account.name = result.name;
       this.account.author_pic = result.profilePic.url;
-      this.events.publish('user:created', this.account);
+
+      this.storeUserInfo(result);
+      this.getUser(result);
+      this.getUserLocations(result);
+
+      setTimeout( () => {
+        this.events.publish('user:created', this.account);
+        this.loading.dismiss();
+        // this.navCtrl.push(TabsPage);
+        this.navCtrl.setRoot(TabsPage);
+      }, 2500);
  
-    }, (err) => {      
+    }, (error) => {      
       this.loading.dismiss();
-      let toast = this.toastCtrl.create({
-        message: err,
-        duration: 3000,
-        position: 'top'
-      });
-      toast.present();
+      if (error.status != 500) {
+        let err = JSON.parse(error.error);
+        console.log("AC - Error on SingUp: ", error);
+        if (err.statusMessage) {
+          console.log("AC - Error on SingUp Message: ", err.statusMessage);
+          let toast = this.toastCtrl.create({
+            message: err.statusMessage,
+            duration: 3000,
+            position: 'top'
+          });
+          toast.present();          
+        } 
+      }else {
+        console.log("AC - Error on SingUp Message: ", error);
+        let toast = this.toastCtrl.create({
+          message: "Error al iniciar sesión",
+          duration: 3000,
+          position: 'top'
+        });
+        toast.present();        
+      }      
     });
   }
 
@@ -74,15 +90,14 @@ export class HelloIonicPage {
     this.storage.set('email', this.account.email);
     this.storage.set('session_key', resp.sessionKey);
     this.storage.set('profile_pic', resp.profilePic.url);
-    this.storage.set('userId', resp.userId);
-    this.getUserLocations(resp);
+    this.storage.set('userId', resp.userId);    
   }
 
-  getUserLocations(resp) {    
-    this.databaseProvider.getAuthor(this.account.email).then( (res) => {
+  getUser(resp){
+    return this.databaseProvider.getAuthor(this.account.email).then( (res) => {
       if (res.id != null){
         console.log("====> author id: ", res.id);
-        this.storage.set('user_id', res.id);
+        return this.storage.set('user_id', res.id);
       }else{
         let user = {
           name: resp.name, 
@@ -90,34 +105,32 @@ export class HelloIonicPage {
           session_key: resp.session_key, 
           profile_pic: resp.profilePic.url
         }
-        this.databaseProvider.createAuthor(resp.userId, user).then( (id) => {          
+        return this.databaseProvider.createAuthor(resp.userId, user).then( (id) => {          
           console.log("====> author id: ", id);
-          this.storage.set('user_id', id);
-        })
+          return this.storage.set('user_id', id);
+        });
       }
-
-      this.userLocations.getUserLocations(resp.userId).subscribe( (data) => {
-        console.log("Response User Locations: ", data);
-
-        if (data.length > 0) {
-          let home = data.filter(d => d.location === "CASA");
-          let work = data.filter(d => d.location === "TRABAJO");
-          let other = data.filter(d => d.location === "OTRO");
-    
-          this.storage.set("location_one", home[0].location_id);
-          this.storage.set("location_two", work[0].location_id);
-          this.storage.set("location_three", other[0].location_id);
-          
-          this.account.location_one = home[0].location_id;
-          this.account.location_two = home[0].location_id;
-          this.account.location_three = home[0].location_id;  
-        }
-        
-        this.loading.dismiss();
-        this.navCtrl.push(TabsPage);
-        this.navCtrl.setRoot(TabsPage); 
-      });
     });
+  }
+
+  getUserLocations(resp) {    
+    return this.userLocations.getUserLocations(resp.userId).subscribe( (data) => {
+      console.log("Response User Locations: ", data);
+
+      if (data.length > 0) {
+        let home = data.filter(d => d.location === "CASA");
+        let work = data.filter(d => d.location === "TRABAJO");
+        let other = data.filter(d => d.location === "OTRO");
+  
+        this.storage.set("location_one", home[0].location_id);
+        this.storage.set("location_two", work[0].location_id);
+        this.storage.set("location_three", other[0].location_id);
+        
+        this.account.location_one = home[0].location_id;
+        this.account.location_two = home[0].location_id;
+        this.account.location_three = home[0].location_id;  
+      } 
+    });    
   }
 
   signup() {
