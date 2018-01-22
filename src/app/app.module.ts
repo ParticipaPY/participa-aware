@@ -2,7 +2,6 @@ import { NgModule, ErrorHandler } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpModule } from '@angular/http';
 import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
-import { CloudSettings, CloudModule } from '@ionic/cloud-angular';
 import { MyApp } from './app.component';
 import { OneSignal } from '@ionic-native/onesignal';
 
@@ -49,25 +48,6 @@ import { IdeasProvider } from '../providers/ideas/ideas';
 import { CommentsProvider } from '../providers/comments/comments';
 import { Autosize } from '../directives/autosize/autosize';
 
-const cloudSettings: CloudSettings = {
-  core: {
-    app_id: '523f61f0'
-  },
-  push: {
-    sender_id: '283358254869',
-    pluginConfig: {
-      ios: {
-        badge: true,
-        sound: true
-      },
-      android: {
-        iconColor: '#193361',
-        forceShow: true
-      }
-    }
-  }  
-};
-
 @NgModule({
   declarations: [
     MyApp,
@@ -92,8 +72,7 @@ const cloudSettings: CloudSettings = {
     BrowserModule,
     HttpModule,
     IonicModule.forRoot(MyApp),
-    SuperTabsModule.forRoot(),
-    CloudModule.forRoot(cloudSettings),
+    SuperTabsModule.forRoot(),    
     IonicStorageModule.forRoot()
   ],
   bootstrap: [IonicApp],
@@ -136,7 +115,7 @@ const cloudSettings: CloudSettings = {
     Notification,
     IdeasProvider,
     CommentsProvider,
-    OneSignal
+    OneSignal 
   ]
 })
 export class AppModule {}

@@ -54,31 +54,35 @@ export class CommentsProvider {
     return this.api.put('assembly/' + this.aid + '/contribution/' + comment_id + '/softremoval', {}, {'SESSION_KEY': this.session_key});
   }  
 
-  createEditCommet(data, idea_id){    
-    return this.databaseProvider.getComment(data.contributionId).then( (res) => {
+  async createEditCommet(data, idea_id){    
+    return await this.databaseProvider.getComment(data.contributionId).then( (res) => {
       if (res.id != null) {
         console.log("Edit Comment");
-        return this.editComment(data);
+        return this.editComment(data).then( () => {
+          return Promise.resolve();
+        });
       } else {
         console.log("Create Comment");        
         return this.getCommentAuthor(data).then( (author_id) => {          
-          return this.createComment(data, author_id, idea_id);          
+          return this.createComment(data, author_id, idea_id).then( () => {
+            return Promise.resolve();
+          });         
         });        
       }
     });
   }
 
-  editComment(data){
+  async editComment(data){
     let comment = {
       "comment_id" : data.contributionId,
       "description": data.text
     }
 
     console.log("Edit Commnet Data: ", comment);
-    return this.databaseProvider.updateComment(comment);
+    return await this.databaseProvider.updateComment(comment);
   }
 
-  createComment(data, author, idea_id){       
+  async createComment(data, author, idea_id){       
     let comment = {
       "comment_id" : data.contributionId,
       "idea_id"    : idea_id,
@@ -88,11 +92,10 @@ export class CommentsProvider {
     }
 
     console.log("New Comment Data: ", comment);
-    return this.databaseProvider.createCommentAC(comment);    
+    return await this.databaseProvider.createCommentAC(comment);    
   }
 
-  getCommentAuthor(data){
-    let author_id;
+  async getCommentAuthor(data){    
     let email = "";
     let name = "";
     let image;
@@ -106,16 +109,14 @@ export class CommentsProvider {
       image = data.firstAuthor.profilePic.urlAsString;
     }
     console.log("===> AUTHOR: ", [email, name, image]);
-    return this.databaseProvider.getAuthor(email).then( (res) => {
-      if (res.id != null) {        
-        author_id = res.id;
-        console.log("COMMENT AUTHOR ID EXISTS: ", author_id);
-        return author_id;
+    return await this.databaseProvider.getAuthor(email).then( (res) => {
+      if (res.id != null) {                
+        console.log("COMMENT AUTHOR ID EXISTS: ", res.id);
+        return res.id;
       } else {
-        return this.databaseProvider.createAuthorAC({name: name, email: email, image: image}).then( (id) => {        
-          author_id = id;
-          console.log("COMMENT AUTHOR ID CREATED: ", author_id);
-          return author_id;
+        return this.databaseProvider.createAuthorAC({name: name, email: email, image: image}).then( (id) => {
+          console.log("COMMENT AUTHOR ID CREATED: ", id);
+          return id;
         });
       }           
     });

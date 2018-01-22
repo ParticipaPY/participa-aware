@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ToastController } from 'ionic-angular';
+import { ToastController, Platform } from 'ionic-angular';
 import { Storage } from '@ionic/storage';
 import { Api } from '../api';
 import { DatabaseProvider } from '../database/database';
@@ -14,102 +14,132 @@ export class IdeasProvider {
   cid  = 209;
   csid = 7903;
 
-  constructor(public api: Api,  public storage: Storage, public databaseProvider: DatabaseProvider, public toastCtrl: ToastController) {
-    this.storage.get('session_key').then( (key) => {
-      this.session_key = key
-    });    
+  constructor(public platform: Platform, public api: Api,  public storage: Storage, public databaseProvider: DatabaseProvider, public toastCtrl: ToastController) {
+    this.platform.ready().then( () => {
+      this.storage.get('session_key').then( (key) => {
+        this.session_key = key;
+      });
+    });
+  }
+
+  getSessionKey() {
+    return this.storage.get('session_key');
   }
 
   getIdea(cid){
-    return this.api.get('space/' + this.csid + '/contribution/' + cid, {}, {'SESSION_KEY': this.session_key});
+    return this.getSessionKey().then( (key) => {
+      this.session_key = key;
+      return this.api.get('space/' + this.csid + '/contribution/' + cid, {}, {'SESSION_KEY': this.session_key});
+    });    
   }
 
   getIdeas(page){
-    let params = {
-      'type': 'idea',
-      'page': page,
-      'pageSize': 5,
-      'sorting': 'date_desc'
-    }
-    return this.api.get('space/' + this.csid + '/contribution', params, {'SESSION_KEY': this.session_key});
+    return this.getSessionKey().then( (key) => {
+      this.session_key = key;
+      let params = {
+        'type': 'idea',
+        'page': page,
+        'pageSize': 5,
+        'sorting': 'date_desc'
+      }
+      return this.api.get('space/' + this.csid + '/contribution', params, {'SESSION_KEY': this.session_key});
+    });
   }
 
   postIdea(idea: any, location: any){
-    let s = location.coordinates.replace("[[", "").replace("]]", "").split('], [');
-    let final = [];
-    
-    for (var l = 0; l < s.length; l++){
-      let a = s[l].split(', ');
-      final.push([parseFloat(a[0]), parseFloat(a[1])]);
-    }
-
-    let data = {
-      "lang"     : "es-es",
-      "title"    : idea.title,
-      "text"     : idea.description,
-      "type"     : "IDEA",      
-      "status"   : "PUBLISHED",
-      "campaigns": [this.cid],
-      "location" : {
-        "placeName": location.name,
-        "geoJson"  : "[{\"type\": \"Polygon\",\"coordinates\": [" + final + "]}]"
+    return this.getSessionKey().then( (key) => {
+      this.session_key = key;
+      let s = location.coordinates.replace("[[", "").replace("]]", "").split('], [');
+      let final = [];
+      
+      for (var l = 0; l < s.length; l++){
+        let a = s[l].split(', ');
+        final.push([parseFloat(a[0]), parseFloat(a[1])]);
       }
-    }
 
-    console.log("POST IDEA DATA: ", data);
-    return this.api.post('space/' + this.csid + '/contribution', data, {'SESSION_KEY': this.session_key});
-  }
-
-  putIdea(idea: any, location: any){
-    let s = location.coordinates.replace("[[", "").replace("]]", "").split('], [');
-    let final = [];
-    
-    for (var l = 0; l < s.length; l++){
-      let a = s[l].split(', ');
-      final.push([parseFloat(a[0]), parseFloat(a[1])]);
-    }
-
-    let data = {
-      "title"    : idea.title,
-      "text"     : idea.description,
-      "type"     : "IDEA",      
-      "status"   : "PUBLISHED",
-      "location" : {
+      let data = {
+        "lang"     : "es-es",
+        "title"    : idea.title,
+        "text"     : idea.description,
+        "type"     : "IDEA",      
+        "status"   : "PUBLISHED",
+        "campaigns": [this.cid],
         "location" : {
           "placeName": location.name,
           "geoJson"  : "[{\"type\": \"Polygon\",\"coordinates\": [" + final + "]}]"
         }
-      },      
-      "contributionId": idea.idea_id
-    }
+      }
 
-    console.log("PUT IDEA DATA: ", data);
-    return this.api.put('assembly/' + this.aid + '/contribution/' + idea.idea_id, data, {'SESSION_KEY': this.session_key});
+      console.log("POST IDEA DATA: ", data);
+      return this.api.post('space/' + this.csid + '/contribution', data, {'SESSION_KEY': this.session_key});
+    });
+  }
+
+  putIdea(idea: any, location: any){
+    return this.getSessionKey().then( (key) => {
+      this.session_key = key;
+      let s = location.coordinates.replace("[[", "").replace("]]", "").split('], [');
+      let final = [];
+      
+      for (var l = 0; l < s.length; l++){
+        let a = s[l].split(', ');
+        final.push([parseFloat(a[0]), parseFloat(a[1])]);
+      }
+
+      let data = {
+        "title"    : idea.title,
+        "text"     : idea.description,
+        "type"     : "IDEA",      
+        "status"   : "PUBLISHED",
+        "location" : {
+          "location" : {
+            "placeName": location.name,
+            "geoJson"  : "[{\"type\": \"Polygon\",\"coordinates\": [" + final + "]}]"
+          }
+        },      
+        "contributionId": idea.idea_id
+      }
+
+      console.log("PUT IDEA DATA: ", data);
+      return this.api.put('assembly/' + this.aid + '/contribution/' + idea.idea_id, data, {'SESSION_KEY': this.session_key});
+    });
   }
 
   deleteIdea(idea_id){
-    return this.api.put('assembly/' + this.aid + '/contribution/' + idea_id + '/softremoval', {}, {'SESSION_KEY': this.session_key});
+    return this.getSessionKey().then( (key) => {
+      this.session_key = key;
+      return this.api.put('assembly/' + this.aid + '/contribution/' + idea_id + '/softremoval', {}, {'SESSION_KEY': this.session_key});
+    });
   }
 
   ideaFeedback(data){
-    let feedback = {
-      "up": data.up, 
-      "down": data.down,
-      "fav": "false", 
-      "flag": "false", 
-      "type": "MEMBER", 
-      "status": "PUBLIC"
-    }
+    return this.getSessionKey().then( (key) => {
+      this.session_key = key;
+      let feedback = {
+        "up": data.up, 
+        "down": data.down,
+        "fav": "false", 
+        "flag": "false", 
+        "type": "MEMBER", 
+        "status": "PUBLIC"
+      }
 
-    return this.api.put('assembly/' + this.aid + '/campaign/' + data.campaign_id + '/contribution/' + data.idea_id + '/feedback', feedback, {'SESSION_KEY': this.session_key} );
+      return this.api.put('assembly/' + this.aid + '/campaign/' + data.campaign_id + '/contribution/' + data.idea_id + '/feedback', feedback, {'SESSION_KEY': this.session_key} );
+    });
   }
 
   userFeedback(data){
-    return this.api.get('assembly/' + this.aid + '/campaign/' + data.campaign_id + '/contribution/' + data.idea_id + '/userfeedback', {}, {'SESSION_KEY': this.session_key} );
+    return this.getSessionKey().then( (key) => {
+      this.session_key = key;
+      return this.api.get('assembly/' + this.aid + '/campaign/' + data.campaign_id + '/contribution/' + data.idea_id + '/userfeedback', {}, {'SESSION_KEY': this.session_key} );
+    });
   }
 
   ideaStat(data){
-    return this.api.get('assembly/' + this.aid + '/campaign/'+ data.campaign_id + '/contribution/' + data.idea_id + '/stats', {}, {'SESSION_KEY': this.session_key});
+    return this.getSessionKey().then( (key) => {
+      this.session_key = key;
+      return this.api.get('assembly/' + this.aid + '/campaign/'+ data.campaign_id + '/contribution/' + data.idea_id + '/stats', {}, {'SESSION_KEY': this.session_key});
+    });
   }
 
   voteUp(idea){
@@ -135,7 +165,9 @@ export class IdeasProvider {
 
     return this.databaseProvider.voteUp(idea).then( (data) => {
       if (idea.voted_down == 1) {
-        this.deleteVoteDown(idea);        
+        return this.deleteVoteDown(idea);        
+      } else {
+        return;
       }
     });    
   }
@@ -187,7 +219,9 @@ export class IdeasProvider {
 
     return this.databaseProvider.voteDown(idea).then(data => {
       if (idea.voted_up == 1) {
-        this.deleteVoteUp(idea);        
+        return this.deleteVoteUp(idea);        
+      } else {
+        return;
       }
     });
   }
@@ -222,16 +256,22 @@ export class IdeasProvider {
         return this.getUserIdeaFeedback({campaign_id: data.campaignIds[0], idea_id: data.contributionId}).then( (userfeedback) => {          
           if (res.id != null) {
             console.log("Edit Idea ID: ", data.contributionId);
-            return this.editIdea(data, feedback, userfeedback);
+            return this.editIdea(data, feedback, userfeedback).then( () => {
+              return res.id;
+            });
           } else {
             console.log("Create Idea ID: ", data.contributionId);                        
             return this.getIdeaAuthor(data).then( (author_id) => {
               if (data.location != null && data.location.placeName != null)              
                 return this.getIdeaLocation(data.location.placeName).then( (location_id) => {                  
-                  return this.createIdea(data, author_id, location_id, feedback, userfeedback);
+                  return this.createIdea(data, author_id, location_id, feedback, userfeedback).then( (new_id) => {
+                    return new_id;
+                  });
                 });
               else
-                return this.createIdea(data, author_id, null, feedback, userfeedback);
+                return this.createIdea(data, author_id, null, feedback, userfeedback).then( (new_id) => {
+                  return new_id;
+                });
             });        
           }
         })
@@ -239,11 +279,11 @@ export class IdeasProvider {
     });
   }
 
-  editIdea(data, feedback, userfeedback){
+  async editIdea(data, feedback, userfeedback){
     let idea = {  
       idea_id    : data.contributionId,    
       title      : data.title,
-      description: data.text,
+      description: data.plainText,
       votes_up   : feedback.ups,
       votes_down : feedback.downs,  
       comments   : data.commentCount,
@@ -251,10 +291,10 @@ export class IdeasProvider {
       voted_down : userfeedback.down
     }
     console.log("Edit Idea: ", idea);
-    return this.databaseProvider.updateIdea(idea);
+    return await this.databaseProvider.updateIdea(idea);
   }
 
-  createIdea(data, author_id, location_id, feedback, userfeedback){
+  async createIdea(data, author_id, location_id, feedback, userfeedback){
     let idea = {
       author_id  : author_id,
       idea_id    : data.contributionId,
@@ -262,7 +302,7 @@ export class IdeasProvider {
       campaign_id: data.campaignIds[0],
       location_id: location_id,
       title      : data.title,
-      description: data.text,
+      description: data.plainText,
       ups        : feedback.ups,
       downs      : feedback.downs,  
       comments   : data.commentCount,
@@ -271,7 +311,7 @@ export class IdeasProvider {
       resourceSpaceId: data.resourceSpaceId
     }
     console.log("New Idea: ", idea);
-    return this.databaseProvider.createIdeaAC(idea);
+    return await this.databaseProvider.createIdeaAC(idea);
   }
 
   getIdeaAuthor(data){  
@@ -289,13 +329,11 @@ export class IdeasProvider {
     }    
     return this.databaseProvider.getAuthor(email).then( (res) => {
       if (res.id != null) {
-        console.log("GET IDEA AUTHOR ID: ", res.id);
-        console.log("IDEA AUTHOR ID: ", res.id);
+        console.log("GET IDEA AUTHOR ID: ", res.id);        
         return res.id;        
       } else {
         return this.databaseProvider.createAuthorAC({name: name, email: email, image: image}).then( (id) => {
-          console.log("CREATE IDEA AUTHOR ID: ", id);
-          console.log("IDEA AUTHOR ID: ", id);
+          console.log("CREATE IDEA AUTHOR ID: ", id);          
           return id;
         });
       }
@@ -339,6 +377,19 @@ export class IdeasProvider {
     }).catch( (error) => {      
       return feedback;
     });
+  }
 
+  voteAction(vote, idea_id){
+    return this.getIdea(idea_id).then( (res) => {      
+      let response = JSON.parse(res.data);                
+      return this.createEditIdea(response).then( () => {
+        return this.databaseProvider.getIdea("idea_id", idea_id).then( (data) => {
+          if (vote == "up")
+            return this.voteUp(data);
+          else
+            return this.voteDown(data);
+        });
+      });
+    });    
   }
 }

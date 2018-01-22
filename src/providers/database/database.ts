@@ -572,7 +572,7 @@ export class DatabaseProvider implements OnInit{
                 idea.voted_down, idea.idea_id];
 
     return this.database.executeSql(sql, data).then( res => {
-      return res;
+      return idea.id;
     }, err => {
       console.log('Error: ', err);
       return 0;
