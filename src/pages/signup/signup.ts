@@ -22,7 +22,7 @@ export class SignupPage {
               public databaseProvider: DatabaseProvider, public notification: Notification, public loadingCtrl: LoadingController) {
     
     this.signUpForm = formBuilder.group({
-        name: ['', Validators.compose([Validators.maxLength(80), Validators.pattern('[a-zA-Z ]*'), Validators.required])],
+        name: ['', Validators.compose([Validators.maxLength(80), Validators.pattern('[a-zA-ZáéíóúÁÉÍÓÚ ]*'), Validators.required])],
         email: ['', Validators.compose([Validators.maxLength(30), Validators.minLength(5), Validators.pattern('[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+'), Validators.required])],
         password: ['', Validators.compose([Validators.maxLength(10), Validators.minLength(5), Validators.required])],
         repeatPassword: ['', Validators.compose([Validators.maxLength(10), Validators.minLength(5), Validators.required])],
