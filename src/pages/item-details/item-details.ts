@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Storage } from '@ionic/storage';
-import { NavController, NavParams, ToastController, PopoverController } from 'ionic-angular';
+import { NavController, NavParams, ToastController, PopoverController, LoadingController, Loading } from 'ionic-angular';
 import { DatabaseProvider } from "../../providers/database/database";
 import { CommentsProvider } from '../../providers/comments/comments';
 import { IdeasProvider } from '../../providers/ideas/ideas';
@@ -18,12 +18,15 @@ export class ItemDetailsPage {
   ideas = [];
   comments = [];
   itemExpandHeight: number = 100;
-  user_id: any;
+  user_id: any;  
+  loading: Loading;
+  ideaLoaded: boolean = false;
+  commentLoaded: boolean = false;
 
   constructor(public navCtrl: NavController, public navParams: NavParams, private databaseprovider: DatabaseProvider, public storage: Storage, public commentProvider: CommentsProvider, 
-              public toastCtrl: ToastController, public ideaProvider: IdeasProvider, public popoverCtrl: PopoverController) {
+              public toastCtrl: ToastController, public ideaProvider: IdeasProvider, public popoverCtrl: PopoverController, public loadingCtrl: LoadingController) {
    
-    this.rootNavCtrl = this.navParams.get('rootNavCtrl'); 
+    this.rootNavCtrl = this.navParams.get('rootNavCtrl');     
   }
 
   ionViewWillLoad() {
@@ -44,67 +47,95 @@ export class ItemDetailsPage {
     return await this.storage.get('user_id');
   }
 
-  getIdea() {
-    console.log("Selected Item: ", this.selectedItem);
-    if (this.selectedItem.idea_id != null) {
-      this.databaseprovider.getIdea("idea_id", this.selectedItem.idea_id).then( (data) => {
-        if (data.id) {
-          console.log("Idea Exists");
-          this.selectedItem = data;
-        } else {
-          console.log("Idea does not exist on database");                
-          this.getIdeaAuthor();
-        }
-        this.loadIdeaComments();
-      });
-    } else {
-      console.log("Idea_id is null");
-      this.databaseprovider.getIdea("id", this.selectedItem.id).then( (data) => {
-        if (data.id) {
-          console.log("Idea Exists");
-          this.selectedItem = data;
-        } else {
-          console.log("Idea does not exist on database");                
-          this.getIdeaAuthor();
-        }
-        this.loadIdeaComments();
-      });
-    }
+  updateIdea() {
+    this.databaseprovider.getDatabaseState().subscribe( (rdy) => {
+      if (rdy) {   
+        this.databaseprovider.getIdea("id", this.selectedItem.id).then( (data) => {
+          if (data.id) {
+            console.log("Idea Exists");
+            this.ideaLoaded = true;
+            this.selectedItem = data; 
+          }
+        });
+      }
+    });    
+  }
+
+  getIdea() { 
+    this.databaseprovider.getDatabaseState().subscribe( (rdy) => {
+      if (rdy) {   
+        this.databaseprovider.getIdea("idea_id", this.selectedItem.idea_id).then( (data) => {
+          if (data.id != null) {
+            console.log("Idea Exists on Database");
+            this.ideaLoaded = true;
+            this.selectedItem = data;            
+            this.loadIdeaComments();
+          } else {
+            console.log("Idea does not exist");
+            this.loading = this.loadingCtrl.create({
+              spinner: 'bubbles',
+              content: 'Cargando idea'
+            });
+            this.loading.present();            
+            this.updateContent().then( () => {
+              this.databaseprovider.getIdea("idea_id", this.selectedItem.idea_id).then( (data) => {
+                if (data.id) {
+                  console.log("Idea created on Database");
+                  this.ideaLoaded = true;                  
+                  this.loading.dismiss().then( () => {
+                    this.selectedItem = data;
+                    // this.loadIdeaComments();
+                  });                  
+                }
+              });
+            }).catch( (error) => {
+              console.log("Error updating idea: ", error);
+            });          
+          }
+        });
+      }
+    });
   }
 
   loadIdeaComments () {
-    this.databaseprovider.getIdeaComments(this.selectedItem).then( (data) => {
-      this.comments = data;
+    console.log("Load idea comment");
+    this.databaseprovider.getIdeaComments(this.selectedItem).then( (data) => {  
+      this.comments = data;    
+      this.commentLoaded = true;
     });
   }
 
   voteUp(idea) {
     this.ideaProvider.voteUp(idea).then( () => {
-      this.getIdea();
+      this.updateIdea();
     });  
   }
 
   voteDown(idea) {
     this.ideaProvider.voteDown(idea).then( () => {
-      this.getIdea();
+      this.updateIdea();
     });    
   } 
 
   deleteVoteUp(idea){
     this.ideaProvider.deleteVoteUp(idea).then( () => {
-      this.getIdea();
+      this.updateIdea();
     });
   }
 
   deleteVoteDown(idea){
     this.ideaProvider.deleteVoteDown(idea).then( () => {
-      this.getIdea();
+      this.updateIdea();
     });
   }
 
   createComment(){
     this.databaseprovider.createComment(this.comment, this.selectedItem).then( (data) => {      
-      this.databaseprovider.updateCommentCounter(this.selectedItem, "create");
+      this.databaseprovider.updateCommentCounter(this.selectedItem, "create").then( () => {
+        this.updateIdea();
+        this.loadIdeaComments();
+        this.comment = "";      
+      });
       this.commentProvider.postComment(this.selectedItem.resourceSpaceId, this.comment, "DISCUSSION").then ( (resp) => {
         let response = JSON.parse(resp.data);
         console.log("Status Create Comment: ", resp.status);      
@@ -118,9 +149,6 @@ export class ItemDetailsPage {
         toast.present();        
         console.log("Error creating Comment: ", error);
       });
-      this.getIdea();
-      this.loadIdeaComments();
-      this.comment = "";      
     });
   }
 
@@ -185,32 +213,30 @@ export class ItemDetailsPage {
   doRefresh(refresher) {
     this.updateContent().then( () => {
       setTimeout( () => {
-        this.getIdea();
-        refresher.complete();    
+        this.getIdea();    
+        refresher.complete();
       }, 2000);
     });
   }  
 
-  updateContent(){
-    return this.ideaProvider.getIdea(this.selectedItem.idea_id).then( (res) => {
+  async updateContent(){
+    return await this.ideaProvider.getIdea(this.selectedItem.idea_id).then( (res) => {
       console.log("GET IDEA FROM AC STATUS", res.status);      
-      let response = JSON.parse(res.data);
-      
-      return this.ideaProvider.getIdeaFeedBack({campaign_id: response.campaignIds[0], idea_id: response.contributionId}).then( (feedback) => {          
-        return this.ideaProvider.getUserIdeaFeedback({campaign_id: response.campaignIds[0], idea_id: response.contributionId}).then( (userfeedback) => {            
-          return this.ideaProvider.editIdea(response, feedback, userfeedback).then( () => {
-            return this.commentProvider.getComments(response.resourceSpaceId).then( (resp) => {
-              console.log("GET COMMENT FROM AC STATUS: ", resp.status);              
-              let response    = JSON.parse(resp.data);
-              let newComments = [];
-              newComments     = response.list;
-                        
-              for (var i = 0; i < newComments.length; i++){                                          
-                this.commentProvider.createEditCommet(newComments[i], this.selectedItem.id);
-              }
-              return;
-            });
-          });
+      let response = JSON.parse(res.data);                
+      return this.ideaProvider.createEditIdea(response).then( (id) => {
+        return this.commentProvider.getComments(response.resourceSpaceId).then( (resp) => {
+          console.log("GET COMMENT FROM AC STATUS: ", resp.status);              
+          let response    = JSON.parse(resp.data);
+          let newComments = [];
+          newComments     = response.list;            
+          let chain       = Promise.resolve();                 
+          for (let c of newComments){     
+            chain = chain.then( () => {
+              return this.commentProvider.createEditCommet(c, id).then( () => {
+                this.loadIdeaComments();
+              });
+            });            
+          }
         });
       });
     });    
@@ -227,7 +253,7 @@ export class ItemDetailsPage {
       console.log("Popover Dismessed");
       console.log("Type: ", type);
       if (type == "edit")
-        this.getIdea();
+        this.updateIdea();
       else if (type == "delete")
         this.navCtrl.pop();
     });    
@@ -242,7 +268,8 @@ export class ItemDetailsPage {
     
     popover.onDidDismiss( () => {
       console.log("Popover Dismessed");
-      this.getIdea();
+      this.updateIdea();
+      this.loadIdeaComments();
     });    
   }
 

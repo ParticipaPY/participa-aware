@@ -17,7 +17,7 @@
     </ion-refresher-content>
   </ion-refresher>
     
-  <ion-card>
+  <ion-card *ngIf="ideaLoaded">
     <ion-item text-wrap>
       <ion-avatar item-start>
         <img *ngIf="selectedItem.author_pic" [src]="selectedItem.author_pic">
@@ -66,8 +66,8 @@
     </ion-row>
   </ion-card>
   
-  <ion-label style="text-align:center;" *ngIf="selectedItem.comments > 0">Comentarios</ion-label>
-  <ion-list>
+  <ion-list *ngIf="selectedItem.comments > 0 && commentLoaded">
+    <ion-label style="text-align:center;">Comentarios</ion-label>
     <button detail-none *ngFor="let item of comments" (click)="expandItem(item)" ion-item>
       <ion-avatar item-start>
         <img *ngIf="item.author_pic" [src]="item.author_pic">
