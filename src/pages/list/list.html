@@ -8,7 +8,8 @@
   <div *ngIf="searching" class="spinner-container">
     <ion-spinner></ion-spinner>
   </div> -->
-
+  <ion-label style="text-align: center; color: gray" *ngIf="ideas.length == 0">Desliza hacia abajo para actualizar</ion-label>
+  
   <ion-card *ngFor="let item of ideas">
     <ion-item >
       <ion-avatar item-start>

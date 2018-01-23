@@ -145,15 +145,14 @@ export class LocationTwoPage {
     this.page = 0;
     this.perPage = 0;
     this.updateContent().then( () => {
-      setTimeout( () => {
-        this.loadIdeas();
+      setTimeout( () => { 
         refresher.complete();    
-      }, 3500);
+      }, 2000);
     });
   } 
 
-  updateContent() {
-    return this.ideaProvider.getIdeas(this.page).then( (res) => {
+  async updateContent() {
+    return await this.ideaProvider.getIdeas(this.page).then( (res) => {
       console.log("PAGE VALUE: ", this.page);
       console.log("GET IDEA RESPONSE STATUS: ", res.status);
       let response = JSON.parse(res.data);
@@ -162,10 +161,12 @@ export class LocationTwoPage {
       this.totalPage = Math.ceil(response.total/5);
       let newIdeas = [];
       newIdeas     = response.list;
-      for (var i = 0; i < newIdeas.length; i++){      
-        this.ideaProvider.createEditIdea(newIdeas[i]);
+      let chain    = Promise.resolve();
+      for (let i of newIdeas){     
+        chain = chain.then( () => {
+          return this.ideaProvider.createEditIdea(i);
+        });
       }
-      return;
     }).catch( (error) => {
       let err = JSON.parse(error.error);
       console.log("AC - Error getting ideas message: ", err);
@@ -182,8 +183,7 @@ export class LocationTwoPage {
   doInfinite(infiniteScroll) {
     this.page = this.page + 1;
     this.updateContent().then( () => {
-      setTimeout( () => {
-        this.loadIdeas();
+      setTimeout( () => {        
         infiniteScroll.complete();    
       }, 2000);
     });

@@ -92,9 +92,6 @@ export class ListPage {
   }
 
   itemTapped(event, item) {
-    // this.rootNavCtrl.push(ItemDetailsPage, {
-    //   item: item
-    // });
     let addModal = this.modalCtrl.create(ItemDetailsPage, {item: item});
     
     addModal.onDidDismiss((item) => {
@@ -112,7 +109,7 @@ export class ListPage {
         this.loadIdeas();             
       } else if (item <= 0) {
         let toast = this.toastCtrl.create({
-          message: "Error Creating Idea",
+          message: "Error al crear idea",
           duration: 3000,
           position: 'top'
         });
@@ -129,7 +126,6 @@ export class ListPage {
   }
 
   voteDown(idea) {
-    console.log("VOte Down from List");
     this.ideaProvider.voteDown(idea).then( () => {
       this.loadIdeas();
     });
@@ -151,10 +147,9 @@ export class ListPage {
     this.page = 0;
     this.perPage = 0;
     this.updateContent().then( () => {
-      setTimeout( () => {
-        this.loadIdeas();
+      setTimeout( () => {        
         refresher.complete();    
-      }, 3500);
+      }, 2000);
     });
   } 
 
@@ -168,10 +163,14 @@ export class ListPage {
       this.totalPage = Math.ceil(response.total/5);
       let newIdeas = [];
       newIdeas     = response.list;
-      for (var i = 0; i < newIdeas.length; i++){      
-        this.ideaProvider.createEditIdea(newIdeas[i]);
+      let chain    = Promise.resolve();
+      for (let i of newIdeas){     
+        chain = chain.then( () => {
+          return this.ideaProvider.createEditIdea(i).then(() => {
+            this.loadIdeas();
+          });
+        });
       }
-      return;
     }).catch( (error) => {
       let err = JSON.parse(error.error);
       console.log("AC - Error getting ideas message: ", err);
@@ -188,8 +187,7 @@ export class ListPage {
   doInfinite(infiniteScroll) {
     this.page = this.page + 1;
     this.updateContent().then( () => {
-      setTimeout( () => {
-        this.loadIdeas();
+      setTimeout( () => {        
         infiniteScroll.complete();    
       }, 2000);
     });

@@ -327,6 +327,7 @@ export class IdeasProvider {
       name  = data.firstAuthor.name;
       image = data.firstAuthor.profilePic.urlAsString;
     }    
+    console.log("===> AUTHOR: ", [email, name, image]);
     return this.databaseProvider.getAuthor(email).then( (res) => {
       if (res.id != null) {
         console.log("GET IDEA AUTHOR ID: ", res.id);        

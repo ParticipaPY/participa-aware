@@ -5,6 +5,8 @@
 
   <ion-searchbar [(ngModel)]="searchTerm" (ionInput)="setFilteredItems()" [showCancelButton]="true"></ion-searchbar>
   
+  <ion-label style="text-align: center; color: gray" *ngIf="ideas.length == 0">Desliza hacia abajo para actualizar</ion-label>
+
   <ion-card *ngFor="let item of ideas">
     <ion-item (click)="itemTapped($event, item)">
       <ion-avatar item-start>
