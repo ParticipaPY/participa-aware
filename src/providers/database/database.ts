@@ -104,8 +104,8 @@ export class DatabaseProvider implements OnInit{
   }
 
   getLocationByName(name: string) {    
-    let sql = "SELECT * FROM location WHERE name = ? OR name = ?;";
-    return this.database.executeSql(sql, [name.toUpperCase(), "BARRIO " + name.toUpperCase()]).then((data) => {
+    let sql = "SELECT * FROM location WHERE name = ? OR ('BARRIO ' || name) = ?;";
+    return this.database.executeSql(sql, [name.toUpperCase(), name.toUpperCase()]).then((data) => {
       let location;
       if (data.rows.length > 0) {
         location = { 
