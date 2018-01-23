@@ -97,8 +97,7 @@ export class ItemDetailsPage {
     });
   }
 
-  loadIdeaComments () {
-    console.log("Load idea comment");
+  loadIdeaComments () {    
     this.databaseprovider.getIdeaComments(this.selectedItem).then( (data) => {  
       this.comments = data;    
       this.commentLoaded = true;
@@ -221,8 +220,8 @@ export class ItemDetailsPage {
 
   async updateContent(){
     return await this.ideaProvider.getIdea(this.selectedItem.idea_id).then( (res) => {
-      console.log("GET IDEA FROM AC STATUS", res.status);      
-      let response = JSON.parse(res.data);                
+      console.log("GET IDEA FROM AC STATUS", res.status);
+      let response = JSON.parse(res.data);      
       return this.ideaProvider.createEditIdea(response).then( (id) => {
         return this.commentProvider.getComments(response.resourceSpaceId).then( (resp) => {
           console.log("GET COMMENT FROM AC STATUS: ", resp.status);              
