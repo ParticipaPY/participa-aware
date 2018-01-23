@@ -126,9 +126,9 @@ export class HelloIonicPage {
         this.storage.set("location_two", work[0].location_id);
         this.storage.set("location_three", other[0].location_id);
         
-        this.account.location_one = home[0].location_id;
-        this.account.location_two = home[0].location_id;
-        this.account.location_three = home[0].location_id;  
+        this.account.location_one   = home[0].location_id;
+        this.account.location_two   = work[0].location_id;
+        this.account.location_three = other[0].location_id;  
       } 
     });    
   }
