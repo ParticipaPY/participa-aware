@@ -2,6 +2,7 @@ import { Component, ViewChild } from '@angular/core';
 import { NavController, NavParams, ViewController, ToastController } from 'ionic-angular';
 import { CommentsProvider } from '../../providers/comments/comments';
 import { DatabaseProvider } from '../../providers/database/database';
+import { LoggingProvider } from '../../providers/logging/logging';
 
 @Component({
   selector: 'page-edit-comment',
@@ -14,7 +15,7 @@ export class EditCommentPage {
   isReadyToSave: boolean = false;
 
   constructor (public viewCtrl: ViewController, public navCtrl: NavController, public navParams: NavParams, public commentProvider: CommentsProvider, 
-              public databaseProvider: DatabaseProvider, public toastCtrl: ToastController) {
+              public databaseProvider: DatabaseProvider, public toastCtrl: ToastController, public loggingProvider: LoggingProvider) {
               
     this.comment = this.navParams.get('comment');
   }
@@ -47,6 +48,7 @@ export class EditCommentPage {
     this.commentProvider.putComment(this.comment, "DISCUSSION").then( (resp) => {
       console.log("Update Comment Status: ", resp.status);      
     });
+
     this.databaseProvider.updateComment(this.comment).then( () => {      
       this.viewCtrl.dismiss();
     }).catch( (error) => {
@@ -62,6 +64,12 @@ export class EditCommentPage {
         this.presentToast("Error desde AppCivist al editar comentario");
       }                
     });
+
+    let data = {
+      action: "Edit Comment",
+      action_data: this.comment
+    }
+    this.loggingProvider.logAction(data).then( (resp) => {resp.subscribe(()=>{});});
   }
 
   cancel () {

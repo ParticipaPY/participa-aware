@@ -6,6 +6,7 @@ import { CommentsProvider } from '../../providers/comments/comments';
 import { IdeasProvider } from '../../providers/ideas/ideas';
 import { IdeaPopoverPage } from '../idea-popover/idea-popover';
 import { CommentPopoverPage } from '../comment-popover/comment-popover';
+import { LoggingProvider } from '../../providers/logging/logging';
 
 @Component({
   selector: 'page-item-details',
@@ -24,7 +25,8 @@ export class ItemDetailsPage {
   commentLoaded: boolean = false;
 
   constructor(public navCtrl: NavController, public navParams: NavParams, private databaseprovider: DatabaseProvider, public storage: Storage, public commentProvider: CommentsProvider, 
-              public toastCtrl: ToastController, public ideaProvider: IdeasProvider, public popoverCtrl: PopoverController, public loadingCtrl: LoadingController) {
+              public toastCtrl: ToastController, public ideaProvider: IdeasProvider, public popoverCtrl: PopoverController, public loadingCtrl: LoadingController,
+              public loggingProvider: LoggingProvider) {
    
     this.rootNavCtrl = this.navParams.get('rootNavCtrl');     
   }
@@ -129,6 +131,11 @@ export class ItemDetailsPage {
   }
 
   createComment(){
+    let data = {
+      action: "Create Comment",
+      action_data: this.comment
+    }
+
     this.databaseprovider.createComment(this.comment, this.selectedItem).then( (data) => {      
       this.databaseprovider.updateCommentCounter(this.selectedItem, "create").then( () => {
         this.updateIdea();
@@ -149,6 +156,8 @@ export class ItemDetailsPage {
         console.log("Error creating Comment: ", error);
       });
     });
+    
+    this.loggingProvider.logAction(data).then( (resp) => {resp.subscribe(()=>{});});   
   }
 
   expandItem(item){

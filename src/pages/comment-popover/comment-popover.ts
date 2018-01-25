@@ -3,6 +3,7 @@ import { NavParams, ViewController, ModalController, AlertController, ToastContr
 import { DatabaseProvider } from '../../providers/database/database';
 import { CommentsProvider } from '../../providers/comments/comments';
 import { EditCommentPage } from '../edit-comment/edit-comment';
+import { LoggingProvider } from '../../providers/logging/logging';
 
 @Component({
   selector: 'page-comment-popover',
@@ -14,7 +15,7 @@ export class CommentPopoverPage {
   comment: any;
   
   constructor(public viewCtrl: ViewController, private navParams: NavParams, public databaseProvider: DatabaseProvider, public commentProvider: CommentsProvider,
-              public modalCtrl: ModalController, private alertCtrl: AlertController, public toastCtrl: ToastController) {
+              public modalCtrl: ModalController, private alertCtrl: AlertController, public toastCtrl: ToastController, public loggingProvider: LoggingProvider) {
 
     if (this.navParams.data) {      
       this.idea    = this.navParams.get('idea');      
@@ -61,6 +62,7 @@ export class CommentPopoverPage {
             console.log('Borrar comentario');
             alert.dismiss().then( () => { 
               console.log("Popover Comment Id: ", this.comment.comment_id);
+              
               this.commentProvider.deleteComment(this.comment.comment_id).then( (resp) => {
                 console.log("Delete Comment Status: ", resp.status);      
               }).catch( (error) => {
@@ -76,11 +78,19 @@ export class CommentPopoverPage {
                   this.presentToast("Error desde AppCivist al borrar comentario");
                 }                
               });
+              
               this.databaseProvider.deleteComment(this.comment.id).then( () => {
                 this.databaseProvider.updateCommentCounter(this.idea, "delete").then( () => {
                   this.viewCtrl.dismiss();
                 });
               });
+
+              let data = {
+                action: "Delete Comment",
+                action_data: this.comment
+              }
+              this.loggingProvider.logAction(data).then( (resp) => {resp.subscribe(()=>{});});
+
             });
             return false;
           }
