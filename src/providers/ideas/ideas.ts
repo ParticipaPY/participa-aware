@@ -4,6 +4,7 @@ import { Storage } from '@ionic/storage';
 import { Api } from '../api';
 import { DatabaseProvider } from '../database/database';
 import 'rxjs/add/operator/map';
+import { LoggingProvider } from '../logging/logging';
 
 
 @Injectable()
@@ -14,7 +15,8 @@ export class IdeasProvider {
   cid  = 209;
   csid = 7903;
 
-  constructor(public platform: Platform, public api: Api,  public storage: Storage, public databaseProvider: DatabaseProvider, public toastCtrl: ToastController) {
+  constructor(public platform: Platform, public api: Api,  public storage: Storage, public databaseProvider: DatabaseProvider, public toastCtrl: ToastController,
+              public loggingProvider: LoggingProvider) {
     this.platform.ready().then( () => {
       this.storage.get('session_key').then( (key) => {
         this.session_key = key;
@@ -163,6 +165,12 @@ export class IdeasProvider {
       console.log("Error creating feedback: ", error);
     });     
 
+    let param = {
+      action: "Vote Up Idea",
+      action_data: idea
+    }
+    this.loggingProvider.logAction(param).then( (resp) => {resp.subscribe(()=>{});});
+
     return this.databaseProvider.voteUp(idea).then( (data) => {
       if (idea.voted_down == 1) {
         return this.deleteVoteDown(idea);        
@@ -193,11 +201,16 @@ export class IdeasProvider {
       console.log("Error creating feedback: ", error);
     });
 
+    let param = {
+      action: "Delete Vote Down Idea",
+      action_data: idea
+    }
+    this.loggingProvider.logAction(param).then( (resp) => {resp.subscribe(()=>{});});   
+
     return this.databaseProvider.deleteVoteDown(idea);
   }
 
-  voteDown(idea){   
-    console.log("VOte DOwn from Idea Provider");     
+  voteDown(idea){       
     let data = {
       "up": false, 
       "down": true,
@@ -216,6 +229,12 @@ export class IdeasProvider {
       toast.present();        
       console.log("Error creating feedback: ", error);
     });
+
+    let param = {
+      action: "Vote Down Idea",
+      action_data: idea
+    }
+    this.loggingProvider.logAction(param).then( (resp) => {resp.subscribe(()=>{});});
 
     return this.databaseProvider.voteDown(idea).then(data => {
       if (idea.voted_up == 1) {
@@ -246,6 +265,12 @@ export class IdeasProvider {
       toast.present();        
       console.log("Error creating feedback: ", error);
     });
+
+    let param = {
+      action: "Delete Vote Up Idea",
+      action_data: idea
+    }
+    this.loggingProvider.logAction(param).then( (resp) => {resp.subscribe(()=>{});});
 
     return this.databaseProvider.deleteVoteUp(idea);
   }
