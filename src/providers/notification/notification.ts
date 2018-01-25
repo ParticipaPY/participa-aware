@@ -22,7 +22,7 @@ export class Notification {
   getUserLocations(user_id){
     let options = new RequestOptions({ headers: this.headers });
     
-    return this.api.get('user/' + user_id + '/locations', {}, options).map(res => res.json());    
+    return this.api.get('notification/user/' + user_id + '/locations', {}, options).map(res => res.json());    
   }
 
   storeUserLocation(user_id, locations){
@@ -33,7 +33,7 @@ export class Notification {
       "other": locations.other
     };
     
-    return this.api.post('user/' + user_id + '/register-location', data, options).map(res => res.json());
+    return this.api.post('notification/user/' + user_id + '/register-location', data, options).map(res => res.json());
   }
 
   updateUserLocation(user_id, locations){
@@ -44,7 +44,7 @@ export class Notification {
       "other": locations.other
     };
     
-    return this.api.put('user/' + user_id + '/locations', data, options).map(res => res.json());
+    return this.api.put('notification/user/' + user_id + '/locations', data, options).map(res => res.json());
   }
 
   storeUserToken(user_id, token){
@@ -55,14 +55,14 @@ export class Notification {
       "token": token
     };
     
-    return this.api.post('user/' + user_id + '/register-token', data, options).map(res => res.json());
+    return this.api.post('notification/user/' + user_id + '/register-token', data, options).map(res => res.json());
   }
 
   createUserNotificationConfig(user_id){
     console.log("Calling Service to Create User Notification Config for user: ", user_id);
     let options = new RequestOptions({ headers: this.headers });
 
-    return this.api.post('user/' + user_id + '/config-notification', [], options).map(res => res.json());    
+    return this.api.post('notification/user/' + user_id + '/config-notification', [], options).map(res => res.json());    
   }
 
 }
