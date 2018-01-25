@@ -5,6 +5,7 @@ import { Geolocation } from '@ionic-native/geolocation';
 
 import { DatabaseProvider } from '../../providers/database/database';
 import { IdeasProvider } from '../../providers/ideas/ideas';
+import { LoggingProvider } from '../../providers/logging/logging';
 
 @Component({
   selector: 'page-edit-idea',
@@ -19,7 +20,7 @@ export class EditIdeaPage {
 
   constructor(public viewCtrl: ViewController, public navCtrl: NavController, public navParams: NavParams, public ideaProvider: IdeasProvider, 
               public databaseProvider: DatabaseProvider, public formBuilder: FormBuilder, private geolocation: Geolocation, 
-              public platform: Platform, public toastCtrl: ToastController) {
+              public platform: Platform, public toastCtrl: ToastController, public loggingProvider: LoggingProvider) {
 
     this.idea = this.navParams.get('idea');
     
@@ -89,6 +90,12 @@ export class EditIdeaPage {
         this.presentToast("Error desde AppCivist al editar idea");
       }                
     });
+
+    let data = {
+      action: "Edit Idea",
+      action_data: this.form.value
+    }
+    this.loggingProvider.logAction(data).then( (resp) => {resp.subscribe(()=>{});});    
    }
  
    getCurrentLocation() {

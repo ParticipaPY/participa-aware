@@ -5,6 +5,7 @@ import { IonicPage, NavController, NavParams, ViewController, ToastController, P
 
 import { DatabaseProvider } from "../../providers/database/database";
 import { IdeasProvider } from '../../providers/ideas/ideas';
+import { LoggingProvider } from '../../providers/logging/logging';
 
 @IonicPage()
 @Component({
@@ -23,7 +24,8 @@ export class ItemCreatePage {
   location: any;
 
   constructor(public navCtrl: NavController, params: NavParams, public viewCtrl: ViewController, public toastCtrl: ToastController, formBuilder: FormBuilder, 
-              private databaseprovider: DatabaseProvider, private geolocation: Geolocation, public platform: Platform, public ideaProvider: IdeasProvider) {
+              private databaseprovider: DatabaseProvider, private geolocation: Geolocation, public platform: Platform, public ideaProvider: IdeasProvider,
+              public loggingProvider: LoggingProvider) {
 
     if (params.get('location'))
       this.location = parseInt(params.get('location'));
@@ -94,7 +96,12 @@ export class ItemCreatePage {
       });
       this.viewCtrl.dismiss(data);
    });
-    
+
+   let data = {
+    action: "Create Idea",
+    action_data: this.form.value
+  }
+  this.loggingProvider.logAction(data).then( (resp) => {resp.subscribe(()=>{});}); 
   }
 
   getCurrentDate() {

@@ -4,6 +4,7 @@ import { DatabaseProvider } from '../../providers/database/database';
 import { IdeasProvider } from '../../providers/ideas/ideas';
 import { CommentsProvider } from '../../providers/comments/comments';
 import { EditIdeaPage } from '../../pages/edit-idea/edit-idea';
+import { LoggingProvider } from '../../providers/logging/logging';
 
 @Component({
   selector: 'page-idea-popover',
@@ -15,7 +16,7 @@ export class IdeaPopoverPage {
 
   constructor(public viewCtrl: ViewController, public navCtrl: NavController, public navParams: NavParams, public databaseProvider: DatabaseProvider, 
               public ideaProvider: IdeasProvider, public commentProvider: CommentsProvider, public modalCtrl: ModalController, private alertCtrl: AlertController,
-              public toastCtrl: ToastController) {
+              public toastCtrl: ToastController, public loggingProvider: LoggingProvider) {
    
     if (this.navParams.data) {      
       this.idea = this.navParams.get('idea');                        
@@ -63,7 +64,7 @@ export class IdeaPopoverPage {
             console.log('Borrar idea');
             alert.dismiss().then( () => { 
               this.ideaProvider.deleteIdea(this.idea.idea_id).then( (resp) => {
-                console.log("Delete Idea Status: ", resp.status);      
+                console.log("AC - Delete Idea Status: ", resp.status);      
               }).catch( (error) => {
                 if (error.status != 500) {
                   let err = JSON.parse(error.error);
@@ -81,6 +82,12 @@ export class IdeaPopoverPage {
                 this.viewCtrl.dismiss("delete");
               });
               this.deleteIdeaComments();
+
+              let data = {
+                action: "Delete Idea",
+                action_data: this.idea
+              }
+              this.loggingProvider.logAction(data).then( (resp) => {resp.subscribe(()=>{});});
             });
             return false;
           }
