@@ -12,6 +12,7 @@ import { MyProfilePage } from '../pages/my-profile/my-profile';
 import { DatabaseProvider } from "../providers/database/database";
 import { Notification } from "../providers/notification/notification";
 import { IdeasProvider } from '../providers/ideas/ideas';
+import { LoggingProvider } from '../providers/logging/logging';
 
 @Component({
   templateUrl: 'app.html'
@@ -27,7 +28,7 @@ export class MyApp {
 
   constructor(public platform: Platform, public menu: MenuController, public statusBar: StatusBar, public splashScreen: SplashScreen,
               public storage: Storage, public databaseprovider: DatabaseProvider, public events: Events, public notification: Notification, 
-              public ideaProvider: IdeasProvider, private oneSignal: OneSignal, public modalCtrl: ModalController) {
+              public ideaProvider: IdeasProvider, private oneSignal: OneSignal, public modalCtrl: ModalController, public logProvider: LoggingProvider) {
 
     this.platform.ready().then(() => {
       this.myProfile = MyProfilePage;
@@ -127,7 +128,12 @@ export class MyApp {
     this.oneSignal.inFocusDisplaying(this.oneSignal.OSInFocusDisplayOption.Notification);
     
     this.oneSignal.handleNotificationReceived().subscribe( (resp) => {      
-      console.log("OS - Notification received: ", resp.payload.additionalData);     
+      console.log("OS - Notification received: ", resp.payload.additionalData);
+      let data = {
+        action: "OS - Notification Received",
+        action_data: resp.payload.additionalData
+      }
+      this.logProvider.logAction(data).then( (resp) => {resp.subscribe(()=>{});});
     });
     
     this.oneSignal.handleNotificationOpened().subscribe( (res) => {
@@ -135,6 +141,11 @@ export class MyApp {
       if (res.action.type == 0) {
         console.log("OS - Notification opened");
         this.detailPage(res.notification.payload.additionalData); 
+        let data = {
+          action: "OS - Notification Opened",
+          action_data: res.notification.payload.additionalData
+        }
+        this.logProvider.logAction(data).then( (resp) => {resp.subscribe(()=>{});});
       }
       
       if (res.action.type == 1) {
@@ -145,6 +156,11 @@ export class MyApp {
           }).catch((error) => {
             console.log("Error on Vote Up Action: ", error);
           });
+          let data = {
+            action: "OS - Action Button 'Me gusta' pressed",
+            action_data: res.notification.payload.additionalData
+          }
+          this.logProvider.logAction(data).then( (resp) => {resp.subscribe(()=>{});});
         }
 
         if (res.action.actionID == "voteDownAction") {
@@ -154,11 +170,21 @@ export class MyApp {
           }).catch((error) => {
             console.log("Error on Vote Down Action: ", error);
           });
+          let data = {
+            action: "OS - Action Button 'No me gusta' pressed",
+            action_data: res.notification.payload.additionalData
+          }
+          this.logProvider.logAction(data).then( (resp) => {resp.subscribe(()=>{});});
         }        
 
         if (res.action.actionID == "comment") {
           console.log("OS ActionTake 'Comentar' pressed");
-          this.detailPage(res.notification.payload.additionalData);          
+          this.detailPage(res.notification.payload.additionalData);
+          let data = {
+            action: "OS - Action Button 'Comentar' pressed",
+            action_data: res.notification.payload.additionalData
+          }
+          this.logProvider.logAction(data).then( (resp) => {resp.subscribe(()=>{});});
         }
       }
     });

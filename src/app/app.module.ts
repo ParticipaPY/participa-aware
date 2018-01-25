@@ -47,6 +47,7 @@ import { ExpandableComponent } from '../components/expandable/expandable';
 import { IdeasProvider } from '../providers/ideas/ideas';
 import { CommentsProvider } from '../providers/comments/comments';
 import { Autosize } from '../directives/autosize/autosize';
+import { LoggingProvider } from '../providers/logging/logging';
 
 @NgModule({
   declarations: [
@@ -115,7 +116,8 @@ import { Autosize } from '../directives/autosize/autosize';
     Notification,
     IdeasProvider,
     CommentsProvider,
-    OneSignal 
+    OneSignal,
+    LoggingProvider 
   ]
 })
 export class AppModule {}
