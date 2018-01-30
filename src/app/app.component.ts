@@ -118,8 +118,18 @@ export class MyApp {
 
   openPage(page){
     console.log("Page: ", page);
+    this.events.subscribe('user:edited', (user) => {
+      if (user) {                
+        this.account.email = user.email;
+        this.account.name  = user.name;        
+        this.account.location_one   = user.place_one;
+        this.account.location_two   = user.place_two;
+        this.account.location_three = user.place_three;
+
+      }      
+    });
     this.nav.push(page, {account: this.account});
-    this.menu.close();
+    this.menu.close();    
   }
 
   initializeOneSignal(){

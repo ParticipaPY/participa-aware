@@ -17,6 +17,7 @@ export class SignupPage {
   private signUpForm : FormGroup; 
   isReadyToSave: boolean = false;
   submitAttempt: boolean = false;
+  ban: boolean = false;
 
   constructor(public navCtrl: NavController, public viewCtrl: ViewController, public formBuilder: FormBuilder, public user: User, public toastCtrl: ToastController,
               public databaseProvider: DatabaseProvider, public notification: Notification, public loadingCtrl: LoadingController) {
@@ -26,15 +27,21 @@ export class SignupPage {
         email: ['', Validators.compose([Validators.maxLength(30), Validators.minLength(5), Validators.pattern('[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+'), Validators.required])],
         password: ['', Validators.compose([Validators.maxLength(10), Validators.minLength(5), Validators.required])],
         repeatPassword: ['', Validators.compose([Validators.maxLength(10), Validators.minLength(5), Validators.required])],
-        place_one: ['', Validators.required],
-        place_two: ['', Validators.required],
-        place_three: ['', Validators.required],
+        place_one: [],
+        place_two: [],
+        place_three: [],
         lang: "es-ES",
         profile_pic: ""
     });
 
     this.signUpForm.valueChanges.subscribe((v) => {
-      this.isReadyToSave = this.signUpForm.valid;
+      if (this.signUpForm.controls['place_one'].value != null || 
+          this.signUpForm.controls['place_two'].value != null || 
+          this.signUpForm.controls['place_three'].value != null) 
+      {
+        this.ban = true;        
+      }
+      this.isReadyToSave = this.signUpForm.valid && this.ban;
     });    
   }
 
@@ -84,7 +91,7 @@ export class SignupPage {
           console.log("AC - Error on SingUp Message: ", err.statusMessage);
           this.presentToast(err.statusMessage);
         } 
-      }else {
+      } else {
         console.log("AC - Error on SingUp Message: ", error);
         this.presentToast("Error desde AppCivist al crear usuario");
       }
@@ -127,7 +134,18 @@ export class SignupPage {
 
   done() {
     if (!this.signUpForm.valid) { return; }
-    this.doSignup();
+
+    if (this.signUpForm.controls['place_one'].value != null || 
+        this.signUpForm.controls['place_two'].value != null || 
+        this.signUpForm.controls['place_three'].value != null) 
+    {
+          this.ban = true;
+          this.doSignup();
+    } else {
+      this.presentToast("Debes elegir al menos un lugar");
+      return;
+    }
+    
   }  
 
 }

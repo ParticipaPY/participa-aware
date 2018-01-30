@@ -41,7 +41,8 @@ export class HelloIonicPage {
       spinner: 'bubbles'
     });
     this.loading.present();
-    this.user.login(this.account).then( (resp) => {        
+    this.user.login(this.account).then( (resp) => {    
+      console.log("AC - Login response: ", resp);    
       let result = JSON.parse(resp.data);        
 
       this.account.user_id = result.userId;
@@ -63,9 +64,9 @@ export class HelloIonicPage {
       this.loading.dismiss();
       if (error.status != 500) {
         let err = JSON.parse(error.error);
-        console.log("AC - Error on SingUp: ", error);
+        console.log("AC - Error on Login: ", error);
         if (err.statusMessage) {
-          console.log("AC - Error on SingUp Message: ", err.statusMessage);
+          console.log("AC - Error on Login Message: ", err.statusMessage);
           let toast = this.toastCtrl.create({
             message: err.statusMessage,
             duration: 3000,
@@ -74,7 +75,7 @@ export class HelloIonicPage {
           toast.present();          
         } 
       }else {
-        console.log("AC - Error on SingUp Message: ", error);
+        console.log("AC - Error on Login Message: ", error);
         let toast = this.toastCtrl.create({
           message: "Error al iniciar sesión",
           duration: 3000,

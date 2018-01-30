@@ -166,12 +166,7 @@ export class DatabaseProvider implements OnInit{
     let data;
     if (location) {
       where = "WHERE i.location_id = ? ";
-      if (location === "ONE")
-        data = [parseInt(this.location_one)];
-      else if (location === "TWO")
-        data = [parseInt(this.location_two)];
-      else
-        data = [parseInt(this.location_three)];
+      data = [parseInt(location)];     
     } else {
       where = "";
       data = [];

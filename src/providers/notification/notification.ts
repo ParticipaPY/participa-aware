@@ -27,23 +27,33 @@ export class Notification {
 
   storeUserLocation(user_id, locations){
     let options = new RequestOptions({ headers: this.headers });
-    let data = {
-      "home": locations.home,
-      "work": locations.work,
-      "other": locations.other
-    };
+    let data : { [index: string]: number } = {};
+    
+    if (locations.home != null)
+      data["home"] = parseInt(locations.home);
+    if (locations.work != null)
+      data["work"] = parseInt(locations.work);
+    if (locations.other != null)
+      data["other"] = parseInt(locations.other);
+    
+    console.log("Data to be send - Register Location: ", data);
     
     return this.api.post('notification/user/' + user_id + '/register-location', data, options).map(res => res.json());
   }
 
   updateUserLocation(user_id, locations){
     let options = new RequestOptions({ headers: this.headers });
-    let data = {
-      "home": locations.home,
-      "work": locations.work,
-      "other": locations.other
-    };
+    let data : { [index: string]: number } = {};
     
+    if (locations.home != null && locations.home != "0")
+      data["home"] = parseInt(locations.home);
+    if (locations.work != null && locations.work != "0")
+      data["work"] = parseInt(locations.work);
+    if (locations.other != null && locations.other != "0")
+      data["other"] = parseInt(locations.other);
+    
+    console.log("Data to be send - Update Location: ", data);
+
     return this.api.put('notification/user/' + user_id + '/locations', data, options).map(res => res.json());
   }
 

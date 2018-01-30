@@ -23,8 +23,7 @@ export class ListPage {
   vote_up: any;
   vote_down: any;
   comment: any;
-  email: string;
-  location_one: any;
+  email: string;  
   searchTerm = "";
   user_id: any;
   page: number      = 0;
@@ -44,20 +43,16 @@ export class ListPage {
 
   ionViewDidLoad() {
     console.log("List Page DidLoad");
-    this.getUserInfo();
     this.setFilteredItems();
   }
 
   ionViewWillEnter(){
-    console.log("List Page WillEnter");
-    this.getUserInfo();
+    console.log("List Page WillEnter");    
     this.setFilteredItems();    
   }
 
   getUserInfo() {      
-    this.storage.get('location_one').then( (val) => {
-      this.location_one = val;
-    });  
+    return this.storage.get('location_one');   
   }
 
   async getUserID() {
@@ -79,9 +74,11 @@ export class ListPage {
   } 
 
   loadIdeas() {
-    console.log("List Ideas");
-    this.databaseprovider.getAllIdeas("ONE").then(data => {
-      this.ideas = data;
+    this.getUserInfo().then( (location_one) => {
+      console.log("List Ideas Location ID: ", location_one);
+      this.databaseprovider.getAllIdeas(location_one).then(data => {
+        this.ideas = data;
+      });
     });
   }
 
@@ -102,21 +99,23 @@ export class ListPage {
   }
 
   addItem() {
-    let addModal = this.modalCtrl.create(ItemCreatePage, {location: this.location_one});
-    addModal.onDidDismiss((item) => {
-      
-      if (item > 0) {
-        this.loadIdeas();             
-      } else if (item <= 0) {
-        let toast = this.toastCtrl.create({
-          message: "Error al crear idea",
-          duration: 3000,
-          position: 'top'
-        });
-        toast.present();
-      }
+    this.getUserInfo().then((location_one) => {
+      let addModal = this.modalCtrl.create(ItemCreatePage, {location: location_one});
+      addModal.onDidDismiss((item) => {
+        
+        if (item > 0) {
+          this.loadIdeas();             
+        } else if (item <= 0) {
+          let toast = this.toastCtrl.create({
+            message: "Error al crear idea",
+            duration: 3000,
+            position: 'top'
+          });
+          toast.present();
+        }
+      });
+      addModal.present();
     });
-    addModal.present();
   }  
 
   voteUp(idea) {

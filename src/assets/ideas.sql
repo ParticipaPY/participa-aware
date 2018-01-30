@@ -73,13 +73,6 @@ CREATE TABLE author (id INTEGER PRIMARY KEY, name TEXT, email TEXT, session_key 
 CREATE TABLE users_locations (id INTEGER PRIMARY KEY, author_id INTEGER, location TEXT, location_id INTEGER);
 
 CREATE TABLE campaign (id INTEGER PRIMARY KEY, name TEXT, hashtag TEXT, resourceSpaceId INTEGER);
-INSERT INTO campaign VALUES(1,'Movilidad Urbana Sostenible','movilidad', 0);
-INSERT INTO campaign VALUES(2,'Basura Cero!','basura', 0);
-INSERT INTO campaign VALUES(3,'Gestión Municipal','gestion', 0);
-INSERT INTO campaign VALUES(4,'Infraestructura','infraestructura', 0);
-INSERT INTO campaign VALUES(5,'Inspiración','inspiración', 0);
-INSERT INTO campaign VALUES(6,'Mercados Municipales','mercados', 0);
-INSERT INTO campaign VALUES(208,'Recuperación y ampliación del famoso Parque Caballero','caballero', 4002);
 
 CREATE TABLE idea (id INTEGER PRIMARY KEY, date TEXT, campaign_id INTEGER, idea_id INTEGER, title TEXT, description TEXT, location_id INTEGER, author_id INTEGER, total_votes INTEGER, votes_up INTEGER, votes_down INTEGER, comments INTEGER, voted_up INTEGER, voted_down INTEGER, resourceSpaceId INTEGER);
 

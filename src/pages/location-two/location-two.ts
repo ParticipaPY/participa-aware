@@ -14,7 +14,7 @@ import { IdeaPopoverPage } from '../idea-popover/idea-popover';
   templateUrl: 'location-two.html'
 })
 export class LocationTwoPage {
-  location_two: any;
+  
   rootNavCtrl: NavController;
   items: Array<{title: string, note: string, icon: string}>;
   ideas = [];
@@ -42,20 +42,16 @@ export class LocationTwoPage {
     this.user_id = this.getUserID(); 
   }
 
-  ionViewDidLoad() {
-    this.getUserInfo();
+  ionViewDidLoad() {    
     this.setFilteredItems();
   }
 
-  ionViewWillEnter(){
-    this.getUserInfo();
+  ionViewWillEnter(){    
     this.setFilteredItems();    
   }  
 
   getUserInfo() {         
-    this.storage.get('location_two').then( (val) => {
-      this.location_two = val;
-    });  
+    return this.storage.get('location_two');  
   }
 
   async getUserID() {
@@ -77,8 +73,11 @@ export class LocationTwoPage {
   } 
 
   loadIdeas() {
-    this.databaseprovider.getAllIdeas("TWO").then(data => {
-      this.ideas = data;
+    this.getUserInfo().then( (location_two) => {
+      console.log("List Ideas Location ID: ", location_two);
+      this.databaseprovider.getAllIdeas(location_two).then(data => {
+        this.ideas = data;
+      });
     });
   }
 
@@ -99,21 +98,23 @@ export class LocationTwoPage {
   }
 
   addItem() {
-    let addModal = this.modalCtrl.create(ItemCreatePage, {location: this.location_two});
-    addModal.onDidDismiss((item) => {
-      
-      if (item > 0) {
-        this.loadIdeas();             
-      } else if (item <= 0) {
-        let toast = this.toastCtrl.create({
-          message: "Error Creating Idea",
-          duration: 3000,
-          position: 'top'
-        });
-        toast.present();
-      }
+    this.getUserInfo().then( (location_two) => {
+      let addModal = this.modalCtrl.create(ItemCreatePage, {location: location_two});
+      addModal.onDidDismiss((item) => {
+        
+        if (item > 0) {
+          this.loadIdeas();             
+        } else if (item <= 0) {
+          let toast = this.toastCtrl.create({
+            message: "Error Creating Idea",
+            duration: 3000,
+            position: 'top'
+          });
+          toast.present();
+        }
+      });
+      addModal.present();
     });
-    addModal.present();
   }  
 
   voteUp(idea) {
