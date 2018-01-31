@@ -3,6 +3,7 @@ import { Storage } from '@ionic/storage';
 import { NavController, ToastController, Events, ModalController, Platform, LoadingController } from 'ionic-angular';
 import { Keyboard } from '@ionic-native/keyboard';
 import { ScreenOrientation } from '@ionic-native/screen-orientation';
+import { TranslateService } from '@ngx-translate/core';
 
 import { SignupPage } from '../signup/signup';
 import { TabsPage } from '../tabs/tabs';
@@ -21,9 +22,10 @@ export class HelloIonicPage {
   loading;
   
   constructor(public navCtrl: NavController, public user: User, public toastCtrl: ToastController, public databaseProvider: DatabaseProvider, 
-              private storage: Storage, public events: Events, public modalCtrl: ModalController, private screenOrientation: ScreenOrientation,
-              public keyboard: Keyboard, public platform: Platform, public loadingCtrl: LoadingController, public userLocations: Notification) {
-
+    private storage: Storage, public events: Events, public modalCtrl: ModalController, private screenOrientation: ScreenOrientation,
+    public keyboard: Keyboard, public platform: Platform, public loadingCtrl: LoadingController, public userLocations: Notification,
+    private translateService: TranslateService
+  ) {
     this.platform.ready().then( () => {      
       this.screenOrientation.lock(this.screenOrientation.ORIENTATIONS.PORTRAIT);
       this.keyboard.onKeyboardShow().subscribe(() => {
@@ -33,7 +35,19 @@ export class HelloIonicPage {
         this.reduce_icon = false;
       });
     });
-    
+  }
+
+  private presentToast(text) {
+    this.translateService.get(text).subscribe( (value) => {
+      let toast = this.toastCtrl.create({
+        message: value,
+        duration: 5000,
+        position: 'top'
+      });
+
+      toast.present();        
+      }
+    );
   }
 
   doLogin() {        
@@ -55,8 +69,7 @@ export class HelloIonicPage {
 
       setTimeout( () => {
         this.events.publish('user:created', this.account);
-        this.loading.dismiss();
-        // this.navCtrl.push(TabsPage);
+        this.loading.dismiss();        
         this.navCtrl.setRoot(TabsPage);
       }, 2500);
  
@@ -67,14 +80,9 @@ export class HelloIonicPage {
         console.log("AC - Error on Login: ", error);
         if (err.statusMessage) {
           console.log("AC - Error on Login Message: ", err.statusMessage);
-          let toast = this.toastCtrl.create({
-            message: err.statusMessage,
-            duration: 3000,
-            position: 'top'
-          });
-          toast.present();          
+          this.presentToast(err.statusMessage);
         } 
-      }else {
+      } else {
         console.log("AC - Error on Login Message: ", error);
         let toast = this.toastCtrl.create({
           message: "Error al iniciar sesión",
@@ -96,10 +104,10 @@ export class HelloIonicPage {
 
   getUser(resp){
     return this.databaseProvider.getAuthor(this.account.email).then( (res) => {
-      if (res.id != null){
+      if (res.id != null) {
         console.log("====> author id: ", res.id);
         return this.storage.set('user_id', res.id);
-      }else{
+      } else {
         let user = {
           name: resp.name, 
           email: this.account.email, 

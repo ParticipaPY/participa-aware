@@ -4,6 +4,7 @@ import { Platform, MenuController, Nav, Events, ModalController } from 'ionic-an
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { OneSignal } from '@ionic-native/onesignal';
+import { TranslateService } from '@ngx-translate/core';
 
 import { HelloIonicPage } from '../pages/hello-ionic/hello-ionic';
 import { TabsPage } from '../pages/tabs/tabs';
@@ -27,10 +28,14 @@ export class MyApp {
   {user_id: 0, email: "", name: "", author_pic: "", location_one: 0, location_two: 0, location_three: 0};
 
   constructor(public platform: Platform, public menu: MenuController, public statusBar: StatusBar, public splashScreen: SplashScreen,
-              public storage: Storage, public databaseprovider: DatabaseProvider, public events: Events, public notification: Notification, 
-              public ideaProvider: IdeasProvider, private oneSignal: OneSignal, public modalCtrl: ModalController, public logProvider: LoggingProvider) {
-
+    public storage: Storage, public databaseprovider: DatabaseProvider, public events: Events, public notification: Notification, 
+    public ideaProvider: IdeasProvider, private oneSignal: OneSignal, public modalCtrl: ModalController, public logProvider: LoggingProvider,
+    private translateService: TranslateService
+  ) {
     this.platform.ready().then(() => {
+      //Language
+      this.translateService.setDefaultLang('es');
+      this.translateService.use('es');
       this.myProfile = MyProfilePage;
       this.initializeApp();
       this.initializeOneSignal();

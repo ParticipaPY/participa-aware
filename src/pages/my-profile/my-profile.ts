@@ -1,9 +1,11 @@
 import { Component, ViewChild } from '@angular/core';
-import { Storage } from '@ionic/storage';
-import { DatabaseProvider } from '../../providers/database/database';
-import { ViewController, NavParams, ToastController, NavController, Events, Nav } from 'ionic-angular';
 import { Validators, FormBuilder, FormGroup } from '@angular/forms';
+import { Storage } from '@ionic/storage';
+import { ViewController, NavParams, ToastController, NavController, Events, Nav } from 'ionic-angular';
+import { TranslateService } from '@ngx-translate/core';
+
 import { User } from '../../providers/user/user';
+import { DatabaseProvider } from '../../providers/database/database';
 import { Notification } from '../../providers/notification/notification';
 import { TabsPage } from '../tabs/tabs';
 
@@ -21,8 +23,13 @@ export class MyProfilePage {
   user: any;
   ban: boolean = false;
 
-  constructor(public navCtrl: NavController, public viewCtrl: ViewController, public navParams: NavParams, public formBuilder: FormBuilder, public databaseProvider: DatabaseProvider, private userProvider: User,
-              public toastCtrl: ToastController, public userLocation: Notification, private storage: Storage, public events: Events) {
+  constructor(public navCtrl: NavController, public viewCtrl: ViewController, 
+    public navParams: NavParams, public formBuilder: FormBuilder, 
+    public databaseProvider: DatabaseProvider, private userProvider: User,
+    public toastCtrl: ToastController, public userLocation: Notification, 
+    private storage: Storage, public events: Events,
+    private translateService: TranslateService
+  ) {
     this.user = navParams.get('account'); 
 
     this.signUpForm = formBuilder.group({
@@ -52,12 +59,16 @@ export class MyProfilePage {
   }
 
   private presentToast(text) {
-    let toast = this.toastCtrl.create({
-      message: text,
-      duration: 5000,
-      position: 'top'
-    });
-    toast.present();
+    this.translateService.get(text).subscribe( (value) => {
+      let toast = this.toastCtrl.create({
+        message: value,
+        duration: 5000,
+        position: 'top'
+      });
+
+      toast.present();        
+      }
+    );
   }
 
   loadLocations() {
@@ -84,7 +95,7 @@ export class MyProfilePage {
       console.log('AC - Update User Profile Response: ', resp);
       let toast = this.toastCtrl.create({
         message: 'Tu perfil ha sido actualizado',
-        duration: 3000,
+        duration: 5000,
         position: 'top'
       });
       toast.present();
@@ -96,9 +107,14 @@ export class MyProfilePage {
           console.log("AC - Error updating user profile Message: ", err.statusMessage);
           this.presentToast(err.statusMessage);
         } 
-      }else {
+      } else {
         console.log("AC - Error updating user profile Message: ", error);
-        this.presentToast("Error desde AppCivist al editar usuario");
+        let toast = this.toastCtrl.create({
+          message: "Error desde AppCivist al editar usuario",
+          duration: 5000,
+          position: 'top'
+        });
+        toast.present();                
       }
     });
   }
@@ -137,7 +153,12 @@ export class MyProfilePage {
       this.ban = true;
       this.editProfile();
     } else {
-      this.presentToast("Debes elegir al menos un lugar");
+      let toast = this.toastCtrl.create({
+        message: "Debes elegir al menos un lugar",
+        duration: 5000,
+        position: 'top'
+      });
+      toast.present();
       return;
     }
   } 

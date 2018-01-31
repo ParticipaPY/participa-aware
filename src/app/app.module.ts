@@ -1,10 +1,10 @@
 import { NgModule, ErrorHandler } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { HttpModule } from '@angular/http';
+import { HttpModule, Http } from '@angular/http';
 import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
 import { MyApp } from './app.component';
-import { OneSignal } from '@ionic-native/onesignal';
 
+import { OneSignal } from '@ionic-native/onesignal';
 import { HTTP } from '@ionic-native/http';
 import { Camera } from '@ionic-native/camera';
 import { File } from '@ionic-native/file';
@@ -13,6 +13,15 @@ import { FilePath } from '@ionic-native/file-path';
 import { Keyboard } from '@ionic-native/keyboard';
 import { Geolocation } from '@ionic-native/geolocation';
 import { ScreenOrientation } from '@ionic-native/screen-orientation';
+import { StatusBar } from '@ionic-native/status-bar';
+import { SplashScreen } from '@ionic-native/splash-screen';
+import { SQLitePorter } from '@ionic-native/sqlite-porter';
+import { SQLite } from '@ionic-native/sqlite';
+import { IonicStorageModule } from '@ionic/storage';
+
+import { SuperTabsModule } from 'ionic2-super-tabs';
+import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
+import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 
 import { LocationThreePage } from '../pages/location-three/location-three';
 import { LocationTwoPage } from '../pages/location-two/location-two';
@@ -35,19 +44,17 @@ import { Barrios } from '../providers/barrios';
 import { NotificationApi } from '../providers/notification-api/notification-api';
 import { Notification } from '../providers/notification/notification';
 import { DatabaseProvider } from '../providers/database/database';
-
-import { StatusBar } from '@ionic-native/status-bar';
-import { SplashScreen } from '@ionic-native/splash-screen';
-import { SuperTabsModule } from 'ionic2-super-tabs';
-
-import { IonicStorageModule } from '@ionic/storage';
-import { SQLitePorter } from '@ionic-native/sqlite-porter';
-import { SQLite } from '@ionic-native/sqlite';
-import { ExpandableComponent } from '../components/expandable/expandable';
 import { IdeasProvider } from '../providers/ideas/ideas';
 import { CommentsProvider } from '../providers/comments/comments';
-import { Autosize } from '../directives/autosize/autosize';
 import { LoggingProvider } from '../providers/logging/logging';
+
+import { ExpandableComponent } from '../components/expandable/expandable';
+import { Autosize } from '../directives/autosize/autosize';
+
+
+export function createTranslateLoader(http: Http) {
+  return new TranslateHttpLoader(http, './assets/i18n/', '.json');
+}
 
 @NgModule({
   declarations: [
@@ -74,7 +81,14 @@ import { LoggingProvider } from '../providers/logging/logging';
     HttpModule,
     IonicModule.forRoot(MyApp),
     SuperTabsModule.forRoot(),    
-    IonicStorageModule.forRoot()
+    IonicStorageModule.forRoot(),
+    TranslateModule.forRoot({
+      loader: {
+        provide: TranslateLoader,
+        useFactory: (createTranslateLoader),
+        deps: [Http]
+      }
+    })
   ],
   bootstrap: [IonicApp],
   entryComponents: [

@@ -37,6 +37,8 @@
         "@ionic-native/transfer": "^3.14.0",
         "@ionic/cloud-angular": "^0.12.0",
         "@ionic/storage": "^2.0.1",
+        "@ngx-translate/core": "^8.0.0",
+        "@ngx-translate/http-loader": "^0.1.0",
         "@types/node": "^8.0.24",
         "cordova-android": "^6.2.3",
         "cordova-plugin-advanced-http": "^1.5.10",

@@ -1,6 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { NavController, ToastController, ViewController, LoadingController } from 'ionic-angular';
 import { Validators, FormBuilder, FormGroup } from '@angular/forms';
+import { TranslateService } from '@ngx-translate/core';
 
 import { User } from "../../providers/user/user";
 import { DatabaseProvider } from '../../providers/database/database';
@@ -20,8 +21,9 @@ export class SignupPage {
   ban: boolean = false;
 
   constructor(public navCtrl: NavController, public viewCtrl: ViewController, public formBuilder: FormBuilder, public user: User, public toastCtrl: ToastController,
-              public databaseProvider: DatabaseProvider, public notification: Notification, public loadingCtrl: LoadingController) {
-    
+    public databaseProvider: DatabaseProvider, public notification: Notification, public loadingCtrl: LoadingController,
+    private translateService: TranslateService
+  ) {    
     this.signUpForm = formBuilder.group({
         name: ['', Validators.compose([Validators.maxLength(80), Validators.pattern('[a-zA-ZáéíóúÁÉÍÓÚ ]*'), Validators.required])],
         email: ['', Validators.compose([Validators.maxLength(30), Validators.minLength(5), Validators.pattern('[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+'), Validators.required])],
@@ -57,12 +59,16 @@ export class SignupPage {
   }  
 
   private presentToast(text) {
-    let toast = this.toastCtrl.create({
-      message: text,
-      duration: 5000,
-      position: 'top'
-    });
-    toast.present();
+    this.translateService.get(text).subscribe( (value) => {
+      let toast = this.toastCtrl.create({
+        message: value,
+        duration: 5000,
+        position: 'top'
+      });
+
+      toast.present();        
+      }
+    );
   }
    
   doSignup() {
@@ -93,7 +99,12 @@ export class SignupPage {
         } 
       } else {
         console.log("AC - Error on SingUp Message: ", error);
-        this.presentToast("Error desde AppCivist al crear usuario");
+        let toast = this.toastCtrl.create({
+          message: "Error desde AppCivist al crear usuario",
+          duration: 5000,
+          position: 'top'
+        });
+        toast.present();        
       }
     });
   }
@@ -142,7 +153,12 @@ export class SignupPage {
           this.ban = true;
           this.doSignup();
     } else {
-      this.presentToast("Debes elegir al menos un lugar");
+      let toast = this.toastCtrl.create({
+        message: "Debes elegir al menos un lugar",
+        duration: 5000,
+        position: 'top'
+      });
+      toast.present();       
       return;
     }
     
