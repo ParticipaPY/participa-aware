@@ -130,14 +130,21 @@ export class HelloIonicPage {
         let home = data.filter(d => d.location === "CASA");
         let work = data.filter(d => d.location === "TRABAJO");
         let other = data.filter(d => d.location === "OTRO");
-  
-        this.storage.set("location_one", home[0].location_id);
-        this.storage.set("location_two", work[0].location_id);
-        this.storage.set("location_three", other[0].location_id);
         
-        this.account.location_one   = home[0].location_id;
-        this.account.location_two   = work[0].location_id;
-        this.account.location_three = other[0].location_id;  
+        if (home.length > 0) {
+          this.storage.set("location_one", home[0].location_id);
+          this.account.location_one   = home[0].location_id;
+        }
+  
+        if (work.length > 0) {
+          this.storage.set("location_two", work[0].location_id);
+          this.account.location_two   = work[0].location_id;
+        }
+        
+        if (other.length > 0) {
+          this.storage.set("location_three", other[0].location_id);       
+          this.account.location_three = other[0].location_id;  
+        }
       } 
     });    
   }
