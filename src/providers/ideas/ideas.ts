@@ -60,7 +60,7 @@ export class IdeasProvider {
       }
 
       let data = {
-        "lang"     : "es-es",
+        "lang"     : "es-ES",
         "title"    : idea.title,
         "text"     : idea.description,
         "type"     : "IDEA",      
@@ -93,11 +93,9 @@ export class IdeasProvider {
         "text"     : idea.description,
         "type"     : "IDEA",      
         "status"   : "PUBLISHED",
-        "location" : {
-          "location" : {
-            "placeName": location.name,
-            "geoJson"  : "[{\"type\": \"Polygon\",\"coordinates\": [" + final + "]}]"
-          }
+        "location" : {          
+          "placeName": location.name,
+          "geoJson"  : "[{\"type\": \"Polygon\",\"coordinates\": [" + final + "]}]"          
         },      
         "contributionId": idea.idea_id
       }
