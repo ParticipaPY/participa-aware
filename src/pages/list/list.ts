@@ -24,7 +24,7 @@ export class ListPage {
   vote_down: any;
   comment: any;
   email: string;  
-  searchTerm = "";
+  searchTerm;
   user_id: any;
   page: number      = 0;
   perPage: number   = 0;
@@ -60,24 +60,28 @@ export class ListPage {
   }
 
   setFilteredItems() {
-    if (this.searchTerm && this.searchTerm.trim() != '')
-      this.ideas = this.ideas.filter((item) => {
-        return ((item.title.toLowerCase().indexOf(this.searchTerm.toLowerCase()) > -1) || 
-                (item.description.toLowerCase().indexOf(this.searchTerm.toLowerCase()) > -1));
-      })
-    else
+    if (this.searchTerm && this.searchTerm.trim() != '') {
+      this.loadIdeas().then( (data) => {
+        this.ideas = data.filter((item) => {
+          return ((item.title.toLowerCase().indexOf(this.searchTerm.toLowerCase()) > -1) || 
+                  (item.description.toLowerCase().indexOf(this.searchTerm.toLowerCase()) > -1));
+        });
+      });
+      
+    } else {
       this.databaseprovider.getDatabaseState().subscribe(rdy => {
         if (rdy) {
           this.loadIdeas();
         }
       });
+    }
   } 
 
   loadIdeas() {
-    this.getUserInfo().then( (location_one) => {
+    return this.getUserInfo().then( (location_one) => {
       console.log("List Ideas Location ID: ", location_one);
-      this.databaseprovider.getAllIdeas(location_one).then(data => {
-        this.ideas = data;
+      return this.databaseprovider.getAllIdeas(location_one).then(data => {
+        return this.ideas = data;
       });
     });
   }

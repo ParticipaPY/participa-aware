@@ -54,22 +54,25 @@ export class LocationOthersPage {
   }
 
   setFilteredItems() {
-    if (this.searchTerm && this.searchTerm.trim() != '')
-      this.ideas = this.ideas.filter((item) => {
-        return ((item.title.toLowerCase().indexOf(this.searchTerm.toLowerCase()) > -1) || 
-                (item.description.toLowerCase().indexOf(this.searchTerm.toLowerCase()) > -1));
+    if (this.searchTerm && this.searchTerm.trim() != '') {
+      this.loadIdeas().then( (data) => {      
+        this.ideas = data.filter((item) => {
+          return ((item.title.toLowerCase().indexOf(this.searchTerm.toLowerCase()) > -1) || 
+            (item.description.toLowerCase().indexOf(this.searchTerm.toLowerCase()) > -1));
+        });
       })
-    else
+    } else {
       this.databaseprovider.getDatabaseState().subscribe(rdy => {
         if (rdy) {
           this.loadIdeas();
         }
       });
+    }
   } 
 
   loadIdeas() {
-    this.databaseprovider.getAllIdeas().then(data => {
-      this.ideas = data;
+    return this.databaseprovider.getAllIdeas().then(data => {
+      return this.ideas = data;
     });
   }
 

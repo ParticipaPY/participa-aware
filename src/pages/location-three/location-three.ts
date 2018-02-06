@@ -58,24 +58,27 @@ export class LocationThreePage {
   }  
 
   setFilteredItems() {
-    if (this.searchTerm && this.searchTerm.trim() != '')
-      this.ideas = this.ideas.filter((item) => {
-        return ((item.title.toLowerCase().indexOf(this.searchTerm.toLowerCase()) > -1) || 
-                (item.description.toLowerCase().indexOf(this.searchTerm.toLowerCase()) > -1));
-      })
-    else
+    if (this.searchTerm && this.searchTerm.trim() != '') {
+      this.loadIdeas().then( (data) => {
+        this.ideas = data.filter((item) => {
+          return ((item.title.toLowerCase().indexOf(this.searchTerm.toLowerCase()) > -1) || 
+            (item.description.toLowerCase().indexOf(this.searchTerm.toLowerCase()) > -1));
+        });
+      });
+    } else {
       this.databaseprovider.getDatabaseState().subscribe(rdy => {
         if (rdy) {
           this.loadIdeas();
         }
       });
+    }
   } 
 
   loadIdeas() {
-    this.getUserInfo().then( (location_three) => {
+    return this.getUserInfo().then( (location_three) => {
       console.log("List Ideas Location ID: ", location_three);
-      this.databaseprovider.getAllIdeas(location_three).then(data => {
-        this.ideas = data;
+      return this.databaseprovider.getAllIdeas(location_three).then(data => {
+        return this.ideas = data;
       });
     });
     

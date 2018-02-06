@@ -59,24 +59,28 @@ export class LocationTwoPage {
   }
 
   setFilteredItems() {
-    if (this.searchTerm && this.searchTerm.trim() != '')
-      this.ideas = this.ideas.filter((item) => {
-        return ((item.title.toLowerCase().indexOf(this.searchTerm.toLowerCase()) > -1) || 
-                (item.description.toLowerCase().indexOf(this.searchTerm.toLowerCase()) > -1));
-      })
-    else
-     this.databaseprovider.getDatabaseState().subscribe(rdy => {
+    if (this.searchTerm && this.searchTerm.trim() != '') {
+      this.loadIdeas().then( (data) => {
+        this.ideas = data.filter((item) => {
+          return ((item.title.toLowerCase().indexOf(this.searchTerm.toLowerCase()) > -1) || 
+            (item.description.toLowerCase().indexOf(this.searchTerm.toLowerCase()) > -1));
+        });
+      });
+      
+    } else {
+      this.databaseprovider.getDatabaseState().subscribe(rdy => {
         if (rdy) {
           this.loadIdeas();
         }
       });
+    }
   } 
 
   loadIdeas() {
-    this.getUserInfo().then( (location_two) => {
+    return this.getUserInfo().then( (location_two) => {
       console.log("List Ideas Location ID: ", location_two);
-      this.databaseprovider.getAllIdeas(location_two).then(data => {
-        this.ideas = data;
+      return this.databaseprovider.getAllIdeas(location_two).then(data => {
+        return this.ideas = data;
       });
     });
   }
