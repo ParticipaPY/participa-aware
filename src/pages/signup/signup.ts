@@ -7,6 +7,8 @@ import { User } from "../../providers/user/user";
 import { DatabaseProvider } from '../../providers/database/database';
 import { Notification } from "../../providers/notification/notification"
 
+import { matchingPasswords } from "../../validators/password";
+
 @Component({
   selector: 'page-signup',
   templateUrl: 'signup.html',
@@ -28,13 +30,13 @@ export class SignupPage {
         name: ['', Validators.compose([Validators.maxLength(80), Validators.pattern('[a-zA-ZáéíóúÁÉÍÓÚ ]*'), Validators.required])],
         email: ['', Validators.compose([Validators.maxLength(30), Validators.minLength(5), Validators.pattern('[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+'), Validators.required])],
         password: ['', Validators.compose([Validators.maxLength(10), Validators.minLength(5), Validators.required])],
-        repeatPassword: ['', Validators.compose([Validators.maxLength(10), Validators.minLength(5), Validators.required])],
+        repeatPassword: ['', Validators.required],
         place_one: [],
         place_two: [],
         place_three: [],
         lang: "es-ES",
         profile_pic: ""
-    });
+    }, {validator: matchingPasswords('password', 'repeatPassword')});
 
     this.signUpForm.valueChanges.subscribe((v) => {
       if (this.signUpForm.controls['place_one'].value != null || 

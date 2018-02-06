@@ -42,7 +42,7 @@
       </ion-item>
 
       <ion-item *ngIf="!signUpForm.controls.name.valid  && (signUpForm.controls.name.dirty || submitAttempt)">
-        <p>Por favor, ingrese un nombre válido.</p>
+        <p style="color: red">Por favor, ingrese un nombre válido.</p>
       </ion-item>
 
       <ion-item>        
@@ -54,7 +54,7 @@
       </ion-item>
 
       <ion-item *ngIf="!signUpForm.controls.email.valid  && (signUpForm.controls.email.dirty || submitAttempt)">
-        <p>Por favor, ingrese un correo válido.</p>
+        <p style="color: red">Por favor, ingrese un correo válido.</p>
       </ion-item> 
 
       <ion-item>        
@@ -62,7 +62,11 @@
           <ion-icon name="key"></ion-icon>
           Contraseña*
         </ion-label>
-        <ion-input type="password" formControlName="password"></ion-input>
+        <ion-input type="password" formControlName="password" [class.invalid]="!signUpForm.controls.password.valid  && (signUpForm.controls.password.dirty || submitAttempt)"></ion-input>
+      </ion-item>
+      
+      <ion-item *ngIf="!signUpForm.controls.password.valid  && (signUpForm.controls.password.dirty || submitAttempt)">
+        <p style="color: red">Longitud min: 5 - máx: 10</p>
       </ion-item>
 
       <ion-item>        
@@ -70,11 +74,11 @@
           <ion-icon name="key"></ion-icon>
           Repetir Contraseña*
         </ion-label>
-        <ion-input type="password" formControlName="repeatPassword"></ion-input>
+        <ion-input type="password" formControlName="repeatPassword" [class.invalid]="signUpForm.controls.repeatPassword.touched && signUpForm.hasError('mismatchedPasswords')"></ion-input>
       </ion-item>      
 
-      <ion-item *ngIf="!signUpForm.controls.password.valid  && (signUpForm.controls.password.dirty || submitAttempt)">
-        <p>Por favor, ingrese una contraseña válida.</p>
+      <ion-item *ngIf="signUpForm.controls.repeatPassword.touched && signUpForm.hasError('mismatchedPasswords')">
+        <p style="color: red">Las contraseñas no coinciden.</p>
       </ion-item>
 
       <ion-item>
@@ -118,6 +122,7 @@
 
       <div padding>
         <button ion-button color="custom-color" block (click)="doSignup()" [disabled]="!isReadyToSave">Registrarme</button>
+        <button ion-button color="custom-color" block (click)="cancel()" class="cancel">Cancelar</button>
       </div>
 
     </ion-list>
