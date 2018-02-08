@@ -1,12 +1,14 @@
 import { Component } from '@angular/core';
 import { Storage } from '@ionic/storage';
 import { NavController, NavParams, ToastController, PopoverController, LoadingController, Loading } from 'ionic-angular';
-import { DatabaseProvider } from "../../providers/database/database";
-import { CommentsProvider } from '../../providers/comments/comments';
+
+import { Notification } from '../../providers/notification/notification';
 import { IdeasProvider } from '../../providers/ideas/ideas';
-import { IdeaPopoverPage } from '../idea-popover/idea-popover';
-import { CommentPopoverPage } from '../comment-popover/comment-popover';
 import { LoggingProvider } from '../../providers/logging/logging';
+import { IdeaPopoverPage } from '../idea-popover/idea-popover';
+import { DatabaseProvider } from '../../providers/database/database';
+import { CommentsProvider } from '../../providers/comments/comments';
+import { CommentPopoverPage } from '../comment-popover/comment-popover';
 
 @Component({
   selector: 'page-item-details',
@@ -25,8 +27,8 @@ export class ItemDetailsPage {
   commentLoaded: boolean = false;
 
   constructor(public navCtrl: NavController, public navParams: NavParams, private databaseprovider: DatabaseProvider, public storage: Storage, public commentProvider: CommentsProvider, 
-              public toastCtrl: ToastController, public ideaProvider: IdeasProvider, public popoverCtrl: PopoverController, public loadingCtrl: LoadingController,
-              public loggingProvider: LoggingProvider) {
+    public toastCtrl: ToastController, public ideaProvider: IdeasProvider, public popoverCtrl: PopoverController, public loadingCtrl: LoadingController,
+    public loggingProvider: LoggingProvider, public notificationProvider: Notification) {
    
     this.rootNavCtrl = this.navParams.get('rootNavCtrl');     
   }
@@ -157,6 +159,27 @@ export class ItemDetailsPage {
       });
     });
     
+    this.getUserID().then( (user_id) => {    
+      this.databaseprovider.getAuthor("id", user_id).then( (comment_author) => {
+        console.log("Comment Author: ", comment_author.user_id);
+        this.databaseprovider.getAuthor("id", this.selectedItem.author_id).then( (idea_author) => {
+          console.log("Idea Author: ", idea_author.user_id);
+          if (idea_author.user_id != comment_author.user_id) {
+            let param = {
+              "idea_id": this.selectedItem.idea_id,
+              "idea_author": idea_author.user_id,
+              "comment_author": comment_author.user_id
+            }
+            this.notificationProvider.notifyNewComment(param).subscribe( (resp) => {
+              console.log('Response from server - Notification on New Comment: ', resp);
+            }, (err) => {
+              console.log('Error sending notification on new comment: ', err);
+            });
+          }
+        });      
+      });
+    });
+
     this.loggingProvider.logAction(data).then( (resp) => {resp.subscribe(()=>{});});   
   }
 
@@ -185,7 +208,7 @@ export class ItemDetailsPage {
       });
     } else {
       console.log("Have email");
-      this.databaseprovider.getAuthor(this.selectedItem.email).then( (res) => {
+      this.databaseprovider.getAuthor("email", this.selectedItem.email).then( (res) => {
         console.log("Author ID: ", res.id);
         this.createIdeaFromAC(res.id);
       });

@@ -139,16 +139,25 @@ export class DatabaseProvider implements OnInit{
     });    
   }
 
-  getAuthor(email){
-    let sql = "SELECT * FROM author WHERE email = ?;";
-    return this.database.executeSql(sql, [email]).then((data) => {
+  getAuthor(type, param){
+    let sql = "";
+    
+    if (type == "email"){
+      sql = "SELECT * FROM author WHERE email = ?;";
+    } else {
+      console.log("ID: ", param);
+      sql = "SELECT * FROM author WHERE id = ?;";
+    }
+
+    return this.database.executeSql(sql, [param]).then((data) => {
       let author;
       if (data.rows.length > 0) {
         author = { 
           id: data.rows.item(0).id, 
           name: data.rows.item(0).name,
           email: data.rows.item(0).email,
-          profile_pic: data.rows.item(0).profile_pic 
+          profile_pic: data.rows.item(0).profile_pic,
+          user_id: data.rows.item(0).user_id 
         };
       } else {
         author = {};
@@ -473,7 +482,7 @@ export class DatabaseProvider implements OnInit{
     this.database.executeSql("INSERT INTO users_locations (author_id, location, location_id) VALUES (?, 'TRABAJO', ?);", [author_id, user.place_two]);
     this.database.executeSql("INSERT INTO users_locations (author_id, location, location_id) VALUES (?, 'OTRO', ?);", [author_id, user.place_three]);
 
-    return this.getAuthor(user.email);
+    return this.getAuthor("email", user.email);
   }
 
   createAuthor(user_id, user){

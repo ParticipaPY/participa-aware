@@ -103,7 +103,7 @@ export class HelloIonicPage {
   }
 
   getUser(resp){
-    return this.databaseProvider.getAuthor(this.account.email).then( (res) => {
+    return this.databaseProvider.getAuthor("email", this.account.email).then( (res) => {
       if (res.id != null) {
         console.log("====> author id: ", res.id);
         return this.storage.set('user_id', res.id);

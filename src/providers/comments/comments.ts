@@ -109,7 +109,7 @@ export class CommentsProvider {
       image = data.firstAuthor.profilePic.urlAsString;
     }
     console.log("===> AUTHOR: ", [email, name, image]);
-    return await this.databaseProvider.getAuthor(email).then( (res) => {
+    return await this.databaseProvider.getAuthor("email", email).then( (res) => {
       if (res.id != null) {                
         console.log("COMMENT AUTHOR ID EXISTS: ", res.id);
         return res.id;

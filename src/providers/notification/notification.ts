@@ -75,4 +75,16 @@ export class Notification {
     return this.api.post('notification/user/' + user_id + '/config-notification', [], options).map(res => res.json());    
   }
 
+  notifyNewComment(param){
+    console.log("Calling Service to Notify new Comment");
+    let options = new RequestOptions({ headers: this.headers });
+    let data = {
+      "idea_id": param.idea_id,
+      "idea_author": param.idea_author,
+      "comment_author": param.comment_author
+    };
+    
+    return this.api.post('notification/notify-comment', data, options).map(res => res.json());
+    
+  }
 }
