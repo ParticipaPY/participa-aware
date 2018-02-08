@@ -102,7 +102,7 @@ export class SignupPage {
       } else {
         console.log("AC - Error on SingUp Message: ", error);
         let toast = this.toastCtrl.create({
-          message: "Error desde AppCivist al crear usuario",
+          message: "Este usuario ya existe, inténtalo con uno nuevo",
           duration: 5000,
           position: 'top'
         });
