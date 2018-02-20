@@ -99,22 +99,30 @@ export class CommentsProvider {
     let email = "";
     let name = "";
     let image;
+    let user_id;
 
-    if (data.nonMemberAuthors) {      
-      email = data.nonMemberAuthors[0].email;
-      name  = data.nonMemberAuthors[0].name;
-    } else if (data.firstAuthor) {            
-      email = data.firstAuthor.email;
-      name  = data.firstAuthor.name;
-      image = data.firstAuthor.profilePic.urlAsString;
-    }
+    if (data.nonMemberAuthors) {
+      if (data.nonMemberAuthors[0].email)      
+        email = data.nonMemberAuthors[0].email;
+      if (data.nonMemberAuthors[0].name)
+        name  = data.nonMemberAuthors[0].name;
+    } else if (data.firstAuthor) {       
+      if (data.firstAuthor.email)
+        email = data.firstAuthor.email;
+      if (data.firstAuthor.name)
+        name  = data.firstAuthor.name;
+      if (data.firstAuthor.profilePic)
+        image = data.firstAuthor.profilePic.urlAsString;
+      if (data.firstAuthor.userId)
+        user_id = data.firstAuthor.userId
+    } 
     console.log("===> AUTHOR: ", [email, name, image]);
     return await this.databaseProvider.getAuthor("email", email).then( (res) => {
       if (res.id != null) {                
         console.log("COMMENT AUTHOR ID EXISTS: ", res.id);
         return res.id;
       } else {
-        return this.databaseProvider.createAuthorAC({name: name, email: email, image: image}).then( (id) => {
+        return this.databaseProvider.createAuthorAC({name: name, email: email, image: image, user_id: user_id}).then( (id) => {
           console.log("COMMENT AUTHOR ID CREATED: ", id);
           return id;
         });
