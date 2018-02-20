@@ -8,20 +8,15 @@ import { BehaviorSubject } from 'rxjs/Rx';
 import { Storage } from '@ionic/storage';
 
 @Injectable()
-export class DatabaseProvider implements OnInit{
+export class DatabaseProvider {
   database: SQLiteObject;
   private databaseReady: BehaviorSubject<boolean>;
-  author_id: any;
-  location_one: any;
-  location_two: any;
-  location_three: any;
  
   constructor(public sqlitePorter: SQLitePorter, private storage: Storage, private sqlite: SQLite, private platform: Platform, private http: Http) {
 
     this.databaseReady = new BehaviorSubject(false);
 
-    this.platform.ready().then(() => {
-      this.getUserInfo();
+    this.platform.ready().then(() => {      
       this.sqlite.create({
         name: 'data.db',
         location: 'default'
@@ -36,25 +31,6 @@ export class DatabaseProvider implements OnInit{
           }
         });
       });
-    });
-  }
-
-  ngOnInit(){
-    this.getUserInfo();
-  }
- 
-  getUserInfo(){
-    this.storage.get('user_id').then( id => {
-      this.author_id = id;
-    });
-    this.storage.get('location_one').then( (val) => {
-      this.location_one = val;
-    });
-    this.storage.get('location_two').then( (val) => {
-      this.location_two = val;
-    });        
-    this.storage.get('location_three').then( (val) => {
-      this.location_three = val;
     });
   }
 
@@ -169,8 +145,7 @@ export class DatabaseProvider implements OnInit{
     });    
   }
 
-  getAllIdeas(location?: string) {
-    this.getUserInfo();
+  getAllIdeas(location?: string) {    
     let where: string;
     let data;
     if (location) {
@@ -417,33 +392,35 @@ export class DatabaseProvider implements OnInit{
     return this.getIdea("idea_id", idea.idea_id);    
   }
 
-  createIdea(idea) {    
-    console.log("author id: ", this.author_id);
-    let data = [parseInt(this.author_id), idea.date, parseInt(idea.campaign_id), parseInt(idea.location_id), idea.title, idea.description];
-    let sql = "INSERT INTO idea (author_id, date, campaign_id, location_id, title, description, total_votes, votes_up, votes_down, comments, voted_up, voted_down) "+
-              "VALUES (?, ?, ?, ?, ?, ?, 0, 0, 0, 0, 0, 0);";
+  createIdea(idea) {        
+    return this.storage.get('user_id').then( (id) => {            
+      let data = [parseInt(id), idea.date, parseInt(idea.campaign_id), parseInt(idea.location_id), idea.title, idea.description];
+      let sql = "INSERT INTO idea (author_id, date, campaign_id, location_id, title, description, total_votes, votes_up, votes_down, comments, voted_up, voted_down) "+
+                "VALUES (?, ?, ?, ?, ?, ?, 0, 0, 0, 0, 0, 0);";
 
-    return this.database.executeSql(sql, data).then(data => {
-      return data.insertId;
-    }, err => {
-      console.log('Error: ', err);
-      return 0;
-    });    
+      return this.database.executeSql(sql, data).then( data => {
+        return data.insertId;
+      }, err => {
+        console.log('Error: ', err);
+        return 0;
+      });    
+    });
   }
 
-  createComment(comment, idea) {
-    console.log("Author ID: ", parseInt(this.author_id));
-    let date = this.getCurrentDate();
-    let data = [date, idea.id, comment, parseInt(this.author_id)];
-    let sql = "INSERT INTO comments (date, idea_id, description, author_id)" + 
-              "VALUES (?, ?, ?, ?);"
+  createComment(comment, idea) {    
+    return this.storage.get('user_id').then( (id) => { 
+      let date = this.getCurrentDate();
+      let data = [date, idea.id, comment, parseInt(id)];
+      let sql = "INSERT INTO comments (date, idea_id, description, author_id)" + 
+                "VALUES (?, ?, ?, ?);"
 
-    return this.database.executeSql(sql, data).then(data => {
-      return data.insertId;
-    }, err => {
-      console.log('Error: ', err);
-      return 0;
-    });    
+      return this.database.executeSql(sql, data).then(data => {
+        return data.insertId;
+      }, err => {
+        console.log('Error: ', err);
+        return 0;
+      });  
+    });  
   }
 
   createCommentAC(comment) {
@@ -518,8 +495,8 @@ export class DatabaseProvider implements OnInit{
   createAuthorAC(author) {
     let sql; 
     if (author.image) {
-      sql = "INSERT INTO author (name, email, profile_pic) VALUES(?, ?, ?);";
-      return this.database.executeSql(sql, [author.name, author.email, author.image]).then( data => {        
+      sql = "INSERT INTO author (name, email, profile_pic, user_id) VALUES (?, ?, ?, ?);";
+      return this.database.executeSql(sql, [author.name, author.email, author.image, author.user_id]).then( data => {        
         return data.insertId;
       }, err => {
         console.error(err);
@@ -600,6 +577,17 @@ export class DatabaseProvider implements OnInit{
     let sql = "UPDATE comments set description = ? WHERE id = ?;"
     
     return this.database.executeSql(sql, [comment.description, comment.id]).then( (data) => {
+      return data;
+    }, err => {
+      console.log('Error: ', err);
+      return 0;
+    });     
+  }
+
+  updateAuthor(author) {
+    let sql = "UPDATE author set name = ? WHERE user_id = ?;"
+
+    return this.database.executeSql(sql, [author.name, author.id]).then( (data) => {
       return data;
     }, err => {
       console.log('Error: ', err);
