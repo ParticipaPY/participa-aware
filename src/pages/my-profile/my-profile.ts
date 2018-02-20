@@ -91,8 +91,18 @@ export class MyProfilePage {
   }
 
   updateUserInfo(){
+    let data = {
+      id: this.user.user_id,
+      name: this.signUpForm.controls['name'].value
+    }
+    this.databaseProvider.updateAuthor(data).then( (res) => {
+      console.log("Updating user name result: ", res);
+    }).catch( (error) => { 
+      console.log("Error updating user name");
+    });
+
     this.userProvider.editProfile(this.user.user_id, this.signUpForm.value).then( (resp) => {
-      console.log('AC - Update User Profile Response: ', resp);
+      console.log('AC - Update User Profile Response: ', resp.status);
       let toast = this.toastCtrl.create({
         message: 'Tu perfil ha sido actualizado',
         duration: 5000,
