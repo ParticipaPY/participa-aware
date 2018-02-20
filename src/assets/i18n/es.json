@@ -21,6 +21,7 @@
     "The given token has either expired or does not exist.": "El token proporcionado ha expirado o no existe,",
     "This field is required": "Este campo es obligatorio",
     "This user already exists.": "Este usuario ya existe",
+    "This user already exists. An e-mail has been sent to the registered address. Please follow the embedded link to activate your account.": "Este usuario ya existe. Se le ha enviado un correo a la dirección registrada. Por favor, sigue el enlace contenido para activar tu cuenta.",
     "User exists": "El usuario existe",
     "Unknown user or password.": "Usuario o contraseña no válido",
     "Valid email required": "Se requiere un correo electrónico válido",
