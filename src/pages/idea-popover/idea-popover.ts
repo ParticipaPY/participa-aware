@@ -26,7 +26,7 @@ export class IdeaPopoverPage {
   private presentToast(text) {
     let toast = this.toastCtrl.create({
       message: text,
-      duration: 5000,
+      duration: 3000,
       position: 'top'
     });
     toast.present();
@@ -78,8 +78,11 @@ export class IdeaPopoverPage {
                   this.presentToast("Error desde AppCivist al borrar idea");
                 }
               });
-              this.databaseProvider.deleteIdea(this.idea.id).then( () => {         
-                this.viewCtrl.dismiss("delete");
+              this.databaseProvider.deleteIdea(this.idea.id).then( () => {   
+                this.presentToast("Tu idea ha sido borrada");
+                setTimeout(() => {      
+                  this.viewCtrl.dismiss("delete");
+                }, 3100);
               });
               this.deleteIdeaComments();
 

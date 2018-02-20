@@ -26,7 +26,7 @@ export class CommentPopoverPage {
   private presentToast(text) {
     let toast = this.toastCtrl.create({
       message: text,
-      duration: 5000,
+      duration: 3000,
       position: 'top'
     });
     toast.present();
@@ -81,7 +81,10 @@ export class CommentPopoverPage {
               
               this.databaseProvider.deleteComment(this.comment.id).then( () => {
                 this.databaseProvider.updateCommentCounter(this.idea, "delete").then( () => {
-                  this.viewCtrl.dismiss();
+                  this.presentToast("Tu comentario ha sido borrado");
+                  setTimeout(() => {      
+                    this.viewCtrl.dismiss();
+                  }, 3100);                  
                 });
               });
 

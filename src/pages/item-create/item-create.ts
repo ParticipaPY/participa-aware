@@ -76,10 +76,16 @@ export class ItemCreatePage {
     }
 
     this.databaseprovider.createIdea(this.form.value).then( data => {
-      console.log("datos: ", data);
-      // let sid = this.campaigns.filter(c => c.id == this.form.controls['campaign_id'].value)[0];
+      let toast = this.toastCtrl.create({
+        message: '¡Gracias por tu contribución!',
+        duration: 3000,
+        position: 'top'
+      });
+      toast.present(); 
+      console.log("datos: ", data);      
       let locationData = this.locations.filter(l => l.id == this.form.controls['location_id'].value)[0];
       console.log("Location => ", locationData);
+      
       this.ideaProvider.postIdea(this.form.value, locationData).then( (resp) => {
         let response = JSON.parse(resp.data)
         console.log("===> IDEA ID: ", data);
@@ -94,14 +100,18 @@ export class ItemCreatePage {
         toast.present();        
         console.log("Error creating Idea: ", error);
       });
-      this.viewCtrl.dismiss(data);
-   });
 
-   let data = {
-    action: "Create Idea",
-    action_data: this.form.value
-  }
-  this.loggingProvider.logAction(data).then( (resp) => {resp.subscribe(()=>{});}); 
+      setTimeout( () => {
+        this.viewCtrl.dismiss(data);
+      }, 3100);
+      
+    });
+
+    let data = {
+      action: "Create Idea",
+      action_data: this.form.value
+    }
+    this.loggingProvider.logAction(data).then( (resp) => {resp.subscribe(()=>{});}); 
   }
 
   getCurrentDate() {
@@ -117,11 +127,28 @@ export class ItemCreatePage {
       this.geolocation.getCurrentPosition({'enableHighAccuracy': true, 'timeout': 30000}).then((resp) => {
         let points = [resp.coords.latitude, resp.coords.longitude];
         console.log('Point: ', points);
+        let ban: boolean = false;
         for (let location of this.locations){        
           if ( this.pointInPolygon(points, location.coordinates) ){          
-            this.form.controls['location_id'].patchValue(location.id);          
+            this.form.controls['location_id'].patchValue(location.id);  
+            ban = true;      
+            let toast = this.toastCtrl.create({
+              message: 'Te encuentras en el barrio: ' + location.name,
+              duration: 3000,
+              position: 'top'
+            });
+            toast.present();  
             break;
           } 
+        }
+
+        if (!ban){
+          let toast = this.toastCtrl.create({
+            message: 'Error al obtener ubicación',
+            duration: 3000,
+            position: 'top'
+          });
+          toast.present();
         }
         
       }).catch((error) => {

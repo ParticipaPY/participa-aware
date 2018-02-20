@@ -37,7 +37,7 @@ export class EditCommentPage {
   private presentToast(text) {
     let toast = this.toastCtrl.create({
       message: text,
-      duration: 5000,
+      duration: 3000,
       position: 'top'
     });
     toast.present();
@@ -49,8 +49,11 @@ export class EditCommentPage {
       console.log("Update Comment Status: ", resp.status);      
     });
 
-    this.databaseProvider.updateComment(this.comment).then( () => {      
-      this.viewCtrl.dismiss();
+    this.databaseProvider.updateComment(this.comment).then( () => {
+      this.presentToast("Tu comentario ha sido editado");    
+      setTimeout(() => {      
+        this.viewCtrl.dismiss();
+      }, 3100);
     }).catch( (error) => {
       if (error.status != 500) {
         let err = JSON.parse(error.error);

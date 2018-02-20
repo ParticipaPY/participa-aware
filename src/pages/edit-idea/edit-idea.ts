@@ -49,7 +49,7 @@ export class EditIdeaPage {
    private presentToast(text) {
     let toast = this.toastCtrl.create({
       message: text,
-      duration: 5000,
+      duration: 3000,
       position: 'top'
     });
     toast.present();
@@ -71,7 +71,10 @@ export class EditIdeaPage {
     }
     
     this.databaseProvider.updateIdeaByAuthor(this.form.value).then( () => {
-      this.viewCtrl.dismiss();
+      this.presentToast("Tu idea ha sido editada");    
+      setTimeout(() => {      
+        this.viewCtrl.dismiss();
+      }, 3100);
     });
 
     let locationData = this.locations.filter(l => l.id == this.form.controls['location_id'].value)[0];
