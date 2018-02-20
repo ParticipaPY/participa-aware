@@ -1,19 +1,28 @@
 import { Injectable } from '@angular/core';
-import { Api } from '../api';
+import { Platform } from 'ionic-angular';
 import { Storage } from '@ionic/storage';
+import { Api } from '../api';
+
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/share';
 import 'rxjs/add/operator/toPromise';
+
 
 @Injectable()
 export class User {
   _user: any;
   session_key: string;
   
-  constructor(public api: Api,  public storage: Storage) {
-    this.storage.get('session_key').then( (key) => {
-      this.session_key = key
+  constructor(public platform: Platform, public api: Api,  public storage: Storage) {
+    this.platform.ready().then( () => {
+      this.storage.get('session_key').then( (key) => {
+        this.session_key = key;
+      });
     });
+  }
+
+  getSessionKey() {
+    return this.storage.get('session_key');
   }
 
   /**
@@ -46,18 +55,25 @@ export class User {
       }
     }
 
+    console.log("Data Signup: ", data);
     return this.api.post('user/signup', data, {});
   }
 
   editProfile(user_id, accountInfo){
-    let data = {
-      "uid": user_id,
-      "email": accountInfo.email,
-      "name": accountInfo.name,
-      "lang": accountInfo.lang
-    }
-    console.log("AC - Data to edit profile: ", data);
-    return this.api.put('user/' + user_id, data, {'SESSION_KEY': this.session_key});
+    return this.getSessionKey().then( (key) => {
+      this.session_key = key;
+      let data = {
+        "uid": user_id,
+        "email": accountInfo.email,
+        "name": accountInfo.name,
+        "lang": accountInfo.lang
+      }
+      console.log("AC - Data to edit profile: ", data);
+      console.log("AC - Data to edit profile, session_key: ", this.session_key);
+      
+      return this.api.put('user/' + user_id, data, {'SESSION_KEY': this.session_key});
+    });
+    
   }
 
   /**
