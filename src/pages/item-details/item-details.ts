@@ -25,6 +25,7 @@ export class ItemDetailsPage {
   loading: Loading;
   ideaLoaded: boolean = false;
   commentLoaded: boolean = false;
+  finishLoading: boolean = false;
 
   constructor(public navCtrl: NavController, public navParams: NavParams, private databaseprovider: DatabaseProvider, public storage: Storage, public commentProvider: CommentsProvider, 
     public toastCtrl: ToastController, public ideaProvider: IdeasProvider, public popoverCtrl: PopoverController, public loadingCtrl: LoadingController,
@@ -35,16 +36,20 @@ export class ItemDetailsPage {
 
   ionViewWillLoad() {
     this.selectedItem = this.navParams.get('item');
-    this.user_id      = this.getUserID(); 
-    this.loadIdeaComments();
+    this.updateContent().then( () => {
+      this.loadIdeaComments().then(() => {
+        this.finishLoading = true;
+      });
+    });
   }
 
   ionViewDidLoad() {
+    this.user_id = this.getUserID();
     this.databaseprovider.getDatabaseState().subscribe( (rdy) => {
       if (rdy) {
         this.getIdea();       
       }
-    })
+    });    
   }
 
   async getUserID() {
@@ -101,8 +106,9 @@ export class ItemDetailsPage {
     });
   }
 
-  loadIdeaComments () {    
-    this.databaseprovider.getIdeaComments(this.selectedItem).then( (data) => {  
+  async loadIdeaComments () {
+    console.log("Loading Comments from database");
+    return await this.databaseprovider.getIdeaComments(this.selectedItem).then( (data) => {  
       this.comments = data;    
       this.commentLoaded = true;
     });

@@ -547,9 +547,9 @@ export class DatabaseProvider {
   }
 
   updateIdea(idea){
-    let sql  = "UPDATE idea set title = ?, description = ?, votes_up = ?, votes_down = ?, comments = ?, " +
+    let sql  = "UPDATE idea set title = ?, description = ?, votes_up = ?, votes_down = ?, " +
                "voted_up = ? , voted_down = ? WHERE idea_id = ?";
-    let data = [idea.title, idea.description, idea.votes_up, idea.votes_down, idea.comments, idea.voted_up, 
+    let data = [idea.title, idea.description, idea.votes_up, idea.votes_down, idea.voted_up, 
                 idea.voted_down, idea.idea_id];
 
     return this.database.executeSql(sql, data).then( res => {

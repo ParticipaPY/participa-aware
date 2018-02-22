@@ -309,7 +309,7 @@ export class IdeasProvider {
       description: data.plainText,
       votes_up   : feedback.ups,
       votes_down : feedback.downs,  
-      comments   : data.commentCount,
+      // comments   : data.commentCount,
       voted_up   : userfeedback.up,
       voted_down : userfeedback.down
     }
@@ -328,7 +328,7 @@ export class IdeasProvider {
       description: data.plainText,
       ups        : feedback.ups,
       downs      : feedback.downs,  
-      comments   : data.commentCount,
+      comments   : 0,
       voted_up   : userfeedback.up,
       voted_down : userfeedback.down,
       resourceSpaceId: data.resourceSpaceId

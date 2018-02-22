@@ -17,41 +17,54 @@ export class CommentsProvider {
     });    
   }
 
+  getSessionKey() {
+    return this.storage.get('session_key');
+  }
+
   getComment(){
 
   }
 
   getComments(sid){
-    return this.api.get('space/' + sid + '/contribution', {'type': 'DISCUSSION', 'sorting': 'date_desc'}, {'SESSION_KEY': this.session_key});
+    return this.getSessionKey().then( (key) => {
+      
+      return this.api.get('space/' + sid + '/contribution', {'type': 'DISCUSSION', 'sorting': 'date_desc'}, {'SESSION_KEY': key});
+    });    
   }
 
   postComment(sid, comment: string, type){
-    let data = {
-      "lang"     : "es-es",
-      "title"    : comment.substring(0, 10),
-      "text"     : comment,
-      "type"     : type,
-      "status"   : "PUBLISHED"     
-    }
-    console.log ("SESSION_KEY: ", this.session_key);
-    return this.api.post('space/' + sid + '/contribution', data, {'SESSION_KEY': this.session_key});
+    return this.getSessionKey().then( (key) => {      
+      let data = {
+        "lang"     : "es-es",
+        "title"    : comment.substring(0, 10),
+        "text"     : comment,
+        "type"     : type,
+        "status"   : "PUBLISHED"     
+      }
+      
+      return this.api.post('space/' + sid + '/contribution', data, {'SESSION_KEY': key});
+    });
   }
 
   putComment(comment, type){
-    let data = {
-      "title" : comment.description.substring(0, 10),
-      "text"  : comment.description,
-      "type"  : type,
-      "status": "PUBLISHED",
-      "contributionId": comment.comment_id
-    }
+    return this.getSessionKey().then( (key) => {      
+      let data = {
+        "title" : comment.description.substring(0, 10),
+        "text"  : comment.description,
+        "type"  : type,
+        "status": "PUBLISHED",
+        "contributionId": comment.comment_id
+      }
 
-    return this.api.put('assembly/' + this.aid + '/contribution/' + comment.comment_id, data, {'SESSION_KEY': this.session_key});
+      return this.api.put('assembly/' + this.aid + '/contribution/' + comment.comment_id, data, {'SESSION_KEY': key});
+    });
   }
 
   deleteComment(comment_id){
-    console.log("Comment ID: ", comment_id);
-    return this.api.put('assembly/' + this.aid + '/contribution/' + comment_id + '/softremoval', {}, {'SESSION_KEY': this.session_key});
+    return this.getSessionKey().then( (key) => {      
+      
+      return this.api.put('assembly/' + this.aid + '/contribution/' + comment_id + '/softremoval', {}, {'SESSION_KEY': key});
+    });
   }  
 
   async createEditCommet(data, idea_id){    
@@ -65,7 +78,9 @@ export class CommentsProvider {
         console.log("Create Comment");        
         return this.getCommentAuthor(data).then( (author_id) => {          
           return this.createComment(data, author_id, idea_id).then( () => {
-            return Promise.resolve();
+            return this.updateIdeaCommentCounter(idea_id).then( () => {
+              return Promise.resolve();
+            });            
           });         
         });        
       }
@@ -127,6 +142,13 @@ export class CommentsProvider {
           return id;
         });
       }           
+    });
+  }
+
+  async updateIdeaCommentCounter(idea_id) {
+    return await this.databaseProvider.getIdea("id", idea_id).then( (idea) => {
+      console.log("Update Idea Comment Counter: ", idea);
+      return this.databaseProvider.updateCommentCounter(idea, "create");
     });
   }
 
