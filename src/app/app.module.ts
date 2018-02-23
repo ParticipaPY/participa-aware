@@ -2,6 +2,7 @@ import { NgModule, ErrorHandler } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpModule, Http } from '@angular/http';
 import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MyApp } from './app.component';
 
 import { OneSignal } from '@ionic-native/onesignal';
@@ -47,10 +48,11 @@ import { DatabaseProvider } from '../providers/database/database';
 import { IdeasProvider } from '../providers/ideas/ideas';
 import { CommentsProvider } from '../providers/comments/comments';
 import { LoggingProvider } from '../providers/logging/logging';
+import { FlashProvider } from '../providers/flash/flash';
 
 import { ExpandableComponent } from '../components/expandable/expandable';
 import { Autosize } from '../directives/autosize/autosize';
-
+import { FlashComponent } from '../components/flash/flash';
 
 export function createTranslateLoader(http: Http) {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json');
@@ -74,10 +76,12 @@ export function createTranslateLoader(http: Http) {
     EditIdeaPage,
     EditCommentPage,
     ExpandableComponent,
-    Autosize
+    Autosize,
+    FlashComponent
   ],
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     HttpModule,
     IonicModule.forRoot(MyApp),
     SuperTabsModule.forRoot(),    
@@ -131,7 +135,8 @@ export function createTranslateLoader(http: Http) {
     IdeasProvider,
     CommentsProvider,
     OneSignal,
-    LoggingProvider 
+    LoggingProvider,
+    FlashProvider 
   ]
 })
 export class AppModule {}
