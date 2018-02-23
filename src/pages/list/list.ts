@@ -8,6 +8,7 @@ import { ItemCreatePage } from '../item-create/item-create';
 import { DatabaseProvider } from "./../../providers/database/database";
 import { IdeasProvider } from '../../providers/ideas/ideas';
 import { IdeaPopoverPage } from '../idea-popover/idea-popover';
+import { FlashProvider } from '../../providers/flash/flash';
 
 @Component({
   selector: 'page-list',
@@ -31,8 +32,10 @@ export class ListPage {
   totalData: number = 0;
   totalPage: number = 0;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, public modalCtrl: ModalController, private databaseprovider: DatabaseProvider, public http: Http, 
-    public storage: Storage, public toastCtrl: ToastController, public platform: Platform, private ideaProvider: IdeasProvider, public popoverCtrl: PopoverController) {
+  constructor(public navCtrl: NavController, public navParams: NavParams, public modalCtrl: ModalController, 
+    private databaseprovider: DatabaseProvider, public http: Http, public storage: Storage, 
+    public toastCtrl: ToastController, public platform: Platform, private ideaProvider: IdeasProvider, 
+    public popoverCtrl: PopoverController, private flashProvider: FlashProvider) {
       
     this.rootNavCtrl = this.navParams.get('rootNavCtrl'); 
   }
@@ -93,6 +96,7 @@ export class ListPage {
   }
 
   itemTapped(event, item) {
+    this.searchTerm = "";
     let addModal = this.modalCtrl.create(ItemDetailsPage, {item: item});
     
     addModal.onDidDismiss((item) => {
@@ -205,7 +209,20 @@ export class ListPage {
     
     popover.onDidDismiss( (type) => {
       console.log("Popover Dismessed");
-      this.loadIdeas();
+      
+      if (type == "delete") {
+        let toast = this.toastCtrl.create({
+          message: "Tu idea ha sido borrada",
+          duration: 3000,
+          position: 'top'
+        });
+        toast.present();
+        setTimeout(() => {      
+          this.loadIdeas();
+        }, 3100);        
+      } else {
+        this.loadIdeas();
+      }
     });    
   }  
 

@@ -6,6 +6,7 @@ import { Geolocation } from '@ionic-native/geolocation';
 import { DatabaseProvider } from '../../providers/database/database';
 import { IdeasProvider } from '../../providers/ideas/ideas';
 import { LoggingProvider } from '../../providers/logging/logging';
+import { FlashProvider } from '../../providers/flash/flash';
 
 @Component({
   selector: 'page-edit-idea',
@@ -19,8 +20,8 @@ export class EditIdeaPage {
   isReadyToSave: boolean = false;
 
   constructor(public viewCtrl: ViewController, public navCtrl: NavController, public navParams: NavParams, public ideaProvider: IdeasProvider, 
-              public databaseProvider: DatabaseProvider, public formBuilder: FormBuilder, private geolocation: Geolocation, 
-              public platform: Platform, public toastCtrl: ToastController, public loggingProvider: LoggingProvider) {
+    public databaseProvider: DatabaseProvider, public formBuilder: FormBuilder, private geolocation: Geolocation, 
+    public platform: Platform, public toastCtrl: ToastController, public loggingProvider: LoggingProvider, private flashProvider: FlashProvider) {
 
     this.idea = this.navParams.get('idea');
     
@@ -70,8 +71,8 @@ export class EditIdeaPage {
        return; 
     }
     
-    this.databaseProvider.updateIdeaByAuthor(this.form.value).then( () => {
-      this.presentToast("Tu idea ha sido editada");    
+    this.databaseProvider.updateIdeaByAuthor(this.form.value).then( () => {          
+      this.flashProvider.show('Tu idea ha sido editada', 3000);
       setTimeout(() => {      
         this.viewCtrl.dismiss();
       }, 3100);

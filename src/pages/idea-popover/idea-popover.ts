@@ -5,6 +5,7 @@ import { IdeasProvider } from '../../providers/ideas/ideas';
 import { CommentsProvider } from '../../providers/comments/comments';
 import { EditIdeaPage } from '../../pages/edit-idea/edit-idea';
 import { LoggingProvider } from '../../providers/logging/logging';
+import { FlashProvider } from '../../providers/flash/flash';
 
 @Component({
   selector: 'page-idea-popover',
@@ -14,9 +15,10 @@ export class IdeaPopoverPage {
 
   idea: any;
 
-  constructor(public viewCtrl: ViewController, public navCtrl: NavController, public navParams: NavParams, public databaseProvider: DatabaseProvider, 
-              public ideaProvider: IdeasProvider, public commentProvider: CommentsProvider, public modalCtrl: ModalController, private alertCtrl: AlertController,
-              public toastCtrl: ToastController, public loggingProvider: LoggingProvider) {
+  constructor(public viewCtrl: ViewController, public navCtrl: NavController, public navParams: NavParams, 
+    public databaseProvider: DatabaseProvider, public ideaProvider: IdeasProvider, public commentProvider: CommentsProvider, 
+    public modalCtrl: ModalController, private alertCtrl: AlertController, public toastCtrl: ToastController, 
+    public loggingProvider: LoggingProvider, private flashProvider: FlashProvider) {
    
     if (this.navParams.data) {      
       this.idea = this.navParams.get('idea');                        
@@ -79,10 +81,7 @@ export class IdeaPopoverPage {
                 }
               });
               this.databaseProvider.deleteIdea(this.idea.id).then( () => {   
-                this.presentToast("Tu idea ha sido borrada");
-                setTimeout(() => {      
-                  this.viewCtrl.dismiss("delete");
-                }, 3100);
+                this.viewCtrl.dismiss("delete");                
               });
               this.deleteIdeaComments();
 

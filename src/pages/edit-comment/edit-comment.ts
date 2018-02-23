@@ -3,6 +3,7 @@ import { NavController, NavParams, ViewController, ToastController } from 'ionic
 import { CommentsProvider } from '../../providers/comments/comments';
 import { DatabaseProvider } from '../../providers/database/database';
 import { LoggingProvider } from '../../providers/logging/logging';
+import { FlashProvider } from '../../providers/flash/flash';
 
 @Component({
   selector: 'page-edit-comment',
@@ -14,8 +15,9 @@ export class EditCommentPage {
   comment: any;
   isReadyToSave: boolean = false;
 
-  constructor (public viewCtrl: ViewController, public navCtrl: NavController, public navParams: NavParams, public commentProvider: CommentsProvider, 
-              public databaseProvider: DatabaseProvider, public toastCtrl: ToastController, public loggingProvider: LoggingProvider) {
+  constructor (public viewCtrl: ViewController, public navCtrl: NavController, public navParams: NavParams, 
+    public commentProvider: CommentsProvider, public databaseProvider: DatabaseProvider, public toastCtrl: ToastController, 
+    public loggingProvider: LoggingProvider, private flashProvider: FlashProvider) {
               
     this.comment = this.navParams.get('comment');
   }
@@ -49,8 +51,8 @@ export class EditCommentPage {
       console.log("Update Comment Status: ", resp.status);      
     });
 
-    this.databaseProvider.updateComment(this.comment).then( () => {
-      this.presentToast("Tu comentario ha sido editado");    
+    this.databaseProvider.updateComment(this.comment).then( () => {      
+      this.flashProvider.show('Tu comentario ha sido editado', 3000);  
       setTimeout(() => {      
         this.viewCtrl.dismiss();
       }, 3100);

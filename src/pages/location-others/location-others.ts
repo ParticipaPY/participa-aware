@@ -30,9 +30,9 @@ export class LocationOthersPage {
   totalData: number = 0;
   totalPage: number = 0;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, public modalCtrl: ModalController, private ideaProvider: IdeasProvider, 
-    private databaseprovider: DatabaseProvider, public http: Http, public storage: Storage, public toastCtrl: ToastController, 
-    public popoverCtrl: PopoverController) {
+  constructor(public navCtrl: NavController, public navParams: NavParams, public modalCtrl: ModalController, 
+    private ideaProvider: IdeasProvider, private databaseprovider: DatabaseProvider, public http: Http, 
+    public storage: Storage, public toastCtrl: ToastController, public popoverCtrl: PopoverController) {
       
     this.rootNavCtrl = navParams.get('rootNavCtrl');      
   }
@@ -83,6 +83,7 @@ export class LocationOthersPage {
   }
 
   itemTapped(event, item) {
+    this.searchTerm = "";
     let addModal = this.modalCtrl.create(ItemDetailsPage, {item: item});
     
     addModal.onDidDismiss((item) => {
@@ -194,7 +195,20 @@ export class LocationOthersPage {
     
     popover.onDidDismiss( (type) => {
       console.log("Popover Dismessed");
-      this.loadIdeas();
-    });    
+      
+      if (type == "delete") {
+        let toast = this.toastCtrl.create({
+          message: "Tu idea ha sido borrada",
+          duration: 3000,
+          position: 'top'
+        });
+        toast.present();
+        setTimeout(() => {      
+          this.loadIdeas();
+        }, 3100);        
+      } else {
+        this.loadIdeas();
+      }
+    });   
   }  
 }

@@ -14,8 +14,9 @@ export class CommentPopoverPage {
   idea: any;
   comment: any;
   
-  constructor(public viewCtrl: ViewController, private navParams: NavParams, public databaseProvider: DatabaseProvider, public commentProvider: CommentsProvider,
-              public modalCtrl: ModalController, private alertCtrl: AlertController, public toastCtrl: ToastController, public loggingProvider: LoggingProvider) {
+  constructor(public viewCtrl: ViewController, private navParams: NavParams, public databaseProvider: DatabaseProvider, 
+    public commentProvider: CommentsProvider, public modalCtrl: ModalController, private alertCtrl: AlertController, 
+    public toastCtrl: ToastController, public loggingProvider: LoggingProvider) {
 
     if (this.navParams.data) {      
       this.idea    = this.navParams.get('idea');      
@@ -36,7 +37,7 @@ export class CommentPopoverPage {
     let modal = this.modalCtrl.create(EditCommentPage, {comment: this.comment});
     modal.present();
     modal.onDidDismiss( () => {
-      this.viewCtrl.dismiss();
+      this.viewCtrl.dismiss("edit");
     })
   }
 
@@ -81,10 +82,7 @@ export class CommentPopoverPage {
               
               this.databaseProvider.deleteComment(this.comment.id).then( () => {
                 this.databaseProvider.updateCommentCounter(this.idea, "delete").then( () => {
-                  this.presentToast("Tu comentario ha sido borrado");
-                  setTimeout(() => {      
-                    this.viewCtrl.dismiss();
-                  }, 3100);                  
+                  this.viewCtrl.dismiss("delete");
                 });
               });
 

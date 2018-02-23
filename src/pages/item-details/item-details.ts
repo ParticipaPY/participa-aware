@@ -9,6 +9,7 @@ import { IdeaPopoverPage } from '../idea-popover/idea-popover';
 import { DatabaseProvider } from '../../providers/database/database';
 import { CommentsProvider } from '../../providers/comments/comments';
 import { CommentPopoverPage } from '../comment-popover/comment-popover';
+import { FlashProvider } from '../../providers/flash/flash';
 
 @Component({
   selector: 'page-item-details',
@@ -29,7 +30,7 @@ export class ItemDetailsPage {
 
   constructor(public navCtrl: NavController, public navParams: NavParams, private databaseprovider: DatabaseProvider, public storage: Storage, public commentProvider: CommentsProvider, 
     public toastCtrl: ToastController, public ideaProvider: IdeasProvider, public popoverCtrl: PopoverController, public loadingCtrl: LoadingController,
-    public loggingProvider: LoggingProvider, public notificationProvider: Notification) {
+    public loggingProvider: LoggingProvider, public notificationProvider: Notification, private flashProvider: FlashProvider) {
    
     this.rootNavCtrl = this.navParams.get('rootNavCtrl');     
   }
@@ -291,8 +292,12 @@ export class ItemDetailsPage {
       console.log("Type: ", type);
       if (type == "edit")
         this.updateIdea();
-      else if (type == "delete")
-        this.navCtrl.pop();
+      else if (type == "delete") {
+        this.flashProvider.show('Tu idea ha sido borrada', 3000);
+        setTimeout(() => {      
+          this.navCtrl.pop();
+        }, 3100);        
+      }
     });    
   }
 
@@ -303,10 +308,18 @@ export class ItemDetailsPage {
       ev: myEvent
     });
     
-    popover.onDidDismiss( () => {
-      console.log("Popover Dismessed");
-      this.updateIdea();
-      this.loadIdeaComments();
+    popover.onDidDismiss( (type) => {      
+      if(type == "delete") {
+        console.log("Comment Popover Dismissed on comment delete");
+        this.flashProvider.show('Tu comentario ha sido borrado', 3000);
+        setTimeout(() => {      
+          this.updateIdea();
+          this.loadIdeaComments();
+        }, 3100);
+      } else if (type == "edit"){
+        this.updateIdea();
+        this.loadIdeaComments();  
+      }
     });    
   }
 

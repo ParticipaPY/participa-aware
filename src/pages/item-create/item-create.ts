@@ -6,6 +6,7 @@ import { IonicPage, NavController, NavParams, ViewController, ToastController, P
 import { DatabaseProvider } from "../../providers/database/database";
 import { IdeasProvider } from '../../providers/ideas/ideas';
 import { LoggingProvider } from '../../providers/logging/logging';
+import { FlashProvider } from '../../providers/flash/flash';
 
 @IonicPage()
 @Component({
@@ -24,8 +25,8 @@ export class ItemCreatePage {
   location: any;
 
   constructor(public navCtrl: NavController, params: NavParams, public viewCtrl: ViewController, public toastCtrl: ToastController, formBuilder: FormBuilder, 
-              private databaseprovider: DatabaseProvider, private geolocation: Geolocation, public platform: Platform, public ideaProvider: IdeasProvider,
-              public loggingProvider: LoggingProvider) {
+    private databaseprovider: DatabaseProvider, private geolocation: Geolocation, public platform: Platform, public ideaProvider: IdeasProvider,
+    public loggingProvider: LoggingProvider, private flashProvider: FlashProvider) {
 
     if (params.get('location'))
       this.location = parseInt(params.get('location'));
@@ -76,12 +77,7 @@ export class ItemCreatePage {
     }
 
     this.databaseprovider.createIdea(this.form.value).then( data => {
-      let toast = this.toastCtrl.create({
-        message: '¡Gracias por tu contribución!',
-        duration: 3000,
-        position: 'top'
-      });
-      toast.present(); 
+      this.flashProvider.show('¡Gracias por tu contribución!', 3000);
       console.log("datos: ", data);      
       let locationData = this.locations.filter(l => l.id == this.form.controls['location_id'].value)[0];
       console.log("Location => ", locationData);

@@ -51,13 +51,6 @@ export class IdeasProvider {
   postIdea(idea: any, location: any){
     return this.getSessionKey().then( (key) => {
       this.session_key = key;
-      let s = location.coordinates.replace("[[", "").replace("]]", "").split('], [');
-      let final = [];
-      
-      for (var l = 0; l < s.length; l++){
-        let a = s[l].split(', ');
-        final.push([parseFloat(a[0]), parseFloat(a[1])]);
-      }
 
       let data = {
         "lang"     : "es-ES",
@@ -68,7 +61,7 @@ export class IdeasProvider {
         "campaigns": [this.cid],
         "location" : {
           "placeName": location.name,
-          "geoJson"  : "[{\"type\": \"Polygon\",\"coordinates\": [" + final + "]}]"
+          "geoJson"  : "[{\"type\": \"Polygon\",\"coordinates\": [" + location.coordinates + "]}]"
         }
       }
 
@@ -80,13 +73,6 @@ export class IdeasProvider {
   putIdea(idea: any, location: any){
     return this.getSessionKey().then( (key) => {
       this.session_key = key;
-      let s = location.coordinates.replace("[[", "").replace("]]", "").split('], [');
-      let final = [];
-      
-      for (var l = 0; l < s.length; l++){
-        let a = s[l].split(', ');
-        final.push([parseFloat(a[0]), parseFloat(a[1])]);
-      }
 
       let data = {
         "title"    : idea.title,
@@ -95,7 +81,7 @@ export class IdeasProvider {
         "status"   : "PUBLISHED",
         "location" : {          
           "placeName": location.name,
-          "geoJson"  : "[{\"type\": \"Polygon\",\"coordinates\": [" + final + "]}]"          
+          "geoJson"  : "[{\"type\": \"Polygon\",\"coordinates\": [" + location.coordinates + "]}]"          
         },      
         "contributionId": idea.idea_id
       }

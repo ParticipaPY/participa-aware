@@ -1,25 +1,25 @@
 <ion-header>
-  
-    <ion-navbar color="custom-color">
-      <ion-title>Editar Comentario</ion-title>
-      <ion-buttons start>
-        <button ion-button (click)="cancel()">
-          <span color="primary" showWhen="ios">
-            Cancelar
-          </span>
-          <ion-icon name="md-close" showWhen="android,windows"></ion-icon>
-        </button>
-      </ion-buttons>
-      <ion-buttons end>
-        <button ion-button (click)="done()" [disabled]="!isReadyToSave" strong>
-          <span color="primary" showWhen="ios">
-            Aceptar
-          </span>
-          <ion-icon name="md-checkmark" showWhen="core,android,windows"></ion-icon>
-        </button>
-      </ion-buttons>    
-    </ion-navbar>
-  </ion-header>
+  <flash></flash>
+  <ion-navbar color="custom-color">
+    <ion-title>Editar Comentario</ion-title>
+    <ion-buttons start>
+      <button ion-button (click)="cancel()">
+        <span color="primary" showWhen="ios">
+          Cancelar
+        </span>
+        <ion-icon name="md-close" showWhen="android,windows"></ion-icon>
+      </button>
+    </ion-buttons>
+    <ion-buttons end>
+      <button ion-button (click)="done()" [disabled]="!isReadyToSave" strong>
+        <span color="primary" showWhen="ios">
+          Aceptar
+        </span>
+        <ion-icon name="md-checkmark" showWhen="core,android,windows"></ion-icon>
+      </button>
+    </ion-buttons>    
+  </ion-navbar>
+</ion-header>
 
 <ion-content padding>
   <ion-grid>

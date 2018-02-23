@@ -1,9 +1,12 @@
+<ion-header>   
+  <flash></flash>
+  <ion-searchbar [(ngModel)]="searchTerm" (ionInput)="setFilteredItems()" [showCancelButton]="true" placeholder="Buscar"></ion-searchbar>  
+</ion-header>
+  
 <ion-content>
   <ion-refresher (ionRefresh)="doRefresh($event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
-
-  <ion-searchbar [(ngModel)]="searchTerm" (ionInput)="setFilteredItems()" [showCancelButton]="true" placeholder="Buscar"></ion-searchbar>
   
   <ion-label style="text-align: center; color: gray" *ngIf="ideas.length == 0">Desliza hacia abajo para actualizar</ion-label>
 

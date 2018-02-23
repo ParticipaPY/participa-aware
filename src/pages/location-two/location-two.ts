@@ -92,6 +92,7 @@ export class LocationTwoPage {
   }
 
   itemTapped(event, item) {
+    this.searchTerm = "";
     let addModal = this.modalCtrl.create(ItemDetailsPage, {item: item});
     
     addModal.onDidDismiss((item) => {
@@ -203,7 +204,20 @@ export class LocationTwoPage {
     
     popover.onDidDismiss( (type) => {
       console.log("Popover Dismessed");
-      this.loadIdeas();
-    });    
+      
+      if (type == "delete") {
+        let toast = this.toastCtrl.create({
+          message: "Tu idea ha sido borrada",
+          duration: 3000,
+          position: 'top'
+        });
+        toast.present();
+        setTimeout(() => {      
+          this.loadIdeas();
+        }, 3100);        
+      } else {
+        this.loadIdeas();
+      }
+    });   
   }  
 }
