@@ -8,6 +8,7 @@ import { User } from '../../providers/user/user';
 import { DatabaseProvider } from '../../providers/database/database';
 import { Notification } from '../../providers/notification/notification';
 import { TabsPage } from '../tabs/tabs';
+import { FlashProvider } from '../../providers/flash/flash';
 
 @Component({
   selector: 'page-my-profile',
@@ -28,7 +29,7 @@ export class MyProfilePage {
     public databaseProvider: DatabaseProvider, private userProvider: User,
     public toastCtrl: ToastController, public userLocation: Notification, 
     private storage: Storage, public events: Events,
-    private translateService: TranslateService
+    private translateService: TranslateService, private flashProvider: FlashProvider
   ) {
     this.user = navParams.get('account'); 
 
@@ -62,7 +63,7 @@ export class MyProfilePage {
     this.translateService.get(text).subscribe( (value) => {
       let toast = this.toastCtrl.create({
         message: value,
-        duration: 5000,
+        duration: 3000,
         position: 'top'
       });
 
@@ -85,9 +86,7 @@ export class MyProfilePage {
     this.events.publish('user:edited', this.signUpForm.value);
     this.updateUserInfo();
     this.updateUserLocation();
-    this.updateStorageInfo();    
-    this.viewCtrl.dismiss();
-    this.navCtrl.setRoot(TabsPage);    
+    this.updateStorageInfo();
   }
 
   updateUserInfo(){
@@ -103,12 +102,11 @@ export class MyProfilePage {
 
     this.userProvider.editProfile(this.user.user_id, this.signUpForm.value).then( (resp) => {
       console.log('AC - Update User Profile Response: ', resp.status);
-      let toast = this.toastCtrl.create({
-        message: 'Tu perfil ha sido actualizado',
-        duration: 5000,
-        position: 'top'
-      });
-      toast.present();
+      this.flashProvider.show('Tu perfil ha sido actualizado', 5000);
+      setTimeout(() => {
+        this.viewCtrl.dismiss();
+        this.navCtrl.setRoot(TabsPage);  
+      }, 5100);
     }).catch( (error) => {      
       if (error.status != 500) {
         let err = JSON.parse(error.error);
@@ -119,12 +117,7 @@ export class MyProfilePage {
         } 
       } else {
         console.log("AC - Error updating user profile Message: ", error);
-        let toast = this.toastCtrl.create({
-          message: "Error desde AppCivist al editar usuario",
-          duration: 5000,
-          position: 'top'
-        });
-        toast.present();                
+        this.presentToast("Error desde AppCivist al editar usuario");        
       }
     });
   }
@@ -162,13 +155,8 @@ export class MyProfilePage {
     {
       this.ban = true;
       this.editProfile();
-    } else {
-      let toast = this.toastCtrl.create({
-        message: "Debes elegir al menos un lugar",
-        duration: 5000,
-        position: 'top'
-      });
-      toast.present();
+    } else {      
+      this.presentToast("Debes elegir al menos un lugar");
       return;
     }
   } 
