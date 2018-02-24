@@ -35,14 +35,15 @@ export class IdeasProvider {
     });    
   }
 
-  getIdeas(page){
+  getIdeas(page, location?){
     return this.getSessionKey().then( (key) => {
       this.session_key = key;
       let params = {
         'type': 'idea',
         'page': page,
         'pageSize': 5,
-        'sorting': 'date_desc'
+        'sorting': 'date_desc',
+        'by_location': location
       }
       return this.api.get('space/' + this.csid + '/contribution', params, {'SESSION_KEY': this.session_key});
     });

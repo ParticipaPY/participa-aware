@@ -158,32 +158,36 @@ export class LocationTwoPage {
   } 
 
   async updateContent() {
-    return await this.ideaProvider.getIdeas(this.page).then( (res) => {
-      console.log("PAGE VALUE: ", this.page);
-      console.log("GET IDEA RESPONSE STATUS: ", res.status);
-      let response = JSON.parse(res.data);
-      this.perPage = 5;
-      this.totalData = response.total;
-      this.totalPage = Math.ceil(response.total/5);
-      let newIdeas = [];
-      newIdeas     = response.list;
-      let chain    = Promise.resolve();
-      for (let i of newIdeas){     
-        chain = chain.then( () => {
-          return this.ideaProvider.createEditIdea(i);
+    return await this.storage.get('location_two').then( (location_two) => {
+      return this.databaseprovider.getLocationById(parseInt(location_two)).then( (location) => {
+        return this.ideaProvider.getIdeas(this.page, location.name).then( (res) => {
+          console.log("PAGE VALUE: ", this.page);
+          console.log("GET IDEA RESPONSE STATUS: ", res.status);
+          let response = JSON.parse(res.data);
+          this.perPage = 5;
+          this.totalData = response.total;
+          this.totalPage = Math.ceil(response.total/5);
+          let newIdeas = [];
+          newIdeas     = response.list;
+          let chain    = Promise.resolve();
+          for (let i of newIdeas){     
+            chain = chain.then( () => {
+              return this.ideaProvider.createEditIdea(i);
+            });
+          }
+        }).catch( (error) => {
+          let err = JSON.parse(error.error);
+          console.log("AC - Error getting ideas message: ", err);
+          let toast = this.toastCtrl.create({
+            message: "Error al actualizar ideas",
+            duration: 3000,
+            position: 'top'
+          });
+          toast.present()
+          return;
         });
-      }
-    }).catch( (error) => {
-      let err = JSON.parse(error.error);
-      console.log("AC - Error getting ideas message: ", err);
-      let toast = this.toastCtrl.create({
-        message: "Error al actualizar ideas",
-        duration: 3000,
-        position: 'top'
       });
-      toast.present()
-      return;
-    });
+    });  
   }   
 
   doInfinite(infiniteScroll) {

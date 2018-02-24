@@ -100,6 +100,27 @@ export class DatabaseProvider {
     });     
   }
 
+  getLocationById(id){
+    let sql = "SELECT * FROM location WHERE id = ?;";
+    return this.database.executeSql(sql, [id]).then( (data) => {
+      let location;
+      if (data.rows.length > 0) {
+        location = { 
+          id: data.rows.item(0).id, 
+          name: data.rows.item(0).name,
+          population: data.rows.item(0).population,
+          coordinates: data.rows.item(0).coordinates 
+        };
+      } else {
+        location = {}
+      }
+      return location;
+    }, err => {
+      console.log('Error: ', err);
+      return {};
+    });     
+  }
+
   getAllAuthors() {
     return this.database.executeSql("SELECT * FROM author;", []).then((data) => {
       let authors = [];
