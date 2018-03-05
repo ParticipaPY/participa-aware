@@ -68,11 +68,15 @@ export class Notification {
     return this.api.post('notification/user/' + user_id + '/register-token', data, options).map(res => res.json());
   }
 
-  createUserNotificationConfig(user_id){
+  createUserNotificationConfig(user_id, email){
     console.log("Calling Service to Create User Notification Config for user: ", user_id);
     let options = new RequestOptions({ headers: this.headers });
+    let data = {
+      "user" : user_id,
+      "email": email
+    }
 
-    return this.api.post('notification/user/' + user_id + '/config-notification', [], options).map(res => res.json());    
+    return this.api.post('notification/user/' + user_id + '/config-notification', data, options).map(res => res.json());    
   }
 
   notifyNewComment(param){

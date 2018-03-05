@@ -120,7 +120,7 @@ export class SignupPage {
   }
 
   createNotificationConfig(user){
-    this.notification.createUserNotificationConfig(user).subscribe( (resp) => {
+    this.notification.createUserNotificationConfig(user, this.signUpForm.controls['email'].value).subscribe( (resp) => {
       console.log('Response from server: ', resp);
     }, (err) => {
       console.log('Error creating user notification config: ', err);
