@@ -128,19 +128,15 @@ export class ItemCreatePage {
           if ( this.pointInPolygon(points, location.coordinates) ){          
             this.form.controls['location_id'].patchValue(location.id);  
             ban = true;      
-            let toast = this.toastCtrl.create({
-              message: 'Te encuentras en el barrio: ' + location.name,
-              duration: 3000,
-              position: 'top'
-            });
-            toast.present();  
+            
+            this.flashProvider.show('Estás en el barrio: ' + location.name, 3000);
             break;
           } 
         }
 
         if (!ban){
           let toast = this.toastCtrl.create({
-            message: 'Error al obtener ubicación',
+            message: 'No hemos podido encontrar tu ubicación',
             duration: 3000,
             position: 'top'
           });
@@ -149,7 +145,7 @@ export class ItemCreatePage {
         
       }).catch((error) => {
         let toast = this.toastCtrl.create({
-          message: 'Error al obtener ubicación',
+          message: error.message,
           duration: 3000,
           position: 'top'
         });
