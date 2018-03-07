@@ -147,9 +147,12 @@ export class ItemDetailsPage {
 
     this.databaseprovider.createComment(this.comment, this.selectedItem).then( (data) => {      
       this.databaseprovider.updateCommentCounter(this.selectedItem, "create").then( () => {
+        this.flashProvider.show('Tu comentario ha sido creado', 3000);
         this.updateIdea();
-        this.loadIdeaComments();
-        this.comment = "";      
+        setTimeout( () => {
+          this.loadIdeaComments();
+          this.comment = "";
+        }, 3100);              
       });
       this.commentProvider.postComment(this.selectedItem.resourceSpaceId, this.comment, "DISCUSSION").then ( (resp) => {
         let response = JSON.parse(resp.data);
@@ -311,7 +314,12 @@ export class ItemDetailsPage {
     popover.onDidDismiss( (type) => {      
       if(type == "delete") {
         console.log("Comment Popover Dismissed on comment delete");
-        this.flashProvider.show('Tu comentario ha sido borrado', 3000);
+        let toast = this.toastCtrl.create({
+          message: 'Comentario borrado',
+          duration: 3000,
+          position: 'top'
+        });
+        toast.present();   
         setTimeout(() => {      
           this.updateIdea();
           this.loadIdeaComments();
