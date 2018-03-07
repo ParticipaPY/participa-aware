@@ -606,9 +606,9 @@ export class DatabaseProvider {
   }
 
   updateAuthor(author) {
-    let sql = "UPDATE author set name = ? WHERE user_id = ?;"
+    let sql = "UPDATE author set name = ?, email = ? WHERE user_id = ?;"
 
-    return this.database.executeSql(sql, [author.name, author.id]).then( (data) => {
+    return this.database.executeSql(sql, [author.name, author.email, author.id]).then( (data) => {
       return data;
     }, err => {
       console.log('Error: ', err);

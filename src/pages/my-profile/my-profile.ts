@@ -92,7 +92,8 @@ export class MyProfilePage {
   updateUserInfo(){
     let data = {
       id: this.user.user_id,
-      name: this.signUpForm.controls['name'].value
+      name: this.signUpForm.controls['name'].value,
+      email: this.signUpForm.controls['email'].value
     }
     this.databaseProvider.updateAuthor(data).then( (res) => {
       console.log("Updating user name result: ", res);
@@ -102,7 +103,7 @@ export class MyProfilePage {
 
     this.userProvider.editProfile(this.user.user_id, this.signUpForm.value).then( (resp) => {
       console.log('AC - Update User Profile Response: ', resp.status);
-      this.flashProvider.show('Tu perfil ha sido actualizado', 5000);
+      this.flashProvider.show('Perfil actualizado', 5000);
       setTimeout(() => {
         this.viewCtrl.dismiss();
         this.navCtrl.setRoot(TabsPage);  
