@@ -23,6 +23,7 @@ export class ItemCreatePage {
   date: any;
   campaigns = [];
   location: any;
+  message = ['¡Gracias por tu contribución', '¡Excelente idea!', 'Tu idea ha sido creada', '¡Muy buena idea!']
 
   constructor(public navCtrl: NavController, params: NavParams, public viewCtrl: ViewController, public toastCtrl: ToastController, formBuilder: FormBuilder, 
     private databaseprovider: DatabaseProvider, private geolocation: Geolocation, public platform: Platform, public ideaProvider: IdeasProvider,
@@ -77,7 +78,7 @@ export class ItemCreatePage {
     }
 
     this.databaseprovider.createIdea(this.form.value).then( data => {
-      this.flashProvider.show('¡Gracias por tu contribución!', 3000);
+      this.flashProvider.show(this.message[Math.floor(Math.random() * this.message.length)], 3000);
       console.log("datos: ", data);      
       let locationData = this.locations.filter(l => l.id == this.form.controls['location_id'].value)[0];
       console.log("Location => ", locationData);
@@ -145,7 +146,7 @@ export class ItemCreatePage {
         
       }).catch((error) => {
         let toast = this.toastCtrl.create({
-          message: error.message,
+          message: 'No hemos podido encontrar tu ubicación',
           duration: 3000,
           position: 'top'
         });

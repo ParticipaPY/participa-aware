@@ -27,13 +27,13 @@
   <form *ngIf="form" [formGroup]="form" >    
     <ion-list>
       <ion-item>
-        <ion-label floating> Título </ion-label>
-        <ion-input type="text" formControlName="title"></ion-input>
+        <ion-label stacked> Título </ion-label>
+        <ion-input type="text" formControlName="title" placeholder="¿Qué título le pondrías a tu idea?"></ion-input>
       </ion-item>
       
       <ion-item>
-        <ion-label floating> Descripción </ion-label>
-        <ion-textarea type="text" formControlName="description"></ion-textarea>
+        <ion-label stacked> Descripción </ion-label>
+        <ion-textarea type="text" formControlName="description" placeholder="Cuéntanos, ¿en qué consiste o cuál es tu idea?"></ion-textarea>
       </ion-item>
       
       <!-- <ion-item>
