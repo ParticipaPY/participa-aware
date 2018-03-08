@@ -5,6 +5,8 @@
     "AppCivist: Confirm your e-mail address": "AppCivist: Confirme su dirección de correo",
     "Authentication failed: ": "Ocurrió un fallo en la autenticación",
     "Before you can use PlayAuthenticate, you first need to verify your e-mail address.": "Antes de que puedas usar 'PlayAuthenticate', necesitas primero verificar tu dirección de correo.",
+    "Form has errors: {\"email\":[\"This field is required\"]}": "Debes ingresar un correo",
+    "Form has errors: {\"email\":[\"Valid email required\"]}": "Se requiere un correo electrónico válido",
     "Error updating user's picture": "Error al actualizar foto de perfil",    
     "Missing language": "Idioma no seleccionado",
     "No contribution found with id {0} in space {0}": "No se han encontrado contribuciones en este espacio",

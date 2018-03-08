@@ -76,6 +76,20 @@ export class User {
     
   }
 
+  passwordForgot(email) {
+    let data = {
+      "email": email
+    }
+
+    return this.api.post('user/password/forgot', data, {});
+  }
+
+  changePassword(data){
+    return this.getSessionKey().then( (key) => {
+      return this.api.put('user/password/change', data, {'SESSION_KEY': key});
+    });
+  }
+
   /**
    * Log the user out, which forgets the session
    */

@@ -21,7 +21,11 @@
 
         <div padding>
           <button ion-button color="custom-color" block (click)="doLogin()" class="login">Ingresar</button>
-          <button ion-button color="custom-color" block (click)="signup()" class="signUp">Registrarme</button>
+          <button ion-button color="custom-color" block (click)="signup()" class="signUp">Registrarme</button>          
+        </div>
+
+        <div padding>
+          <a (click)="passwordForgot()">Olvidé mi contraseña</a>
         </div>
       </ion-list>
     </form>

@@ -4,6 +4,7 @@ import { NavController, ToastController, Events, ModalController, Platform, Load
 import { Keyboard } from '@ionic-native/keyboard';
 import { ScreenOrientation } from '@ionic-native/screen-orientation';
 import { TranslateService } from '@ngx-translate/core';
+import { AlertController } from 'ionic-angular';
 
 import { SignupPage } from '../signup/signup';
 import { TabsPage } from '../tabs/tabs';
@@ -24,7 +25,7 @@ export class HelloIonicPage {
   constructor(public navCtrl: NavController, public user: User, public toastCtrl: ToastController, public databaseProvider: DatabaseProvider, 
     private storage: Storage, public events: Events, public modalCtrl: ModalController, private screenOrientation: ScreenOrientation,
     public keyboard: Keyboard, public platform: Platform, public loadingCtrl: LoadingController, public userLocations: Notification,
-    private translateService: TranslateService
+    private translateService: TranslateService, private alertCtrl: AlertController
   ) {
     this.platform.ready().then( () => {      
       this.screenOrientation.lock(this.screenOrientation.ORIENTATIONS.PORTRAIT);
@@ -161,4 +162,55 @@ export class HelloIonicPage {
     addModal.present();
   }  
 
+  passwordForgot() {
+    let alert = this.alertCtrl.create({
+      title: 'Recuperar Contraseña',
+      message: 'Recibirás un correo con el enlace para recuperar tu contraseña. ' + 
+              'Luego de recuperarla, regresa aquí para iniciar sesión',
+      inputs: [
+        {
+          name: 'email',
+          placeholder: 'Ingresa tu correo',
+          type: 'email'
+        }
+      ],
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+          handler: data => {
+            console.log('Cancel clicked');
+          }
+        },
+        {
+          text: 'Enviar',
+          handler: data => {
+            this.user.passwordForgot(data.email).then( () => {
+              this.presentToast("Operación exitosa. Por favor, revisa tu correo");
+            }).catch((error) => {
+              if (error.status == 404) {
+                this.presentToast("Usuario " + data.email + " no encontrado");
+              } else if (error.status != 500) {
+                let err = JSON.parse(error.error);
+                console.log("AC - Error on Password Forgot: ", error);
+                if (err.statusMessage) {
+                  console.log("AC - Error on Password Forgot Message: ", err.statusMessage);
+                  this.presentToast(err.statusMessage);
+                } 
+              } else {
+                console.log("AC - Error on Password Forgot Message: ", error);
+                let toast = this.toastCtrl.create({
+                  message: "Error al recuperar contraseña",
+                  duration: 3000,
+                  position: 'top'
+                });
+                toast.present();        
+              }      
+            });
+          }
+        }
+      ]
+    });
+    alert.present();
+  }
 }
