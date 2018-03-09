@@ -86,7 +86,8 @@
           <ion-icon name="home"></ion-icon>
           Casa
         </ion-label>
-        <ion-select formControlName="place_one" cancelText="Cancelar">         
+        <ion-select formControlName="place_one" cancelText="Cancelar">
+          <ion-option value="0">--Barrio--</ion-option>         
           <ion-option *ngFor="let location of locations" value="{{ location.id }}">
             {{ location.name }}
           </ion-option> 
@@ -97,10 +98,11 @@
       <ion-item>        
         <ion-label>
           <ion-icon name="briefcase"></ion-icon>
-          Escuela/Trabajo
+          Estudio/Trabajo
         </ion-label>
 
-        <ion-select formControlName="place_two" cancelText="Cancelar">         
+        <ion-select formControlName="place_two" cancelText="Cancelar">   
+          <ion-option value="0">--Barrio--</ion-option>        
           <ion-option *ngFor="let location of locations" value="{{ location.id }}">
             {{ location.name }}
           </ion-option>                                                                                              
@@ -113,7 +115,8 @@
           Distracción
         </ion-label>
 
-        <ion-select formControlName="place_three" cancelText="Cancelar">         
+        <ion-select formControlName="place_three" cancelText="Cancelar">        
+          <ion-option value="0">--Barrio--</ion-option> 
           <ion-option *ngFor="let location of locations" value="{{ location.id }}">
             {{ location.name }}
           </ion-option> 
