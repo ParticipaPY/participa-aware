@@ -172,7 +172,9 @@ export class LocationTwoPage {
           let chain    = Promise.resolve();
           for (let i of newIdeas){     
             chain = chain.then( () => {
-              return this.ideaProvider.createEditIdea(i);
+              return this.ideaProvider.createEditIdea(i).then(() => {
+                this.loadIdeas();
+              });
             });
           }
         }).catch( (error) => {
