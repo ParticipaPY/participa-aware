@@ -50,7 +50,7 @@
         </button>        
       </ion-col>      
       <ion-col>
-        <button ion-button color="light-gray" clear small icon-left>
+        <button ion-button color="light-gray" clear small icon-left (click)="itemTapped($event, item)">
           <ion-icon name='text'></ion-icon>
           {{ item.comments }}
         </button>
