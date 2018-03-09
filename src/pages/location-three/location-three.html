@@ -11,7 +11,7 @@
   <ion-label style="text-align: center; color: gray" *ngIf="ideas.length == 0">Desliza hacia abajo para actualizar</ion-label>
 
   <ion-card *ngFor="let item of ideas">
-    <ion-item (click)="itemTapped($event, item)">
+    <ion-item>
       <ion-avatar item-start>
         <img *ngIf="item.author_pic" [src]="item.author_pic">
         <img *ngIf="!item.author_pic" src='assets/img/blank_profile.png'>
