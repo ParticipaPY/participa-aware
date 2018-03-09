@@ -109,9 +109,13 @@ export class ItemDetailsPage {
 
   async loadIdeaComments () {
     console.log("Loading Comments from database");
-    return await this.databaseprovider.getIdeaComments(this.selectedItem).then( (data) => {  
-      this.comments = data;    
-      this.commentLoaded = true;
+    return await this.databaseprovider.getDatabaseState().subscribe( (rdy) => {
+      if (rdy) {
+        return this.databaseprovider.getIdeaComments(this.selectedItem).then( (data) => {  
+          this.comments = data;    
+          this.commentLoaded = true;
+        });
+      }
     });
   }
 
