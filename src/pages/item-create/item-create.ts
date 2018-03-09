@@ -89,6 +89,10 @@ export class ItemCreatePage {
         this.databaseprovider.updateIdeaIdeaId(data, response.contributionId);
         this.databaseprovider.updateIdeaRSID(data, response.resourceSpaceId);
       }).catch((error) => {
+        let err = JSON.parse(error.error);
+        if (err.statusMessage) {
+          console.log("AC - Error on Create Idea Message: ", err.statusMessage);          
+        } 
         let toast = this.toastCtrl.create({
           message: 'Error al crear Idea en AppCivist',
           duration: 3000,
