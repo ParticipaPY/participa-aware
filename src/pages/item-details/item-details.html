@@ -64,10 +64,10 @@
     </ion-row>
   </ion-card>
   
-  <div *ngIf="!finishLoading" class="spinner-container">
+  <!-- <div *ngIf="!finishLoading" class="spinner-container">
       <ion-spinner name="bubbles"></ion-spinner>
-  </div>
-  <ion-list *ngIf="comments.length > 0 && commentLoaded && finishLoading">  
+  </div> -->
+  <ion-list *ngIf="comments.length > 0 && commentLoaded">  
     <ion-label style="text-align:center;">Comentarios</ion-label>
     <button detail-none *ngFor="let item of comments" (click)="expandItem(item)" ion-item>
       <ion-avatar item-start>

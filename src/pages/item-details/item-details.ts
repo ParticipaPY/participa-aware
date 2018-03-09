@@ -37,11 +37,8 @@ export class ItemDetailsPage {
 
   ionViewWillLoad() {
     this.selectedItem = this.navParams.get('item');
-    this.updateContent().then( () => {
-      this.loadIdeaComments().then(() => {
-        this.finishLoading = true;
-      });
-    });
+    this.updateContent();
+    this.loadIdeaComments();
   }
 
   ionViewDidLoad() {
@@ -107,11 +104,11 @@ export class ItemDetailsPage {
     });
   }
 
-  async loadIdeaComments () {
+  loadIdeaComments () {
     console.log("Loading Comments from database");
-    return await this.databaseprovider.getDatabaseState().subscribe( (rdy) => {
+    this.databaseprovider.getDatabaseState().subscribe( (rdy) => {
       if (rdy) {
-        return this.databaseprovider.getIdeaComments(this.selectedItem).then( (data) => {  
+        this.databaseprovider.getIdeaComments(this.selectedItem).then( (data) => {  
           this.comments = data;    
           this.commentLoaded = true;
         });
@@ -148,49 +145,58 @@ export class ItemDetailsPage {
       action: "Create Comment",
       action_data: this.comment
     }
-
-    this.databaseprovider.createComment(this.comment, this.selectedItem).then( (data) => {      
-      this.databaseprovider.updateCommentCounter(this.selectedItem, "create").then( () => {
-        this.flashProvider.show('Tu comentario ha sido creado', 3000);
-        this.updateIdea();
-        setTimeout( () => {
-          this.loadIdeaComments();
-          this.comment = "";
-        }, 3100);              
-      });
-      this.commentProvider.postComment(this.selectedItem.resourceSpaceId, this.comment, "DISCUSSION").then ( (resp) => {
-        let response = JSON.parse(resp.data);
-        console.log("Status Create Comment: ", resp.status);      
-        this.databaseprovider.updateCommentRSID(data, response.contributionId, response.resourceSpaceId);
-      }).catch((error) => {
-        let toast = this.toastCtrl.create({
-          message: 'Error al crear Comentario en AppCivist',
-          duration: 3000,
-          position: 'top'
-        });
-        toast.present();        
-        console.log("Error creating Comment: ", error);
-      });
-    });
     
-    this.getUserID().then( (user_id) => {    
-      this.databaseprovider.getAuthor("id", user_id).then( (comment_author) => {
-        console.log("Comment Author: ", comment_author.user_id);
-        this.databaseprovider.getAuthor("id", this.selectedItem.author_id).then( (idea_author) => {
-          console.log("Idea Author: ", idea_author.user_id);
-          if (idea_author.user_id != comment_author.user_id) {
-            let param = {
-              "idea_id": this.selectedItem.idea_id,
-              "idea_author": idea_author.user_id,
-              "comment_author": comment_author.user_id
-            }
-            this.notificationProvider.notifyNewComment(param).subscribe( (resp) => {
-              console.log('Response from server - Notification on New Comment: ', resp);
-            }, (err) => {
-              console.log('Error sending notification on new comment: ', err);
+    this.databaseprovider.getDatabaseState().subscribe( (rdy) => {
+      if (rdy) {
+        this.databaseprovider.createComment(this.comment, this.selectedItem).then( (data) => {      
+          this.databaseprovider.updateCommentCounter(this.selectedItem, "create").then( () => {
+            this.flashProvider.show('Tu comentario ha sido creado', 3000);
+            this.updateIdea();
+            setTimeout( () => {
+              this.loadIdeaComments();
+              this.comment = "";
+            }, 3100);              
+          });
+
+          this.commentProvider.postComment(this.selectedItem.resourceSpaceId, this.comment, "DISCUSSION").then ( (resp) => {
+            let response = JSON.parse(resp.data);
+            console.log("Status Create Comment: ", resp.status);      
+            this.databaseprovider.updateCommentRSID(data, response.contributionId, response.resourceSpaceId);
+          }).catch((error) => {
+            let toast = this.toastCtrl.create({
+              message: 'Error al crear Comentario en AppCivist',
+              duration: 3000,
+              position: 'top'
             });
-          }
-        });      
+            toast.present();        
+            console.log("Error creating Comment: ", error);
+          });
+        });
+      }
+    });
+        
+    this.getUserID().then( (user_id) => {    
+      this.databaseprovider.getDatabaseState().subscribe( (rdy) => {
+        if (rdy) {
+          this.databaseprovider.getAuthor("id", user_id).then( (comment_author) => {
+            console.log("Comment Author: ", comment_author.user_id);
+            this.databaseprovider.getAuthor("id", this.selectedItem.author_id).then( (idea_author) => {
+              console.log("Idea Author: ", idea_author.user_id);
+              if (idea_author.user_id != comment_author.user_id) {
+                let param = {
+                  "idea_id": this.selectedItem.idea_id,
+                  "idea_author": idea_author.user_id,
+                  "comment_author": comment_author.user_id
+                }
+                this.notificationProvider.notifyNewComment(param).subscribe( (resp) => {
+                  console.log('Response from server - Notification on New Comment: ', resp);
+                }, (err) => {
+                  console.log('Error sending notification on new comment: ', err);
+                });
+              }
+            });      
+          });
+        }
       });
     });
 
@@ -216,15 +222,23 @@ export class ItemDetailsPage {
         email: this.selectedItem.email
       };
 
-      this.databaseprovider.createAuthorAC(author).then( (res) => {
-        console.log("Author ID: ", res);
-        this.createIdeaFromAC(res);        
+      this.databaseprovider.getDatabaseState().subscribe( (rdy) => {
+        if (rdy) {
+          this.databaseprovider.createAuthorAC(author).then( (res) => {
+            console.log("Author ID: ", res);
+            this.createIdeaFromAC(res);        
+          });
+        }
       });
     } else {
       console.log("Have email");
-      this.databaseprovider.getAuthor("email", this.selectedItem.email).then( (res) => {
-        console.log("Author ID: ", res.id);
-        this.createIdeaFromAC(res.id);
+      this.databaseprovider.getDatabaseState().subscribe( (rdy) => {
+        if (rdy) {
+          this.databaseprovider.getAuthor("email", this.selectedItem.email).then( (res) => {
+            console.log("Author ID: ", res.id);
+            this.createIdeaFromAC(res.id);
+          });
+        }
       });
     }
   }
@@ -246,12 +260,16 @@ export class ItemDetailsPage {
 
     console.log("Idea Author ID: ", new_idea.author_id);
 
-    this.databaseprovider.createIdeaAC(new_idea).then( (id) => {
-      console.log("Idea ID ", id);            
-      this.databaseprovider.getIdea("idea_id", this.selectedItem.idea_id).then( (new_idea) => {
-        console.log("New Idea: ", new_idea);
-        this.selectedItem = new_idea;
-      });
+    this.databaseprovider.getDatabaseState().subscribe( (rdy) => {
+      if (rdy) {
+        this.databaseprovider.createIdeaAC(new_idea).then( (id) => {
+          console.log("Idea ID ", id);            
+          this.databaseprovider.getIdea("idea_id", this.selectedItem.idea_id).then( (new_idea) => {
+            console.log("New Idea: ", new_idea);
+            this.selectedItem = new_idea;
+          });
+        });
+      }
     }); 
   }
 
