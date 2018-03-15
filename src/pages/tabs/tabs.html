@@ -4,12 +4,12 @@
       <ion-icon class="icon icon-md ion-md-menu" name="menu"></ion-icon>
     </button> 
     <!-- Title -->
-     <ion-title>Ideas cerca de tu ...</ion-title> 
+     <ion-title>Ideas cerca de tu</ion-title> 
    </ion-toolbar>  
 </ion-header>
 
 <ion-content no-bounce>
-  <super-tabs *ngIf="tabsLoaded" [config]="{ sideMenu: 'left' }" height="100%" toolbarColor="light" toolbarBackground="custom-color" indicatorColor="light">
+  <super-tabs *ngIf="tabsLoaded" [config]="{ sideMenu: 'left' }" height="100%" toolbarColor="white-color" toolbarBackground="custom-color" indicatorColor="secondary">
     <super-tab  *ngFor="let tab of tabs" [root]="pages[tab.root]" icon="{{ tab.icon }}" title="{{ tab.title }}"></super-tab>
   </super-tabs>
 </ion-content>
