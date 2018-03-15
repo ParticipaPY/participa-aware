@@ -75,7 +75,7 @@ export class MyApp {
   }
 
   logOut(){   
-    this.storage.remove("email");
+    this.storage.remove('email');
     this.storage.remove('name');
     this.storage.remove('user_id');
     this.storage.remove('userId');
@@ -84,7 +84,8 @@ export class MyApp {
     this.storage.remove('location_one');
     this.storage.remove('location_two');
     this.storage.remove('location_three');
-    
+    this.oneSignal.setSubscription(false);
+
     setTimeout( () => {
       this.menu.close();
       this.nav.setRoot(HelloIonicPage);

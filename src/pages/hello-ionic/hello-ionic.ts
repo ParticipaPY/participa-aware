@@ -11,6 +11,7 @@ import { TabsPage } from '../tabs/tabs';
 import { User } from '../../providers/user/user';
 import { DatabaseProvider } from '../../providers/database/database';
 import { Notification } from '../../providers/notification/notification';
+import { OneSignal } from '@ionic-native/onesignal';
 
 @Component({
   selector: 'page-hello-ionic',
@@ -22,10 +23,11 @@ export class HelloIonicPage {
   reduce_icon: Boolean = false;
   loading;
   
-  constructor(public navCtrl: NavController, public user: User, public toastCtrl: ToastController, public databaseProvider: DatabaseProvider, 
-    private storage: Storage, public events: Events, public modalCtrl: ModalController, private screenOrientation: ScreenOrientation,
-    public keyboard: Keyboard, public platform: Platform, public loadingCtrl: LoadingController, public userLocations: Notification,
-    private translateService: TranslateService, private alertCtrl: AlertController
+  constructor(public navCtrl: NavController, public user: User, public toastCtrl: ToastController, 
+    public databaseProvider: DatabaseProvider, private storage: Storage, public events: Events, 
+    public modalCtrl: ModalController, private screenOrientation: ScreenOrientation, public keyboard: Keyboard,
+    public platform: Platform, public loadingCtrl: LoadingController, public userLocations: Notification,
+    private translateService: TranslateService, private alertCtrl: AlertController, private oneSignal: OneSignal
   ) {
     this.platform.ready().then( () => {      
       this.screenOrientation.lock(this.screenOrientation.ORIENTATIONS.PORTRAIT);
@@ -67,12 +69,13 @@ export class HelloIonicPage {
       this.storeUserInfo(result);
       this.getUser(result);
       this.getUserLocations(result);
+      this.oneSignal.setSubscription(true);
 
       setTimeout( () => {
         this.events.publish('user:created', this.account);
         this.loading.dismiss();        
         this.navCtrl.setRoot(TabsPage);
-      }, 2500);
+      }, 4000);
  
     }, (error) => {      
       this.loading.dismiss();
