@@ -1,14 +1,13 @@
 import { Component, ViewChild } from '@angular/core';
 import { Validators, FormBuilder, FormGroup } from '@angular/forms';
 import { Geolocation } from '@ionic-native/geolocation';
-import { IonicPage, NavController, NavParams, ViewController, ToastController, Platform } from 'ionic-angular';
+import { NavController, NavParams, ViewController, ToastController, Platform } from 'ionic-angular';
 
 import { DatabaseProvider } from "../../providers/database/database";
 import { IdeasProvider } from '../../providers/ideas/ideas';
 import { LoggingProvider } from '../../providers/logging/logging';
 import { FlashProvider } from '../../providers/flash/flash';
 
-@IonicPage()
 @Component({
   selector: 'page-item-create',
   templateUrl: 'item-create.html',
