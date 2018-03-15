@@ -34,8 +34,8 @@ export class MyProfilePage {
     this.user = navParams.get('account'); 
 
     this.signUpForm = formBuilder.group({
-      name: [this.user.name, Validators.compose([Validators.maxLength(80), Validators.pattern('[a-zA-ZáéíóúÁÉÍÓÚ ]*'), Validators.required])],
-      email: [this.user.email, Validators.compose([Validators.maxLength(30), Validators.minLength(5), Validators.pattern('[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+'), Validators.required])],
+      name: [this.user.name, Validators.compose([Validators.maxLength(80), Validators.pattern('[a-zA-ZáéíóúüñÁÉÍÓÚÜÑ ]*'), Validators.required])],
+      email: [this.user.email],
       place_one: [this.user.location_one],
       place_two: [this.user.location_two],
       place_three: [this.user.location_three],

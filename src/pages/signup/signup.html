@@ -87,7 +87,7 @@
           Casa
         </ion-label>
         <ion-select formControlName="place_one" cancelText="Cancelar">
-          <ion-option value="0">--Barrio--</ion-option>         
+          <ion-option value="0">--Seleccionar Barrio--</ion-option>         
           <ion-option *ngFor="let location of locations" value="{{ location.id }}">
             {{ location.name }}
           </ion-option> 
@@ -102,7 +102,7 @@
         </ion-label>
 
         <ion-select formControlName="place_two" cancelText="Cancelar">   
-          <ion-option value="0">--Barrio--</ion-option>        
+          <ion-option value="0">--Seleccionar Barrio--</ion-option>        
           <ion-option *ngFor="let location of locations" value="{{ location.id }}">
             {{ location.name }}
           </ion-option>                                                                                              
@@ -116,7 +116,7 @@
         </ion-label>
 
         <ion-select formControlName="place_three" cancelText="Cancelar">        
-          <ion-option value="0">--Barrio--</ion-option> 
+          <ion-option value="0">--Seleccionar Barrio--</ion-option> 
           <ion-option *ngFor="let location of locations" value="{{ location.id }}">
             {{ location.name }}
           </ion-option> 

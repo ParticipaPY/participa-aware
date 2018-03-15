@@ -28,25 +28,13 @@
         <p>Por favor, ingrese un nombre válido.</p>
       </ion-item>
 
-      <ion-item>        
-        <ion-label stacked>
-          <ion-icon ios="ios-mail" md="md-mail"></ion-icon>
-          Correo*
-        </ion-label>
-        <ion-input type="email" formControlName="email" [class.invalid]="!signUpForm.controls.email.valid && (signUpForm.controls.email.dirty || submitAttempt)"></ion-input>
-      </ion-item>
-
-      <ion-item *ngIf="!signUpForm.controls.email.valid  && (signUpForm.controls.email.dirty || submitAttempt)">
-        <p>Por favor, ingrese un correo válido.</p>
-      </ion-item> 
-
-      <ion-item>
+      <ion-item style="margin-top: 5%;">
         <ion-label>
           <ion-icon name="home"></ion-icon>
           Casa
         </ion-label>
         <ion-select formControlName="place_one" cancelText="Cancelar">
-          <ion-option value="0">--Barrio--</ion-option>         
+          <ion-option value="0">--Seleccionar Barrio--</ion-option>         
           <ion-option *ngFor="let location of locations" value="{{ location.id }}">
             {{ location.name }}
           </ion-option> 
@@ -61,7 +49,7 @@
         </ion-label>
 
         <ion-select formControlName="place_two" cancelText="Cancelar">     
-          <ion-option value="0">--Barrio--</ion-option>    
+          <ion-option value="0">--Seleccionar Barrio--</ion-option>    
           <ion-option *ngFor="let location of locations" value="{{ location.id }}">
             {{ location.name }}
           </ion-option>                                                                                              
@@ -75,7 +63,7 @@
         </ion-label>
 
         <ion-select formControlName="place_three" cancelText="Cancelar">
-          <ion-option value="0">--Barrio--</ion-option>         
+          <ion-option value="0">--Seleccionar Barrio--</ion-option>         
           <ion-option *ngFor="let location of locations" value="{{ location.id }}">
             {{ location.name }}
           </ion-option> 
